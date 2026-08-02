@@ -1,0 +1,17 @@
+{
+  "name": "mahanaim-agents",
+  "version": "1.0.0",
+  "description": "Agentes de automatización para generar recursos del Centro de Recursos Bíblicos Mahanaim",
+  "type": "module",
+  "main": "src/cli.js",
+  "scripts": {
+    "generar": "node src/cli.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
