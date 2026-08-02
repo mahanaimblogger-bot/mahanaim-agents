@@ -1,0 +1,45 @@
+name: Generar estudio bíblico
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: "Libro (ej: genesis)"
+        required: true
+      capitulo:
+        description: "Capítulo (ej: 4)"
+        required: true
+      forzar:
+        description: "Regenerar aunque ya exista (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Generar el estudio
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --forzar=${{ github.event.inputs.forzar }}
+
+      - name: Subir el HTML generado como artefacto descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: estudio-generado
+          path: output/*.html
