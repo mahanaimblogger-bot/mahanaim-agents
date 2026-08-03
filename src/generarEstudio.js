@@ -119,7 +119,7 @@ sin usar cercas de código (\`\`\`).
   const respuestaCruda = await generarConDeepSeek(
     promptMaestro,
     mensajeUsuario,
-    16000 // los estudios son largos, dejamos margen generoso
+    32000 // los estudios son largos, dejamos margen generoso
   );
 
   const html = limpiarCercasDeCodigo(respuestaCruda);
