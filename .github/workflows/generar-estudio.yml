@@ -40,6 +40,12 @@ jobs:
 
       - name: Subir el HTML generado como artefacto descargable
         uses: actions/upload-artifact@v4
+        - name: Subir el HTML generado como artefacto descargable
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: estudio-generado
+          path: output/*.html
         with:
           name: estudio-generado
           path: output/*.html
