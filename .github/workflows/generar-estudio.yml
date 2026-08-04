@@ -39,13 +39,8 @@ jobs:
           node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --forzar=${{ github.event.inputs.forzar }}
 
       - name: Subir el HTML generado como artefacto descargable
-        uses: actions/upload-artifact@v4
-        - name: Subir el HTML generado como artefacto descargable
-        uses: actions/upload-artifact@v4
         if: always()
-        with:
-          name: estudio-generado
-          path: output/*.html
+        uses: actions/upload-artifact@v4
         with:
           name: estudio-generado
           path: output/*.html
