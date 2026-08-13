@@ -97,16 +97,16 @@ ESTRUCTURA DEL ESTUDIO HTML (ORDEN EXACTO)
 El HTML DEBE seguir exactamente este orden:
 
 1. IMAGEN DE PORTADA
-   - Si hay imagen: <div class="imagen-portada"><img alt="[TÍTULO]" src="[URL]" /></div>
-   - Si no hay imagen: OMITIR esta sección completamente.
+   - Si en los DATOS DE ENTRADA se proporcionó una URL de imagen real: <div class="imagen-portada"><img alt="[TÍTULO]" src="[URL]" /></div>
+   - Si NO se proporcionó imagen (dice "SIN IMAGEN"): en ese mismo lugar, justo antes del <h1>, agrega un comentario HTML con este formato exacto, describiendo una imagen de portada que capture visualmente la esencia del capítulo completo: <!-- IMAGEN_SUGERIDA_PORTADA: descripción breve y visual de la imagen de portada en español, útil como prompt para un generador de imágenes -->. NO omitas esta sugerencia — siempre debe generarse una, sin importar el capítulo.
 
 2. TÍTULO PRINCIPAL
    - <h1 class="titulo-entrada">TÍTULO IMPACTANTE</h1>
-   - El título NO debe ser "Estudio de [Libro] [Capítulo]". Debe ser una frase que capte la esencia del pasaje y genere curiosidad. Ejemplos:
-     * Para Romanos 8: "Nada te separará: La cadena de hierro que Dios rompió por ti"
-     * Para Salmo 23: "El pastor que camina hacia la muerte con su rebaño"
-     * Para Génesis 15: "Tu viejo yo no puede heredar la promesa"
-     * Para Apocalipsis 6: "Cuando el Cordero rompe los sellos: El día que nadie quiere ver llegar"
+   - El título NO debe ser "Estudio de [Libro] [Capítulo]". Debe ser una frase ORIGINAL que capte la esencia específica de ESTE pasaje y genere curiosidad — nunca genérico, nunca reciclado. Estilo de referencia (NO copies estos ejemplos ni los adaptes, son solo para mostrar el TONO):
+     * "Nada te separará: La cadena de hierro que Dios rompió por ti"
+     * "El pastor que camina hacia la muerte con su rebaño"
+     * "Cuando el Cordero rompe los sellos: El día que nadie quiere ver llegar"
+   - IMPORTANTE: crea un título 100% propio basado en el contenido específico del capítulo que estás generando ahora. Nunca reutilices, ni adaptes levemente, ninguno de los ejemplos de este prompt.
 
 3. VERSÍCULO(S) CLAVE(S)
    - <div class="cita-versiculo"><h3>REFERENCIA</h3><p>"TEXTO"</p></div>
