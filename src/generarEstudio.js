@@ -95,8 +95,12 @@ export async function generarEstudio({
     "utf-8"
   );
 
-  // 5. Leer indicaciones especiales guardadas en el repo (Opción A)
-  const indicacionEspecial = await leerIndicacionEspecial(libro, capitulo);
+ // 5. Indicaciones especiales: prioridad a lo escrito manualmente al correr
+  // el workflow; si no se escribió nada, se busca en indicaciones/<libro>.md
+  const indicacionEspecial =
+    indicacionManual && indicacionManual.trim().length > 0
+      ? indicacionManual.trim()
+      : await leerIndicacionEspecial(libro, capitulo);
 
   // 6. Armar el mensaje de datos de entrada
   const mensajeUsuario = `
