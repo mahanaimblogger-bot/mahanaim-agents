@@ -67,6 +67,7 @@ export async function generarEstudio({
   imagen = "SIN IMAGEN",
   minimoPalabras = 3500,
   forzar = false,
+  indicacionManual = null,
 }) {
   console.log(`\n📖 Generando estudio: ${libro} ${capitulo}...`);
 
