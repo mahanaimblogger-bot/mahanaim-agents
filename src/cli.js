@@ -38,6 +38,7 @@ Parámetros opcionales:
     imagen: args.imagen || "SIN IMAGEN",
     minimoPalabras: args.minimoPalabras ? parseInt(args.minimoPalabras, 10) : 3500,
     forzar: args.forzar === "true",
+    indicacionManual: args.indicaciones || null,
   });
 
   if (resultado.omitido) {
