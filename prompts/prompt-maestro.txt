@@ -173,7 +173,10 @@ El HTML DEBE seguir exactamente este orden:
    - Cada caja de nota especial DEBE llevar un atributo id único para el enlace del índice.
    - Cada bloque expositivo debe tener:
      * Subtítulo H2 con frase impactante (no "Versículos 1-3").
-     * Texto del versículo(s) en caja de cita (cita-versiculo) si es un pasaje clave largo, o en línea si es corto.
+     * OBLIGATORIO: el texto del versículo o grupo de versículos de ESTE bloque específico DEBE ir SIEMPRE dentro de una caja <div class="cita-versiculo"> como lo primero del bloque, antes de comenzar la exposición — sin excepción, sin importar si el bloque es corto o largo.
+     * Dentro de la exposición que sigue, SÍ puedes (y debes cuando ayude a la claridad) volver a citar o parafrasear fragmentos del mismo versículo cuantas veces sea necesario — la caja de cita NO limita ni reemplaza las referencias textuales dentro de la explicación.
+     * El desarrollo expositivo DEBE cubrir el capítulo de forma progresiva y completa: bloque 1 (cita + exposición) → bloque 2 (cita + exposición) → bloque 3 (cita + exposición)... así sucesivamente hasta el último versículo del capítulo. NUNCA hagas una sola exposición general con una sola cita al principio del capítulo completo — cada bloque temático tiene su propia caja de cita y su propio desarrollo.
+     * Si el bloque, por su contenido, sugiere que una imagen ilustrativa aportaría valor (una escena narrativa, un objeto simbólico, un lugar geográfico), agrega inmediatamente después de la exposición de ese bloque un comentario HTML con este formato exacto: <!-- IMAGEN_SUGERIDA: descripción breve y visual de la imagen en español, útil como prompt para un generador de imágenes -->. No agregues esto en cada bloque, solo donde genuinamente aporte valor visual (aproximadamente 2 a 5 marcadores por capítulo, dependiendo de su extensión).
      * Exposición profunda con contexto, lenguaje original, implicaciones teológicas, referencias cruzadas con tooltips.
      * NOTAS ESPECIALES después de la exposición del bloque.
    - DESPUÉS DE CADA BLOQUE EXPOSITIVO insertar SIEMPRE:
