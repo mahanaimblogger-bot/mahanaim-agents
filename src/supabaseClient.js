@@ -75,6 +75,26 @@ export async function obtenerOCrearChapterId(bookId, numeroCapitulo) {
 }
 
 /**
+/**
+ * Busca el chapter_id SIN crearlo. Devuelve null si el capítulo no existe.
+ * Útil para los agentes de imágenes, que solo deben LEER estudios que
+ * ya fueron generados antes — nunca crear un capítulo vacío por error.
+ */
+export async function buscarChapterId(bookId, numeroCapitulo) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("chapters")
+    .select("id")
+    .eq("book_id", bookId)
+    .eq("numero", numeroCapitulo)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Error buscando el capítulo: ${error.message}`);
+  }
+  return data ? data.id : null;
+}
  * Revisa si ya existe un recurso de cierto tipo para un chapter_id dado.
  */
 export async function existeRecurso(chapterId, tipo) {
