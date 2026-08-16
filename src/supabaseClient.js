@@ -116,6 +116,50 @@ export async function existeRecurso(chapterId, tipo) {
 }
 
 /**
+/**
+ * Busca el recurso ("estudio") completo de un chapter_id, con su
+ * contenido HTML. Devuelve null si no existe (en vez de lanzar error),
+ * para que el agente que llama pueda dar un mensaje amable en vez de
+ * "colgarse".
+ */
+export async function obtenerRecurso(chapterId, tipo) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("resources")
+    .select("id, titulo, contenido_html, publicado")
+    .eq("chapter_id", chapterId)
+    .eq("tipo", tipo)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Error buscando el recurso: ${error.message}`);
+  }
+  return data; // null si no existe
+}
+
+/**
+ * Actualiza el contenido_html de un recurso ya existente (por su id).
+ * Se usa en la Etapa 2B (incorporar imágenes) para reemplazar el HTML
+ * con marcadores por el HTML final con las imágenes ya insertadas.
+ */
+export async function actualizarContenidoRecurso(recursoId, nuevoHtml) {
+  if (!supabase) {
+    console.warn("No hay conexión a Supabase configurada — no se actualizó nada.");
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("resources")
+    .update({ contenido_html: nuevoHtml })
+    .eq("id", recursoId)
+    .select();
+
+  if (error) {
+    throw new Error(`Error actualizando el recurso: ${error.message}`);
+  }
+  return data;
+}
  * Guarda un recurso generado en Supabase con publicado=false (borrador),
  * para que lo revises en el panel admin antes de publicarlo.
  */
