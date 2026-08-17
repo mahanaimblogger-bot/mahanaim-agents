@@ -1,0 +1,40 @@
+name: Listar imágenes pendientes
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: "Libro (ej: genesis)"
+        required: true
+      capitulo:
+        description: "Capítulo (ej: 4)"
+        required: true
+
+jobs:
+  listar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Listar imágenes pendientes
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node src/cliImagenesPendientes.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }}
+
+      - name: Subir la lista como artefacto descargable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: imagenes-pendientes
+          path: output/*-imagenes-pendientes.txt
