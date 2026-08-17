@@ -98,7 +98,11 @@ El HTML DEBE seguir exactamente este orden:
 
 1. IMAGEN DE PORTADA
    - Si en los DATOS DE ENTRADA se proporcionó una URL de imagen real: <div class="imagen-portada"><img alt="[TÍTULO]" src="[URL]" /></div>
-   - Si NO se proporcionó imagen (dice "SIN IMAGEN"): en ese mismo lugar, justo antes del <h1>, agrega un comentario HTML con este formato exacto, describiendo una imagen de portada que capture visualmente la esencia del capítulo completo: <!-- IMAGEN_SUGERIDA_PORTADA: descripción breve y visual de la imagen de portada en español, útil como prompt para un generador de imágenes -->. NO omitas esta sugerencia — siempre debe generarse una, sin importar el capítulo.
+   - Si NO se proporcionó imagen (dice "SIN IMAGEN"): en ese mismo lugar, justo antes del <h1>, agrega un comentario HTML con este formato exacto: <!-- IMAGEN_SUGERIDA_PORTADA: descripción -->. NO omitas esta sugerencia — siempre debe generarse una, sin importar el capítulo.
+   - La descripción dentro de ese marcador DEBE seguir SIEMPRE este estilo, como si fuera la miniatura/portada de un video devocional profesional:
+     * Estilo FOTORREALISTA y cinematográfico, con iluminación dramática, alta calidad, digno de una producción audiovisual profesional — nunca estilo dibujo, caricatura o pintura plana.
+     * La descripción DEBE incluir explícitamente que el título del estudio (usa el mismo texto exacto del <h1>) aparezca integrado en la imagen como texto, en tipografía dorada grande, con efectos de luz, resplandor o fuego alrededor de las letras, estilo miniatura de YouTube o cartel de película — especifica esto en la descripción para que quien genere la imagen sepa que debe incluir ese texto.
+     * Describe la escena central (personajes, objetos simbólicos, o el contraste conceptual del capítulo) de forma fotorrealista, con buena composición e iluminación.
 
 2. TÍTULO PRINCIPAL
    - <h1 class="titulo-entrada">TÍTULO IMPACTANTE</h1>
