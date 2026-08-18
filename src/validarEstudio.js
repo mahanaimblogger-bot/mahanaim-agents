@@ -76,5 +76,28 @@ export function validarEstudio(html, minimoPalabras = 3500) {
     );
   }
 
+  // 10. Debe tener el marcador de imagen de portada
+  const tienePortada = /<!--\s*IMAGEN_SUGERIDA_PORTADA:/i.test(html);
+  if (!tienePortada) {
+    errores.push(
+      "Falta el marcador de imagen de portada (IMAGEN_SUGERIDA_PORTADA)."
+    );
+  }
+
+  // 11. Debe tener MÍNIMO 2 marcadores de recurso visual de contenido
+  //     (esto se valida por código, no solo confiando en que el modelo
+  //     siga la instrucción del prompt — así nunca pasa desapercibido
+  //     un estudio con 0 o 1 marcador).
+  const marcadoresContenido = (
+    html.match(/<!--\s*IMAGEN_SUGERIDA:/gi) || []
+  ).length;
+
+  if (marcadoresContenido < 2) {
+    errores.push(
+      `El estudio tiene ${marcadoresContenido} marcador(es) de recurso visual de contenido ` +
+        `(IMAGEN_SUGERIDA), por debajo del mínimo obligatorio de 2.`
+    );
+  }
+
   return { valido: errores.length === 0, errores };
 }
