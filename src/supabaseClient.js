@@ -18,7 +18,6 @@ export const supabase =
 
 /**
  * Busca el id de un libro por su slug (ej: "genesis", "1-samuel").
- * Corresponde a la tabla "books" (columnas: id, nombre, slug, testamento, capitulos...).
  */
 export async function obtenerBookIdPorSlug(slugLibro) {
   if (!supabase) return null;
@@ -42,9 +41,8 @@ export async function obtenerBookIdPorSlug(slugLibro) {
 }
 
 /**
- * Busca el id del capítulo (tabla "chapters") para un book_id + número dado.
- * Si el capítulo no existe todavía, lo crea automáticamente
- * (chapters solo tiene book_id, numero y resumen — no hace falta más para crearlo).
+ * Busca el id del capítulo para un book_id + número dado.
+ * Si el capítulo no existe todavía, lo crea automáticamente.
  */
 export async function obtenerOCrearChapterId(bookId, numeroCapitulo) {
   if (!supabase) return null;
@@ -76,8 +74,6 @@ export async function obtenerOCrearChapterId(bookId, numeroCapitulo) {
 
 /**
  * Busca el chapter_id SIN crearlo. Devuelve null si el capítulo no existe.
- * Útil para los agentes de imágenes, que solo deben LEER estudios que
- * ya fueron generados antes — nunca crear un capítulo vacío por error.
  */
 export async function buscarChapterId(bookId, numeroCapitulo) {
   if (!supabase) return null;
@@ -96,7 +92,8 @@ export async function buscarChapterId(bookId, numeroCapitulo) {
 }
 
 /**
- * Revisa si ya existe un recurso de cierto tipo para un chapter_id dado.
+ * Revisa si ya existe AL MENOS UN recurso de cierto tipo para un
+ * chapter_id dado (sin importar si es borrador o publicado).
  */
 export async function existeRecurso(chapterId, tipo) {
   if (!supabase) return false;
@@ -117,10 +114,9 @@ export async function existeRecurso(chapterId, tipo) {
 }
 
 /**
- * Busca el recurso ("estudio") completo de un chapter_id, con su
- * contenido HTML. Devuelve null si no existe (en vez de lanzar error),
- * para que el agente que llama pueda dar un mensaje amable en vez de
- * "colgarse".
+ * Busca UN recurso (el más reciente) de cierto tipo para un chapter_id.
+ * Si puede haber un borrador Y un publicado a la vez, usa
+ * obtenerRecursosPorTipo() en su lugar para verlos todos.
  */
 export async function obtenerRecurso(chapterId, tipo) {
   if (!supabase) return null;
@@ -130,6 +126,8 @@ export async function obtenerRecurso(chapterId, tipo) {
     .select("id, titulo, contenido_html, publicado")
     .eq("chapter_id", chapterId)
     .eq("tipo", tipo)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
@@ -139,9 +137,27 @@ export async function obtenerRecurso(chapterId, tipo) {
 }
 
 /**
+ * Devuelve TODOS los recursos de un tipo para un chapter_id (puede haber
+ * 0, 1, o hasta 2 a la vez: un borrador pendiente + uno publicado).
+ */
+export async function obtenerRecursosPorTipo(chapterId, tipo) {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("resources")
+    .select("id, titulo, contenido_html, publicado, created_at")
+    .eq("chapter_id", chapterId)
+    .eq("tipo", tipo)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error(`Error buscando recursos: ${error.message}`);
+  }
+  return data || [];
+}
+
+/**
  * Actualiza el contenido_html de un recurso ya existente (por su id).
- * Se usa en la Etapa 2B (incorporar imágenes) para reemplazar el HTML
- * con marcadores por el HTML final con las imágenes ya insertadas.
  */
 export async function actualizarContenidoRecurso(recursoId, nuevoHtml) {
   if (!supabase) {
@@ -162,8 +178,65 @@ export async function actualizarContenidoRecurso(recursoId, nuevoHtml) {
 }
 
 /**
+ * Borra un recurso por su id.
+ */
+export async function eliminarRecurso(recursoId) {
+  if (!supabase) return null;
+
+  const { error } = await supabase.from("resources").delete().eq("id", recursoId);
+
+  if (error) {
+    throw new Error(`Error eliminando el recurso: ${error.message}`);
+  }
+  return true;
+}
+
+/**
+ * Marca un recurso como publicado (publicado: true).
+ */
+export async function publicarRecurso(recursoId) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("resources")
+    .update({ publicado: true })
+    .eq("id", recursoId)
+    .select();
+
+  if (error) {
+    throw new Error(`Error publicando el recurso: ${error.message}`);
+  }
+  return data;
+}
+
+/**
+ * Borra el borrador pendiente (publicado: false) de un chapter_id + tipo,
+ * si existe. Se usa antes de generar de nuevo con forzar=true, para no
+ * acumular borradores viejos sin aprobar. NUNCA toca el recurso publicado.
+ */
+export async function eliminarBorradorExistente(chapterId, tipo) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("resources")
+    .delete()
+    .eq("chapter_id", chapterId)
+    .eq("tipo", tipo)
+    .eq("publicado", false)
+    .select();
+
+  if (error) {
+    throw new Error(`Error eliminando el borrador anterior: ${error.message}`);
+  }
+  if (data && data.length > 0) {
+    console.log(`   🗑️  Borrador anterior eliminado (id=${data[0].id}).`);
+  }
+  return data;
+}
+
+/**
  * Guarda un recurso generado en Supabase con publicado=false (borrador),
- * para que lo revises en el panel admin antes de publicarlo.
+ * para que lo revises antes de publicarlo con el agente "Aprobar estudio".
  */
 export async function guardarRecursoComoBorrador({
   chapterId,
@@ -202,8 +275,6 @@ export async function guardarRecursoComoBorrador({
 
 /**
  * Devuelve el texto real (RVR1960) de un versículo desde la tabla "verses".
- * Útil para, más adelante, validar que los tooltips del HTML generado
- * no contengan citas alucinadas por el modelo.
  */
 export async function obtenerVersiculo(bookId, capitulo, verso) {
   if (!supabase) return null;
