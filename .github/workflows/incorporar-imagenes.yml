@@ -39,3 +39,16 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           node src/cliIncorporarImagenes.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --portada="${{ github.event.inputs.portada }}" --imagenes="${{ github.event.inputs.imagenes }}"
+       - name: Notificar éxito en Telegram
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="🖼️ Lista de imágenes pendientes generada%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A👉 Descarga el archivo .txt desde los Artifacts y genera las imágenes."
+
+      - name: Notificar fallo en Telegram
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ Error al listar imágenes pendientes%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A🔗 Ver detalles: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
