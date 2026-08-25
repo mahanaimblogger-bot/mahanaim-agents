@@ -35,3 +35,17 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           node src/cliAprobar.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --tipo=${{ github.event.inputs.tipo }}
+
+      - name: Notificar éxito en Telegram
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="🎉 Estudio aprobado y publicado%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A✅ Ya está visible en tu sitio web."
+
+      - name: Notificar fallo en Telegram
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ Error al aprobar el estudio%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A🔗 Ver detalles: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
