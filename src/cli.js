@@ -20,13 +20,14 @@ async function main() {
 Uso:
   node src/cli.js --libro=genesis --capitulo=4
   node src/cli.js --libro=genesis --capitulo=4 --video=https://youtube.com/watch?v=XXXX
-  node src/cli.js --libro=genesis --capitulo=4 --forzar=true
+  node src/cli.js --libro=genesis --capitulo=4 --regenerar=true
 
 Parámetros opcionales:
-  --video=URL         Enlace de YouTube (por defecto: SIN VIDEO)
-  --imagen=URL        Enlace de imagen de portada (por defecto: SIN IMAGEN)
-  --minimoPalabras=N  Mínimo de palabras a exigir (por defecto: 3500)
-  --forzar=true       Regenera aunque ya exista el recurso
+  --video=URL           Enlace de YouTube (por defecto: SIN VIDEO)
+  --imagen=URL          Enlace de imagen de portada (por defecto: SIN IMAGEN)
+  --minimoPalabras=N    Mínimo de palabras a exigir (por defecto: 3500)
+  --regenerar=true      Regenera aunque ya exista el recurso
+  --indicaciones="..."  Indicación especial para este capítulo (opcional)
 `);
     process.exit(1);
   }
@@ -37,7 +38,7 @@ Parámetros opcionales:
     video: args.video || "SIN VIDEO",
     imagen: args.imagen || "SIN IMAGEN",
     minimoPalabras: args.minimoPalabras ? parseInt(args.minimoPalabras, 10) : 3500,
-    forzar: args.forzar === "true",
+    forzar: args.regenerar === "true",
     indicacionManual: args.indicaciones || null,
   });
 
