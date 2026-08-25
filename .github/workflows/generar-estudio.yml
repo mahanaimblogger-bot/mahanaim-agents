@@ -9,8 +9,8 @@ on:
       capitulo:
         description: "Capítulo (ej: 4)"
         required: true
-      forzar:
-        description: "Regenerar aunque ya exista (true/false)"
+      regenerar:
+        description: "¿Regenerar si ya existe un estudio para este capítulo? (true/false)"
         required: false
         default: "false"
       indicaciones:
@@ -40,7 +40,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --forzar=${{ github.event.inputs.forzar }} --indicaciones="${{ github.event.inputs.indicaciones }}"
+                    node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --forzar=${{ github.event.inputs.regenerar }} --indicaciones="${{ github.event.inputs.indicaciones }}"
 
       - name: Subir el HTML generado como artefacto descargable
         if: always()
