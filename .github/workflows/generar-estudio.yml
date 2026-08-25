@@ -48,3 +48,17 @@ jobs:
         with:
           name: estudio-generado
           path: output/*.html
+
+      - name: Notificar éxito en Telegram
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="✅ Estudio generado correctamente%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A👉 Recuerda aprobarlo cuando lo hayas revisado."
+
+      - name: Notificar fallo en Telegram
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ Error al generar el estudio%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Capítulo: ${{ github.event.inputs.capitulo }}%0A🔗 Ver detalles: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
