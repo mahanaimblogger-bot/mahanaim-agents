@@ -93,6 +93,9 @@ export async function generarEstudio({
       ? indicacionManual.trim()
       : await leerIndicacionEspecial(libro, capitulo);
 
+   // OBTENER EL TEXTO REAL DEL CAPÍTULO PARA INYECTAR EN EL PROMPT
+  const textoCapituloReal = await obtenerTextoCapituloCompleto(bookId, capitulo);
+
   const mensajeUsuario = `
 DATOS DE ENTRADA:
 - Libro: ${libro}
@@ -101,9 +104,21 @@ DATOS DE ENTRADA:
 - Enlace de video YouTube: ${video}
 - Enlace de imagen de portada: ${imagen}
 
+=========================================================
+⚠️ REGLA ABSOLUTA SOBRE CITAS BÍBLICAS (ANTI-ALUCINACIÓN) ⚠️
+A continuación te proporciono el texto EXACTO de este capítulo en la versión Reina-Valera 1960 (RVR1960) desde nuestra base de datos oficial.
+
+TEXTO BÍBLICO DEL CAPÍTULO A ESTUDIAR:
+${textoCapituloReal}
+
+INSTRUCCIONES OBLIGATORIAS:
+1. Cualquier cita del capítulo que estás estudiando DEBE ser una copia exacta, palabra por palabra, del texto proporcionado arriba. TIENES PROHIBIDO parafrasear, inventar, o modificar una sola coma.
+2. Para las REFERENCIAS CRUZADAS a otros libros/capítulos: usa SOLO citas que conozcas con 100% de certeza en la versión RVR1960. Si tienes la más mínima duda del texto exacto de una referencia cruzada, NO pongas el texto en el tooltip — solo deja la referencia (ej: "Ver Hebreos 11:4") sin el tooltip de texto.
+3. NUNCA inventes un versículo. Es preferible omitir un tooltip a inventar una cita.
+=========================================================
+
 Genera el estudio completo siguiendo EXACTAMENTE las instrucciones del Prompt Maestro.
-Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después,
-sin usar cercas de código (\`\`\`).
+Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
 `.trim();
 
   console.log(
