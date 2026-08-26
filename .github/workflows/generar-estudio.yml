@@ -39,9 +39,8 @@ jobs:
           DEEPSEEK_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-                    node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --forzar=${{ github.event.inputs.regenerar }} --indicaciones="${{ github.event.inputs.indicaciones }}"
-
+          run: |
+             node src/cli.js --libro=${{ github.event.inputs.libro }} --capitulo=${{ github.event.inputs.capitulo }} --regenerar=${{ github.event.inputs.regenerar }} --indicaciones="${{ github.event.inputs.indicaciones }}"
       - name: Subir el HTML generado como artefacto descargable
         if: always()
         uses: actions/upload-artifact@v4
