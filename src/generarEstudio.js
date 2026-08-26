@@ -133,7 +133,7 @@ Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o d
 
   const html = limpiarCercasDeCodigo(respuestaCruda);
 
-  const { valido, errores } = validarEstudio(html, minimoPalabras);
+    const { valido, errores, htmlCorregido, citasCorregidas } = await validarEstudio(html, minimoPalabras);
 
   await mkdir(path.join(process.cwd(), "output"), { recursive: true });
   const rutaLocal = path.join(
@@ -141,7 +141,7 @@ Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o d
     "output",
     `${libro}-${capitulo}.html`
   );
-  await writeFile(rutaLocal, html, "utf-8");
+  await writeFile(rutaLocal, htmlCorregido, "utf-8");
   console.log(`   💾 Copia local guardada en: ${rutaLocal}`);
 
   if (!valido) {
@@ -155,7 +155,11 @@ Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o d
 
   console.log("   ✅ Validación automática superada.");
 
-  const titulo = extraerTitulo(html, libro, capitulo);
+  if (citasCorregidas > 0) {
+    console.log(`   🔧 ${citasCorregidas} cita(s) bíblica(s) fueron corregidas automáticamente con el texto de Supabase.`);
+  }
+
+  const titulo = extraerTitulo(htmlCorregido, libro, capitulo);
   const slug = generarSlug(libro, capitulo, "estudio");
 
   await guardarRecursoComoBorrador({
@@ -163,9 +167,8 @@ Recuerda: responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o d
     tipo: "estudio",
     titulo,
     slug,
-    contenidoHtml: html,
-  });
-  console.log(
+    contenidoHtml: htmlCorregido,
+  });  console.log(
     `   ☁️  Guardado en Supabase como BORRADOR (publicado=false). Título: "${titulo}"`
   );
   console.log(
