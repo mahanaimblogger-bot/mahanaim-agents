@@ -297,6 +297,26 @@ export async function obtenerTextoCapituloCompleto(bookId, capitulo) {
 
   return data.map(v => `${v.verse}. ${v.text}`).join("\n");
 }
+/**
+ * Devuelve el texto real (RVR1960) de un versículo desde la tabla "verses".
+ */
+export async function obtenerVersiculo(bookId, capitulo, verso) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("verses")
+    .select("text")
+    .eq("book_id", bookId)
+    .eq("chapter", capitulo)
+    .eq("verse", verso)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error consultando la tabla verses:", error.message);
+    return null;
+  }
+  return data ? data.text : null;
+}
 
 /**
  * Obtiene el texto de un versículo específico usando el slug del libro.
