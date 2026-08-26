@@ -34,7 +34,7 @@ async function obtenerSlugLibro(nombreLibro) {
 
 /**
  * Validaciones automáticas + CORRECCIÓN AUTOMÁTICA de citas.
- * 1. Verifica que las citas en cajas estén correctas
+ * 1. Verifica que los tooltips existentes estén correctos
  * 2. Detecta referencias cruzadas sin tooltip y las corrige automáticamente
  */
 export async function validarEstudio(html, minimoPalabras = 3500) {
@@ -123,7 +123,6 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
           const porcentaje = (coincidencias / palabrasReales.length) * 100;
 
           if (porcentaje < 85) {
-            // Corregir tooltip existente
             const tooltipCorregido = `<span class="tooltip-cita">${cita.referenciaCompleta}</span>${textoReal}`;
             htmlCorregido = htmlCorregido.replace(cita.matchCompleto, tooltipCorregido);
             console.log(`   ✅ Tooltip "${cita.referenciaCompleta}" corregido (coincidencia: ${porcentaje.toFixed(0)}%).`);
@@ -137,45 +136,49 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   }
 
   // PASO 2: Detectar referencias cruzadas SIN tooltip y agregarlas
-  // Busca patrones como: (Dt 34:8), (Éx 28:35,43), (Ro 4:17), (Sal 1:2)
-  // Pero IGNORA las que ya están dentro de <span class="biblia-ref">
-  const referenciasDesnudasRegex = /(?<!<span class="biblia-ref">[^<]*?)\(([a-zA-ZáéíóúñÁÉÍÓÑ\s\-]+?)\s+(\d+):(\d+(?:,\d+)*?)\)(?![^<]*?<\/span>)/g;
-  let matchRef;
-  const referenciasAProcesar = [];
-
-  // Resetear el regex
-  const htmlSinTooltips = htmlCorregido.replace(/<span class="biblia-ref">[\s\S]*?<\/span>/g, '');
+  // Regex segura para Node.js: busca patrones como (Dt 34:8), (Éx 28:35,43), (Ro 4:17)
+  const referenciasDesnudasRegex = /\(([a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-]+?)\s+(\d+):(\d+(?:,\d+)*?)\)/g;
   
-  while ((matchRef = referenciasDesnudasRegex.exec(htmlSinTooltips)) !== null) {
-    referenciasAProcesar.push({
-      nombreLibro: matchRef[1].trim(),
-      capitulo: parseInt(matchRef[2], 10),
-      versos: matchRef[3], // Puede ser "17" o "35,43"
-      textoOriginal: matchRef[0],
-    });
-  }
-
-  for (const ref of referenciasAProcesar) {
-    const slugLibro = await obtenerSlugLibro(ref.nombreLibro);
-
-    if (slugLibro) {
-      // Obtener el primer verso del rango (si es "35,43", tomamos 35)
-      const primerVerso = parseInt(ref.versos.split(',')[0], 10);
+  // Dividimos el HTML para NO tocar lo que ya está dentro de <span class="biblia-ref">
+  const partes = htmlCorregido.split(/(<span class="biblia-ref">[\s\S]*?<\/span>)/g);
+  
+  for (let i = 0; i < partes.length; i++) {
+    const parte = partes[i];
+    // Si la parte NO es un span de biblia-ref (los impares son los spans por el split con captura)
+    if (!parte.startsWith('<span class="biblia-ref">')) {
+      // Encontrar todas las coincidencias en esta parte
+      const coincidencias = [...parte.matchAll(referenciasDesnudasRegex)];
       
-      const textoReal = await obtenerVersiculoPorSlug(slugLibro, ref.capitulo, primerVerso);
+      // Procesamos de atrás hacia adelante para no alterar los índices de reemplazo
+      for (let j = coincidencias.length - 1; j >= 0; j--) {
+        const match = coincidencias[j];
+        const nombreLibro = match[1].trim();
+        const capitulo = parseInt(match[2], 10);
+        const versos = match[3];
+        const matchTexto = match[0];
+        const startIndex = match.index;
+        const endIndex = startIndex + matchTexto.length;
 
-      if (textoReal) {
-        // Crear el HTML completo con tooltip
-        const referenciaFormateada = `${ref.nombreLibro} ${ref.capitulo}:${ref.versos}`;
-        const htmlConTooltip = `<span class="biblia-ref">${referenciaFormateada}<span class="tooltip-text"><span class="tooltip-cita">${referenciaFormateada}</span>${textoReal}</span></span>`;
-        
-        // Reemplazar la referencia desnuda por la versión con tooltip
-        htmlCorregido = htmlCorregido.replace(`(${ref.nombreLibro} ${ref.capitulo}:${ref.versos})`, htmlConTooltip);
-        console.log(`   ➕ Agregado tooltip para "${referenciaFormateada}"`);
-        referenciasAgregadas++;
+        const slugLibro = await obtenerSlugLibro(nombreLibro);
+        if (slugLibro) {
+          const primerVerso = parseInt(versos.split(',')[0], 10);
+          const textoReal = await obtenerVersiculoPorSlug(slugLibro, capitulo, primerVerso);
+
+          if (textoReal) {
+            const referenciaFormateada = `${nombreLibro} ${capitulo}:${versos}`;
+            const htmlConTooltip = `<span class="biblia-ref">${referenciaFormateada}<span class="tooltip-text"><span class="tooltip-cita">${referenciaFormateada}</span>${textoReal}</span></span>`;
+            
+            // Reemplazar en la parte
+            partes[i] = partes[i].substring(0, startIndex) + htmlConTooltip + partes[i].substring(endIndex);
+            console.log(`   ➕ Agregado tooltip para "${referenciaFormateada}"`);
+            referenciasAgregadas++;
+          }
+        }
       }
     }
   }
+  
+  htmlCorregido = partes.join('');
 
   console.log(`   📊 Resumen: ${citasValidadas} tooltips validados | ${citasCorregidas} corregidos | ${referenciasAgregadas} nuevos tooltips agregados`);
 
