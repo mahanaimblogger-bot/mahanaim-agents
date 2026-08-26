@@ -33,8 +33,9 @@ async function obtenerSlugLibro(nombreLibro) {
 }
 
 /**
- * Validaciones automáticas + CORRECCIÓN AUTOMÁTICA de citas incorrectas.
- * Reemplaza directamente las citas dudosas con el texto real de Supabase.
+ * Validaciones automáticas + CORRECCIÓN AUTOMÁTICA de citas.
+ * 1. Verifica que las citas en cajas estén correctas
+ * 2. Detecta referencias cruzadas sin tooltip y las corrige automáticamente
  */
 export async function validarEstudio(html, minimoPalabras = 3500) {
   const errores = [];
@@ -83,23 +84,24 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   // ==========================================================
   console.log("   🔍 Verificando y corrigiendo citas bíblicas contra la base de datos...");
   
-  // Regex para encontrar tooltips completos
+  let citasCorregidas = 0;
+  let citasValidadas = 0;
+  let referenciasAgregadas = 0;
+
+  // PASO 1: Verificar tooltips existentes contra Supabase
   const tooltipRegex = /<span class="tooltip-cita">(.*?)<\/span>([\s\S]*?)(?=<\/span>\s*<\/span>)/g;
   let match;
-  const citasAProcesar = [];
+  const tooltipsExistentes = [];
 
   while ((match = tooltipRegex.exec(html)) !== null) {
-    citasAProcesar.push({
+    tooltipsExistentes.push({
       referenciaCompleta: match[1].trim(),
       textoTooltip: match[2].trim(),
       matchCompleto: match[0],
     });
   }
 
-  let citasCorregidas = 0;
-  let citasValidadas = 0;
-
-  for (const cita of citasAProcesar) {
+  for (const cita of tooltipsExistentes) {
     const matchRef = cita.referenciaCompleta.match(/^([a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-]+?)\s+(\d+):(\d+)/i);
     
     if (matchRef) {
@@ -121,10 +123,10 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
           const porcentaje = (coincidencias / palabrasReales.length) * 100;
 
           if (porcentaje < 85) {
-            // REEMPLAZAR DIRECTAMENTE con el texto correcto de Supabase
+            // Corregir tooltip existente
             const tooltipCorregido = `<span class="tooltip-cita">${cita.referenciaCompleta}</span>${textoReal}`;
             htmlCorregido = htmlCorregido.replace(cita.matchCompleto, tooltipCorregido);
-            console.log(`   ✅ Cita "${cita.referenciaCompleta}" corregida automáticamente (coincidencia era: ${porcentaje.toFixed(0)}%).`);
+            console.log(`   ✅ Tooltip "${cita.referenciaCompleta}" corregido (coincidencia: ${porcentaje.toFixed(0)}%).`);
             citasCorregidas++;
           } else {
             citasValidadas++;
@@ -134,14 +136,55 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
     }
   }
 
-  console.log(`   ✅ Citas validadas: ${citasValidadas} | Citas corregidas automáticamente: ${citasCorregidas}`);
+  // PASO 2: Detectar referencias cruzadas SIN tooltip y agregarlas
+  // Busca patrones como: (Dt 34:8), (Éx 28:35,43), (Ro 4:17), (Sal 1:2)
+  // Pero IGNORA las que ya están dentro de <span class="biblia-ref">
+  const referenciasDesnudasRegex = /(?<!<span class="biblia-ref">[^<]*?)\(([a-zA-ZáéíóúñÁÉÍÓÑ\s\-]+?)\s+(\d+):(\d+(?:,\d+)*?)\)(?![^<]*?<\/span>)/g;
+  let matchRef;
+  const referenciasAProcesar = [];
 
-    const valido = errores.length === 0;
+  // Resetear el regex
+  const htmlSinTooltips = htmlCorregido.replace(/<span class="biblia-ref">[\s\S]*?<\/span>/g, '');
+  
+  while ((matchRef = referenciasDesnudasRegex.exec(htmlSinTooltips)) !== null) {
+    referenciasAProcesar.push({
+      nombreLibro: matchRef[1].trim(),
+      capitulo: parseInt(matchRef[2], 10),
+      versos: matchRef[3], // Puede ser "17" o "35,43"
+      textoOriginal: matchRef[0],
+    });
+  }
+
+  for (const ref of referenciasAProcesar) {
+    const slugLibro = await obtenerSlugLibro(ref.nombreLibro);
+
+    if (slugLibro) {
+      // Obtener el primer verso del rango (si es "35,43", tomamos 35)
+      const primerVerso = parseInt(ref.versos.split(',')[0], 10);
+      
+      const textoReal = await obtenerVersiculoPorSlug(slugLibro, ref.capitulo, primerVerso);
+
+      if (textoReal) {
+        // Crear el HTML completo con tooltip
+        const referenciaFormateada = `${ref.nombreLibro} ${ref.capitulo}:${ref.versos}`;
+        const htmlConTooltip = `<span class="biblia-ref">${referenciaFormateada}<span class="tooltip-text"><span class="tooltip-cita">${referenciaFormateada}</span>${textoReal}</span></span>`;
+        
+        // Reemplazar la referencia desnuda por la versión con tooltip
+        htmlCorregido = htmlCorregido.replace(`(${ref.nombreLibro} ${ref.capitulo}:${ref.versos})`, htmlConTooltip);
+        console.log(`   ➕ Agregado tooltip para "${referenciaFormateada}"`);
+        referenciasAgregadas++;
+      }
+    }
+  }
+
+  console.log(`   📊 Resumen: ${citasValidadas} tooltips validados | ${citasCorregidas} corregidos | ${referenciasAgregadas} nuevos tooltips agregados`);
+
+  const valido = errores.length === 0;
 
   return { 
     valido, 
     errores, 
     htmlCorregido,
-    citasCorregidas 
+    citasCorregidas: citasCorregidas + referenciasAgregadas 
   };
 }
