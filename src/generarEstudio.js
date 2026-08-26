@@ -9,6 +9,7 @@ import {
   existeRecurso,
   eliminarRecursoExistente,
   guardarRecursoComoBorrador,
+  obtenerTextoCapituloCompleto,
 } from "./supabaseClient.js";
 
 /**
