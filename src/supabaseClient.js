@@ -210,26 +210,29 @@ export async function publicarRecurso(recursoId) {
 }
 
 /**
- * Borra el borrador pendiente (publicado: false) de un chapter_id + tipo,
- * si existe. Se usa antes de generar de nuevo con forzar=true, para no
- * acumular borradores viejos sin aprobar. NUNCA toca el recurso publicado.
+ * Borra CUALQUIER recurso pendiente o publicado de un chapter_id + tipo,
+ * si existe. Se usa cuando forzar=true, para garantizar que no se dupliquen
+ * registros en la base de datos (reemplaza en lugar de acumular).
  */
-export async function eliminarBorradorExistente(chapterId, tipo) {
+export async function eliminarRecursoExistente(chapterId, tipo) {
   if (!supabase) return null;
 
+  // NOTA: Eliminamos la condición .eq("publicado", false) para que borre
+  // tanto borradores como versiones ya publicadas, evitando duplicados.
   const { data, error } = await supabase
     .from("resources")
     .delete()
     .eq("chapter_id", chapterId)
     .eq("tipo", tipo)
-    .eq("publicado", false)
     .select();
 
   if (error) {
-    throw new Error(`Error eliminando el borrador anterior: ${error.message}`);
+    throw new Error(`Error eliminando el recurso anterior: ${error.message}`);
   }
   if (data && data.length > 0) {
-    console.log(`   🗑️  Borrador anterior eliminado (id=${data[0].id}).`);
+    console.log(`   🗑️  Recurso anterior eliminado (id=${data[0].id}, publicado=${data[0].publicado}).`);
+  } else {
+    console.log(`   ℹ️  No existía un recurso previo para este capítulo.`);
   }
   return data;
 }
