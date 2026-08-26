@@ -79,7 +79,7 @@ export async function generarEstudio({
       return { omitido: true };
     }
   } else {
-    await eliminarBorradorExistente(chapterId, "estudio");
+    await eliminarRecursoExistente(chapterId, "estudio");
   }
 
   const promptMaestro = await readFile(
