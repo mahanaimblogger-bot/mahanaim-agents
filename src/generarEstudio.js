@@ -7,7 +7,7 @@ import {
   obtenerBookIdPorSlug,
   obtenerOCrearChapterId,
   existeRecurso,
-  eliminarBorradorExistente,
+  eliminarRecursoExistente,
   guardarRecursoComoBorrador,
 } from "./supabaseClient.js";
 
