@@ -277,22 +277,37 @@ export async function guardarRecursoComoBorrador({
 }
 
 /**
- * Devuelve el texto real (RVR1960) de un versículo desde la tabla "verses".
+ * Obtiene TODOS los versículos de un capítulo específico de una sola vez.
+ * Devuelve un string formateado listo para ser inyectado en el Prompt.
  */
-export async function obtenerVersiculo(bookId, capitulo, verso) {
-  if (!supabase) return null;
+export async function obtenerTextoCapituloCompleto(bookId, capitulo) {
+  if (!supabase) return "NO DISPONIBLE";
 
   const { data, error } = await supabase
     .from("verses")
-    .select("text")
+    .select("verse, text")
     .eq("book_id", bookId)
     .eq("chapter", capitulo)
-    .eq("verse", verso)
-    .maybeSingle();
+    .order("verse", { ascending: true });
 
-  if (error) {
-    console.error("Error consultando la tabla verses:", error.message);
-    return null;
+  if (error || !data || data.length === 0) {
+    console.warn(`⚠️ No se pudieron cargar los versículos para el capítulo ${capitulo}.`);
+    return "NO DISPONIBLE";
   }
-  return data ? data.text : null;
+
+  return data.map(v => `${v.verse}. ${v.text}`).join("\n");
+}
+
+/**
+ * Obtiene el texto de un versículo específico usando el slug del libro.
+ * Útil para validar referencias cruzadas sin tener que buscar el book_id primero.
+ */
+export async function obtenerVersiculoPorSlug(slugLibro, capitulo, verso) {
+  if (!supabase) return null;
+
+  // Primero buscamos el book_id
+  const libroInfo = await obtenerBookIdPorSlug(slugLibro);
+  if (!libroInfo) return null;
+
+  return await obtenerVersiculo(libroInfo.id, capitulo, verso);
 }
