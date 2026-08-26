@@ -136,4 +136,12 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
 
   console.log(`   ✅ Citas validadas: ${citasValidadas} | Citas corregidas automáticamente: ${citasCorregidas}`);
 
-  const valido = errores.length
+    const valido = errores.length === 0;
+
+  return { 
+    valido, 
+    errores, 
+    htmlCorregido,
+    citasCorregidas 
+  };
+}
