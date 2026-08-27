@@ -1,0 +1,75 @@
+name: Orquestar Recursos de un Capítulo
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: "Libro (ej: josue)"
+        required: true
+      capitulo:
+        description: "Capítulo (ej: 1)"
+        required: true
+      url_video:
+        description: "URL de Video (opcional, deja en blanco para omitir)"
+        required: false
+        default: ""
+      url_imagen:
+        description: "URL de Imagen/Portada (opcional)"
+        required: false
+        default: ""
+      url_audio:
+        description: "URL de Audio/Podcast (opcional)"
+        required: false
+        default: ""
+      url_mapa:
+        description: "URL de Mapa Interactivo (opcional)"
+        required: false
+        default: ""
+      url_diapositiva:
+        description: "URL de Diapositivas (opcional)"
+        required: false
+        default: ""
+      url_testimonio:
+        description: "URL de Testimonio (opcional)"
+        required: false
+        default: ""
+
+jobs:
+  orquestar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar Orquestador
+        env:
+          LLM_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          LLM_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node src/orquestador.js \
+            --libro=${{ github.event.inputs.libro }} \
+            --capitulo=${{ github.event.inputs.capitulo }} \
+            --url_video=${{ github.event.inputs.url_video || 'SIN_URL' }} \
+            --url_imagen=${{ github.event.inputs.url_imagen || 'SIN_URL' }} \
+            --url_audio=${{ github.event.inputs.url_audio || 'SIN_URL' }} \
+            --url_mapa=${{ github.event.inputs.url_mapa || 'SIN_URL' }} \
+            --url_diapositiva=${{ github.event.inputs.url_diapositiva || 'SIN_URL' }} \
+            --url_testimonio=${{ github.event.inputs.url_testimonio || 'SIN_URL' }}
+
+      - name: Notificar resultado en Telegram
+        if: always()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="🤖 Orquestador finalizado para ${{ github.event.inputs.libro }} ${{ github.event.inputs.capitulo }}.%0ARevisa los borradores en el panel de administración."
