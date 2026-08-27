@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { supabase, obtenerBookIdPorSlug, obtenerOCrearChapterId, obtenerTextoCapituloCompleto, guardarRecursoComoBorrador } from "./supabaseClient.js";
 import { generarPromptRecurso } from "./promptsRecursos.js";
+import { formatearRecurso } from "./formateadores.js"; // <-- NUEVO IMPORT
 
 // Recursos que la IA puede generar automáticamente
 const RECURSOS_IA = [
@@ -77,13 +78,12 @@ async function main() {
   if (faltantesIA.length === 0) {
     console.log("✅ Todos los recursos de IA para este capítulo ya están generados.");
   } else {
-    console.log(`🤖 Recursos de IA a generar: ${faltantesIA.join(", ")}`);
+    console.log(` Recursos de IA a generar: ${faltantesIA.join(", ")}`);
     
-    // Obtener texto del capítulo para inyección anti-alucinación
     const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
 
     for (const tipo of faltantesIA) {
-      console.log(`\n⏳ Generando: ${tipo}...`);
+      console.log(`\n Generando: ${tipo}...`);
       try {
         const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo);
         const respuestaCruda = await llamarIA(prompt);
@@ -94,8 +94,12 @@ async function main() {
         try {
           datos = JSON.parse(jsonLimpio);
         } catch {
+          // Si falla el parse, creamos un objeto básico para que el formateador lo maneje
           datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: jsonLimpio };
         }
+
+        // 🔥 CORRECCIÓN CLAVE: Formatear el JSON a HTML antes de guardar
+        const htmlFinal = formatearRecurso(tipo, datos);
 
         // Guardar en Supabase como borrador
         await guardarRecursoComoBorrador({
@@ -103,11 +107,10 @@ async function main() {
           tipo: datos.tipo || tipo,
           titulo: datos.titulo || `Recurso de ${tipo}`,
           slug: `${libro}-${capituloNum}-${tipo}`,
-          contenidoHtml: datos.contenido_html || JSON.stringify(datos),
+          contenidoHtml: htmlFinal, // <-- Ahora guardamos el HTML limpio
         });
         console.log(`   ✅ ${tipo} guardado como borrador.`);
         
-        // Pausa de 3 segundos para no saturar la API
         await new Promise(r => setTimeout(r, 3000));
       } catch (err) {
         console.error(`   ❌ Error generando ${tipo}:`, err.message);
@@ -121,7 +124,7 @@ async function main() {
   
   for (const tipo of RECURSOS_EXTERNOS) {
     if (tiposExistentes.includes(tipo)) {
-      console.log(`   ⏭️ ${tipo} ya existe, se omite.`);
+      console.log(`   ️ ${tipo} ya existe, se omite.`);
       continue;
     }
     
@@ -138,7 +141,7 @@ async function main() {
       });
       console.log(`   ✅ ${tipo} agregado con URL.`);
     } else {
-      console.log(`   ⚠️ ${tipo} omitido (sin URL). Podrás agregarlo luego en el panel Admin.`);
+      console.log(`   ️ ${tipo} omitido (sin URL). Podrás agregarlo luego en el panel Admin.`);
       externosPendientes.push(tipo);
     }
   }
@@ -148,7 +151,7 @@ async function main() {
   const tiposFinales = recursosFinales.map(r => r.tipo);
   
   if (faltantesIA.length === 0 && externosPendientes.length === 0) {
-    console.log("\n ¡ÉXITO! Este capítulo ya tiene todos los recursos completos.");
+    console.log("\n🎉 ¡ÉXITO! Este capítulo ya tiene todos los recursos completos.");
   } else {
     console.log(`\n📋 Resumen: Se completaron ${tiposFinales.length} recursos. Recursos de IA pendientes: ${faltantesIA.length}. Recursos externos pendientes: ${externosPendientes.join(", ") || "Ninguno"}.`);
     console.log("💡 Ejecuta el orquestador nuevamente con las URLs faltantes si lo deseas.");
