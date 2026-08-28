@@ -164,22 +164,6 @@ export function formatInfografiaDoctrinal(json) {
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
   
-  // Estilos para el elemento details nativo
-  html += `<style>
-    .mah-details { background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .mah-details summary { padding: 24px; text-align: center; cursor: pointer; list-style: none; user-select: none; }
-    .mah-details summary::-webkit-details-marker { display: none; }
-    .mah-details summary::marker { display: none; content: ''; }
-    .mah-details[open] summary { border-bottom: 2px solid #d4c4a8; }
-    .mah-details-content { background: #1a3a5c; padding: 20px; }
-    
-    /* En PC: siempre abierto */
-    @media (min-width: 769px) {
-      .mah-details { display: block; }
-      .mah-details summary { cursor: default; }
-    }
-  </style>`;
-
   html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
 
   items.forEach((item, index) => {
@@ -187,23 +171,21 @@ export function formatInfografiaDoctrinal(json) {
     const fundamento = escapeHtml(item.fundamento || "");
     const desarrollo = escapeHtml(item.desarrollo || "");
     
-    // En móvil: cerrado por defecto. En PC: abierto por defecto.
-    const isOpen = 'open';
+    // details sin 'open' - se controla por JS según dispositivo
+    html += `<details class="mah-details-${index}" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">`;
     
-    html += `<details class="mah-details" ${isOpen}>`;
-    
-    // Summary (frente de la tarjeta - siempre visible)
-    html += `<summary>`;
+    // Summary (frente) - SIEMPRE VISIBLE, fondo blanco, texto oscuro
+    html += `<summary style="padding: 24px; text-align: center; cursor: pointer; list-style: none; background: #ffffff;">`;
     html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
     html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
-    html += `<p class="mah-hint" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600;">👆 Toca para ver el desarrollo</p>`;
+    html += `<p class="mah-hint-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600;">👆 Toca para ver el desarrollo</p>`;
     html += `</summary>`;
     
-    // Contenido (desarrollo - se muestra al hacer click)
-    html += `<div class="mah-details-content">`;
+    // Contenido (desarrollo) - fondo AZUL OSCURO, texto BLANCO PURO
+    html += `<div style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d;">`;
     html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
-    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
+    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif; font-weight: 400;">${desarrollo}</p>`;
     html += `</div>`;
     
     html += `</details>`;
@@ -211,23 +193,40 @@ export function formatInfografiaDoctrinal(json) {
 
   html += `</div>`;
 
-  // Script mínimo solo para ocultar el hint en PC
+  // Script para controlar apertura según dispositivo
   html += `<script>
     (function() {
-      function updateHint() {
+      function updateLayout() {
         const isMobile = window.innerWidth <= 768;
-        document.querySelectorAll('.mah-hint').forEach(h => {
-          h.style.display = isMobile ? 'block' : 'none';
-        });
+        const totalCards = ${items.length};
+        
+        for (let i = 0; i < totalCards; i++) {
+          const details = document.querySelector('.mah-details-' + i);
+          const hint = document.querySelector('.mah-hint-' + i);
+          
+          if (!details || !hint) continue;
+          
+          if (isMobile) {
+            // MÓVIL: Cerrado por defecto, mostrar hint
+            details.removeAttribute('open');
+            hint.style.display = 'block';
+          } else {
+            // PC: Abierto por defecto, ocultar hint
+            details.setAttribute('open', '');
+            hint.style.display = 'none';
+          }
+        }
       }
-      updateHint();
-      window.addEventListener('resize', updateHint);
+      
+      updateLayout();
+      window.addEventListener('resize', updateLayout);
     })();
   </script>`;
 
   html += `</div>`;
   return html;
 }
+
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
