@@ -7,8 +7,6 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
   const reglaOrtografia = "**⛔ REGLA ABSOLUTA DE ORTOGRAFÍA Y FORMATO ⛔**\nEl texto DEBE estar en ESPAÑOL PERFECTO. Revisa tildes, puntuación y nombres propios. No inventes citas ni datos. Si usas comillas dobles dentro del JSON, escápalas con \\\".\n\n";
   
   const basePrompt = `Genera contenido para ${ctx}. \n\nTEXTO BÍBLICO DE REFERENCIA (RVR1960) PARA CITAS EXACTAS:\n${textoCapitulo}\n\n`;
-
-  // Clases CSS base para mantener consistencia visual con Mahanaim App
   const clasesCSS = "Usa las clases HTML: 'contenedor-blog', 'titulo-entrada', 'subtitulo', 'caja-meditar', 'tabla-comparativa'.";
 
   switch (tipo) {
@@ -36,55 +34,34 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
     case "infografia":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "infografia", "titulo": "Infografía Doctrinal: ${ctx}", "doctrinas": [{"doctrina": "Nombre formal de la doctrina", "fundamento": "Versículos del capítulo", "desarrollo": "Explicación teológica con referencias cruzadas"}]}. 
 
-          ⚠️ INSTRUCCIÓN CRÍTICA SOBRE NOMENCLATURA DOCTRINAL:
-          No uses frases descriptivas. Debes identificar y nombrar la DOCTRINA FORMAL según la Teología Sistemática.
-          
-          Busca conexiones en estas categorías doctrinales:
-          • Teología Propia: Soberanía de Dios, Santidad, Justicia, Misericordia
-          • Hamartiología: Depravación Total, Endurecimiento del corazón
-          • Cristología: Mediación de Cristo, Tipología bíblica
-          • Soteriología: Redención, Gracia, Justificación, Santificación
-          • Teología del Pacto: Fidelidad del Pacto de Gracia
-          
-          INSTRUCCIONES:
-          1. Identifica 3 a 5 doctrinas FORMALES (usa el nombre técnico).
-          2. Para cada doctrina, proporciona: "doctrina" (nombre formal), "fundamento" (versículos específicos de este capítulo), "desarrollo" (conexión con el plan redentor y referencias cruzadas).
-          
-          El HTML será generado automáticamente con scroll horizontal para mejor visualización.`;
-          
-                    ⚠️ INSTRUCCIÓN CRÍTICA SOBRE NOMENCLATURA DOCTRINAL:
-                    No uses frases descriptivas o títulos de sermones como "La dureza del corazón" o "El sufrimiento del pueblo". Debes identificar y nombrar la DOCTRINA FORMAL según la Teología Sistemática.
-                    
-                    Busca conexiones en estas categorías doctrinales (elige las que apliquen al capítulo):
-                    • Teología Propia: Soberanía de Dios, Santidad, Justicia, Misericordia, Omnisciencia, Inmutabilidad.
-                    • Hamartiología: Depravación Total, Endurecimiento del corazón, Naturaleza del pecado.
-                    • Cristología: Mediación de Cristo, Tipología bíblica, Preexistencia, Oficios de Cristo (Profeta, Sacerdote, Rey).
-                    • Soteriología: Redención, Gracia Irresistible, Justificación, Santificación, Perseverancia.
-                    • Teología del Pacto: Fidelidad del Pacto de Gracia, Promesa mesiánica.
-                    • Ecclesiología: La naturaleza del pueblo de Dios, Sufrimiento y purificación de la Iglesia.
-                    
-                    INSTRUCCIONES:
-                    1. Identifica 3 a 5 doctrinas FORMALES (usa el nombre técnico, ej: "Depravación Total", no "La maldad de Faraón").
-                    2. Explica cómo se manifiesta o prefigura esa doctrina específica en este capítulo.
-                    3. Incluye referencias cruzadas a otros pasajes bíblicos donde se desarrolla esa doctrina sistemáticamente.
-                    
-                    El HTML debe ser una tabla con clase "tabla-comparativa" mostrando: 
-                    - Columna 1: Doctrina (NOMBRE FORMAL DE TEOLOGÍA SISTEMÁTICA).
-                    - Columna 2: Fundamento Bíblico (versículos específicos de este capítulo).
-                    - Columna 3: Desarrollo Teológico (conexión con el plan redentor y referencias cruzadas).`;
+⚠️ INSTRUCCIÓN CRÍTICA SOBRE NOMENCLATURA DOCTRINAL:
+No uses frases descriptivas o títulos de sermones. Debes identificar y nombrar la DOCTRINA FORMAL según la Teología Sistemática.
+
+Busca conexiones en estas categorías doctrinales:
+• Teología Propia: Soberanía de Dios, Santidad, Justicia, Misericordia, Omnisciencia.
+• Hamartiología: Depravación Total, Endurecimiento del corazón.
+• Cristología: Mediación de Cristo, Tipología bíblica, Oficios de Cristo.
+• Soteriología: Redención, Gracia, Justificación, Santificación.
+• Teología del Pacto: Fidelidad del Pacto de Gracia.
+
+INSTRUCCIONES:
+1. Identifica 3 a 5 doctrinas FORMALES (usa el nombre técnico, ej: "Depravación Total").
+2. Para cada doctrina, proporciona: "doctrina" (nombre formal), "fundamento" (versículos específicos de este capítulo), "desarrollo" (conexión con el plan redentor y referencias cruzadas).
+
+El HTML será generado automáticamente con scroll horizontal para mejor visualización.`;
     
     case "citas_teologos":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_teologos", "titulo": "Citas de Teólogos: ${ctx}", "citas": [{"autor": "Nombre real", "obra": "Obra real", "cita": "Cita textual pertinente"}]}. 3 a 5 citas. SOLO autores y obras REALES y VERIFICABLES.`;
     
-        case "citas_libros":
+    case "citas_libros":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_libros", "titulo": "Citas de Libros: ${ctx}", "citas": [{"autor": "Nombre del autor", "titulo_libro": "Título del libro", "cita": "Cita textual del libro"}]}. 
 
-        ⚠️ IMPORTANTE: 
-        - Estos NO son versículos bíblicos. Son citas de LIBROS EXTERNOS a la Biblia.
-        - Los libros deben ser: comentarios bíblicos, obras teológicas, libros de devocionales, o escritos de autores cristianos reconocidos (ej: Juan Calvino, Matthew Henry, Charles Spurgeon, C.S. Lewis, A.W. Tozer, etc.).
-        - Cada cita debe ser un fragmento textual de ese libro externo que hable específicamente sobre ${ctx}.
-        - 3 a 5 citas de libros REALES y VERIFICABLES.
-        - NO incluyas referencias bíblicas como "título_libro". Solo libros externos.`;
+⚠️ IMPORTANTE: 
+- Estos NO son versículos bíblicos. Son citas de LIBROS EXTERNOS a la Biblia.
+- Los libros deben ser: comentarios bíblicos, obras teológicas, libros de devocionales, o escritos de autores cristianos reconocidos (ej: Juan Calvino, Matthew Henry, Charles Spurgeon, C.S. Lewis, A.W. Tozer, etc.).
+- Cada cita debe ser un fragmento textual de ese libro externo que hable específicamente sobre ${ctx}.
+- 3 a 5 citas de libros REALES y VERIFICABLES.
+- NO incluyas referencias bíblicas como "título_libro". Solo libros externos.`;
     
     case "contexto_arqueologico":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener secciones: Contexto Histórico, Contexto Arqueológico (datos REALES), Implicaciones para la Interpretación. ${clasesCSS}`;
@@ -92,7 +69,7 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
     case "diagrama_estructura":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "diagrama_estructura", "titulo": "Diagrama de Estructura Literaria: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe mostrar el tipo de estructura (ej: quiasmo) y un diagrama textual en una etiqueta <pre>. Incluye el significado teológico de la estructura.`;
     
-        case "cronologia":
+    case "cronologia":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "cronologia", "titulo": "Cronología del capítulo ${capitulo}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe ser una tabla con clase "tabla-comparativa" listando los eventos en orden cronológico con su referencia bíblica exacta. El título DEBE ser exactamente "Cronología del capítulo ${capitulo}".`;
     
     case "conexion_at":
