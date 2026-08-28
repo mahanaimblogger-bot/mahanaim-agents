@@ -39,13 +39,13 @@ export function limpiarHtml(html) {
     .trim();
 }
 
-// Estilos base para mantener consistencia
 const ESTILOS = {
-  contenedor: "font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px;",
+  contenedor: "font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word;",
   titulo: "color: #1a5276; border-bottom: 2px solid #d4ac0d; padding-bottom: 8px; margin-bottom: 20px;",
-  tablaHeader: "background: #1a3a5c; color: #d4ac0d; padding: 10px 12px; text-align: left; font-weight: bold; font-size: 0.9em; border: 1px solid #3e5a7a;",
-  tablaCelda: "padding: 10px 12px; border: 1px solid #d4c4a8; vertical-align: top; font-size: 0.9em; line-height: 1.5;",
-  card: "background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);",
+  tablaHeader: "background: #1a3a5c; color: #d4ac0d; padding: 10px 12px; text-align: left; font-weight: bold; font-size: 0.9em; border: 1px solid #3e5a7a; white-space: normal; word-wrap: break-word;",
+  tablaCelda: "padding: 10px 12px; border: 1px solid #d4c4a8; vertical-align: top; font-size: 0.9em; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; max-width: 300px;",
+  tablaContenedor: "overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px;",
+  card: "background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 100%; box-sizing: border-box;",
   cardTitulo: "color: #1a3a5c; border-bottom: 1px dashed #d4ac0d; padding-bottom: 6px; margin-bottom: 10px; font-size: 1.1em;",
   btn: "background: #1a3a5c; color: #d4ac0d; border: 2px solid #d4ac0d; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Georgia', serif;"
 };
@@ -61,16 +61,16 @@ export function formatQuizInteractivo(json) {
   preguntas.forEach((p, i) => {
     const preguntaTexto = p.pregunta || "Pregunta sin texto";
     html += `<div class="quiz-pregunta-card" style="${ESTILOS.card}" data-pregunta-num="${i + 1}">`;
-    html += `<p style="font-weight: bold; color: #1a5276; margin-bottom: 12px; font-size: 1.05em;">${i + 1}. ${escapeHtml(preguntaTexto)}</p>`;
+    html += `<p style="font-weight: bold; color: #1a5276; margin-bottom: 12px; font-size: 1.05em; word-wrap: break-word;">${i + 1}. ${escapeHtml(preguntaTexto)}</p>`;
     html += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
 
     const opciones = p.opciones || [];
     opciones.forEach((op, j) => {
       const opcionTexto = op.texto || op.text || "Opción sin texto";
       const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
-      html += `<label class="quiz-opcion-label" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; cursor: pointer; transition: all 0.2s;">`;
-      html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" style="accent-color: #d4ac0d; width: 16px; height: 16px;">`;
-      html += `<span style="color: #3e2723;">${escapeHtml(opcionTexto)}</span>`;
+      html += `<label class="quiz-opcion-label" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; cursor: pointer; transition: all 0.2s; word-wrap: break-word;">`;
+      html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" style="accent-color: #d4ac0d; width: 16px; height: 16px; flex-shrink: 0;">`;
+      html += `<span style="color: #3e2723; word-wrap: break-word;">${escapeHtml(opcionTexto)}</span>`;
       html += `</label>`;
     });
 
@@ -101,7 +101,7 @@ export function formatQuizInteractivo(json) {
             if (feedback) { feedback.textContent = '✅ Correcto'; feedback.style.color = '#2d6a4f'; }
             if (seleccionada) { seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd'; seleccionada.closest('.quiz-opcion-label').style.borderColor = '#2d6a4f'; }
           } else {
-            if (feedback) { feedback.textContent = seleccionada ? '❌ Incorrecto' : '⚠️ Sin responder'; feedback.style.color = '#c0392b'; }
+            if (feedback) { feedback.textContent = seleccionada ? '❌ Incorrecto' : '️ Sin responder'; feedback.style.color = '#c0392b'; }
             if (seleccionada) { seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#fbdcdc'; seleccionada.closest('.quiz-opcion-label').style.borderColor = '#c0392b'; }
             const correctaLabel = card.querySelector('input[data-correcta="true"]');
             if (correctaLabel) { correctaLabel.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd'; correctaLabel.closest('.quiz-opcion-label').style.borderColor = '#2d6a4f'; }
@@ -109,7 +109,7 @@ export function formatQuizInteractivo(json) {
         });
         const total = preguntasCards.length;
         const porcentaje = Math.round((correctas / total) * 100);
-        let mensaje = porcentaje === 100 ? '🎉 ¡Excelente! Has comprendido muy bien este pasaje.' : porcentaje >= 80 ? '🙌 Muy bien. Revisa las preguntas que fallaste.' : porcentaje >= 50 ? '📖 Buen intento. Te recomiendo volver a leer el capítulo.' : '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma.';
+        let mensaje = porcentaje === 100 ? '🎉 ¡Excelente! Has comprendido muy bien este pasaje.' : porcentaje >= 80 ? '🙌 Muy bien. Revisa las preguntas que fallaste.' : porcentaje >= 50 ? ' Buen intento. Te recomiendo volver a leer el capítulo.' : '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma.';
         resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span style="font-size: 0.8em; font-weight: normal; margin-top: 8px; display: block;">' + mensaje + '</span>';
         resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
       });
@@ -125,7 +125,7 @@ export function formatTablaGenerica(json, tipoLabel, columnas) {
 
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || tipoLabel)}</h1>`;
-  html += `<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; font-size: 0.9em; color: #3e2723;">`;
+  html += `<div style="${ESTILOS.tablaContenedor}"><table style="width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; font-size: 0.9em; color: #3e2723; table-layout: auto;">`;
   html += `<thead><tr>`;
   columnas.headers.forEach(h => {
     html += `<th style="${ESTILOS.tablaHeader}">${h}</th>`;
@@ -133,7 +133,7 @@ export function formatTablaGenerica(json, tipoLabel, columnas) {
   html += `</tr></thead><tbody>`;
   
   items.forEach((item, index) => {
-    const bgColor = index % 2 === 0 ? '#ffffff' : '#fdfbf7'; // Filas alternadas
+    const bgColor = index % 2 === 0 ? '#ffffff' : '#fdfbf7';
     html += `<tr style="background-color: ${bgColor};">`;
     columnas.keys.forEach(k => {
       const val = item[k] || "—";
@@ -156,7 +156,7 @@ export function formatCitasHtml(json, tipoLabel) {
   citas.forEach((c) => {
     html += `<div style="${ESTILOS.card}">`;
     html += `<h4 style="${ESTILOS.cardTitulo}"><strong>${escapeHtml(c.autor || "")}</strong>${c.obra ? ` — <em style="color: #757575;">${escapeHtml(c.obra)}</em>` : ""}${c.titulo_libro ? ` — <em style="color: #757575;">${escapeHtml(c.titulo_libro)}</em>` : ""}</h4>`;
-    html += `<p style="font-style: italic; color: #3e2723; line-height: 1.6; border-left: 3px solid #d4ac0d; padding-left: 12px; margin: 0;">“${escapeHtml(c.cita)}”</p>`;
+    html += `<p style="font-style: italic; color: #3e2723; line-height: 1.6; border-left: 3px solid #d4ac0d; padding-left: 12px; margin: 0; word-wrap: break-word;">"${escapeHtml(c.cita)}"</p>`;
     html += `</div>`;
   });
   html += `</div>`;
@@ -171,22 +171,19 @@ export function formatPalabrasClaveHtml(json) {
   terminos.forEach((t) => {
     html += `<div style="${ESTILOS.card}">`;
     html += `<h4 style="${ESTILOS.cardTitulo}">`;
-    html += `<span style="font-size: 1.2em; color: #1a3a5c;">${escapeHtml(t.termino_original)}</span> — <span style="font-style: italic;">${escapeHtml(t.transliteracion)}</span>`;
+    html += `<span style="font-size: 1.2em; color: #1a3a5c; word-wrap: break-word;">${escapeHtml(t.termino_original)}</span> — <span style="font-style: italic;">${escapeHtml(t.transliteracion)}</span>`;
     if (t.strong && t.strong !== "No disponible") {
       html += `<span style="float: right; font-size: 0.75em; background: #1a3a5c; color: #d4ac0d; padding: 2px 8px; border-radius: 12px;">Strong ${escapeHtml(t.strong)}</span>`;
     }
     html += `</h4>`;
-    html += `<p style="margin-bottom: 8px;"><strong style="color: #1a5276;">Significado:</strong> ${escapeHtml(t.significado)}</p>`;
-    html += `<p style="margin: 0;"><strong style="color: #1a5276;">Contexto:</strong> ${escapeHtml(t.contexto)}</p>`;
+    html += `<p style="margin-bottom: 8px; word-wrap: break-word;"><strong style="color: #1a5276;">Significado:</strong> ${escapeHtml(t.significado)}</p>`;
+    html += `<p style="margin: 0; word-wrap: break-word;"><strong style="color: #1a5276;">Contexto:</strong> ${escapeHtml(t.contexto)}</p>`;
     html += `</div>`;
   });
   html += `</div>`;
   return html;
 }
 
-/**
- * Función principal que decide cómo formatear cada recurso.
- */
 export function formatearRecurso(tipo, datos) {
   if (!datos) return "<p>Error: No se recibieron datos.</p>";
 
@@ -230,6 +227,6 @@ export function formatearRecurso(tipo, datos) {
       });
 
     default:
-      return `<div style="${ESTILOS.contenedor}"><pre style="white-space: pre-wrap; font-family: monospace;">${escapeHtml(JSON.stringify(datos, null, 2))}</pre></div>`;
+      return `<div style="${ESTILOS.contenedor}"><pre style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word;">${escapeHtml(JSON.stringify(datos, null, 2))}</pre></div>`;
   }
 }
