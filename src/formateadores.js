@@ -197,6 +197,7 @@ export function formatInfografiaDoctrinal(json) {
   (function() {
     const total = ${items.length};
     let openIndex = -1;
+    let currentMode = null;
 
     function cerrar(i) {
       const btn = document.getElementById('mah-btn-' + i);
@@ -218,8 +219,27 @@ export function formatInfografiaDoctrinal(json) {
       openIndex = i;
     }
 
-    function updateLayout() {
-      const isMobile = window.innerWidth <= 768;
+    function inicializarListeners() {
+      for (let i = 0; i < total; i++) {
+        const btn = document.getElementById('mah-btn-' + i);
+        if (!btn || btn.dataset.mahInit) continue;
+        btn.dataset.mahInit = '1';
+        btn.addEventListener('click', function() {
+          const idx = parseInt(this.id.replace('mah-btn-', ''));
+          if (openIndex === idx) {
+            cerrar(idx);
+          } else {
+            if (openIndex !== -1) cerrar(openIndex);
+            abrir(idx);
+          }
+        });
+      }
+    }
+
+    function aplicarModo(isMobile) {
+      const modo = isMobile ? 'mobile' : 'desktop';
+      if (currentMode === modo) return;
+      currentMode = modo;
 
       for (let i = 0; i < total; i++) {
         const btn = document.getElementById('mah-btn-' + i);
@@ -227,38 +247,31 @@ export function formatInfografiaDoctrinal(json) {
         if (!btn || !dev) continue;
 
         if (isMobile) {
-          // Mostrar botón, ocultar desarrollo salvo el que ya estaba abierto
           btn.style.display = 'block';
-          if (openIndex !== i) {
-            dev.style.display = 'none';
-            btn.textContent = '👆 Toca para ver el desarrollo';
-            btn.setAttribute('aria-expanded', 'false');
-          }
-          // Asignar onclick solo una vez usando dataset como bandera
-          if (!btn.dataset.mahInit) {
-            btn.dataset.mahInit = '1';
-            btn.addEventListener('click', function() {
-              const idx = parseInt(this.id.replace('mah-btn-', ''));
-              if (openIndex === idx) {
-                cerrar(idx);
-              } else {
-                if (openIndex !== -1) cerrar(openIndex);
-                abrir(idx);
-              }
-            });
-          }
+          dev.style.display = 'none';
+          btn.textContent = '👆 Toca para ver el desarrollo';
+          btn.setAttribute('aria-expanded', 'false');
+          openIndex = -1;
         } else {
-          // PC: siempre visible, botón oculto
           dev.style.display = 'block';
           btn.style.display = 'none';
           btn.setAttribute('aria-expanded', 'true');
+          openIndex = -1;
         }
       }
     }
 
-    // Ejecutar al cargar y en cada resize
-    updateLayout();
-    window.addEventListener('resize', updateLayout);
+    let resizeTimer;
+    function onResize() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        aplicarModo(window.innerWidth <= 768);
+      }, 150);
+    }
+
+    inicializarListeners();
+    aplicarModo(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
   })();
   </script>`;
 
