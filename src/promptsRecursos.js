@@ -33,8 +33,29 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
     case "palabras_clave":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "palabras_clave", "titulo": "Estudio de Palabras Clave: ${ctx}", "terminos": [{"termino_original": "Hebreo/Griego", "transliteracion": "Transliteración", "strong": "Número Strong", "significado": "Significado", "contexto": "Contexto en el capítulo"}]}. Entre 3 y 5 términos.`;
     
-    case "infografia":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "infografia", "titulo": "Infografía Doctrinal: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe ser una tabla con clase "tabla-comparativa" mostrando: Doctrina, Fundamento Bíblico, Desarrollo Teológico (con tipología). 3 a 5 doctrinas.`;
+        case "infografia":
+      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "infografia", "titulo": "Infografía Doctrinal: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. 
+
+          ⚠️ INSTRUCCIÓN CRÍTICA SOBRE NOMENCLATURA DOCTRINAL:
+          No uses frases descriptivas o títulos de sermones como "La dureza del corazón" o "El sufrimiento del pueblo". Debes identificar y nombrar la DOCTRINA FORMAL según la Teología Sistemática.
+          
+          Busca conexiones en estas categorías doctrinales (elige las que apliquen al capítulo):
+          • Teología Propia: Soberanía de Dios, Santidad, Justicia, Misericordia, Omnisciencia, Inmutabilidad.
+          • Hamartiología: Depravación Total, Endurecimiento del corazón, Naturaleza del pecado.
+          • Cristología: Mediación de Cristo, Tipología bíblica, Preexistencia, Oficios de Cristo (Profeta, Sacerdote, Rey).
+          • Soteriología: Redención, Gracia Irresistible, Justificación, Santificación, Perseverancia.
+          • Teología del Pacto: Fidelidad del Pacto de Gracia, Promesa mesiánica.
+          • Ecclesiología: La naturaleza del pueblo de Dios, Sufrimiento y purificación de la Iglesia.
+          
+          INSTRUCCIONES:
+          1. Identifica 3 a 5 doctrinas FORMALES (usa el nombre técnico, ej: "Depravación Total", no "La maldad de Faraón").
+          2. Explica cómo se manifiesta o prefigura esa doctrina específica en este capítulo.
+          3. Incluye referencias cruzadas a otros pasajes bíblicos donde se desarrolla esa doctrina sistemáticamente.
+          
+          El HTML debe ser una tabla con clase "tabla-comparativa" mostrando: 
+          - Columna 1: Doctrina (NOMBRE FORMAL DE TEOLOGÍA SISTEMÁTICA).
+          - Columna 2: Fundamento Bíblico (versículos específicos de este capítulo).
+          - Columna 3: Desarrollo Teológico (conexión con el plan redentor y referencias cruzadas).`;
     
     case "citas_teologos":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_teologos", "titulo": "Citas de Teólogos: ${ctx}", "citas": [{"autor": "Nombre real", "obra": "Obra real", "cita": "Cita textual pertinente"}]}. 3 a 5 citas. SOLO autores y obras REALES y VERIFICABLES.`;
