@@ -164,79 +164,73 @@ export function formatInfografiaDoctrinal(json) {
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
   
-  html += `<style>
-    .mah-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-    .mah-flip-card { background-color: transparent; width: 100%; height: 320px; perspective: 1000px; cursor: pointer; }
-    .mah-flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
-    .mah-flip-card.flipped .mah-flip-card-inner { transform: rotateY(180deg); }
-    .mah-flip-card-front, .mah-flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 8px; padding: 20px; box-sizing: border-box; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-    
-    /* FRENTE: Fondo blanco, texto oscuro */
-    .mah-flip-card-front { background-color: #ffffff; border: 2px solid #d4c4a8; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-    
-    /* REVERSO: Fondo azul oscuro, texto BLANCO (alto contraste) */
-    .mah-flip-card-back { background-color: #1a3a5c; color: #ffffff; transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; text-align: left; }
-    
-    /* PC/DESKTOP: Tarjetas estáticas con todo visible */
-    @media (min-width: 769px) {
-      .mah-flip-card { height: auto; perspective: none; cursor: default; }
-      .mah-flip-card-inner { transform: none !important; transition: none; display: block; }
-      .mah-flip-card-front { position: relative; height: auto; border-radius: 8px 8px 0 0; align-items: flex-start; text-align: left; border-bottom: none; }
-      .mah-flip-card-back { position: relative; transform: none !important; height: auto; border-radius: 0 0 8px 8px; border-top: 3px solid #d4ac0d; color: #ffffff; }
-      .mah-mobile-hint { display: none !important; }
-    }
-    
-    /* MÓVIL: Ocultar reverso inicialmente */
-    @media (max-width: 768px) {
-      .mah-flip-card-back { opacity: 0; pointer-events: none; }
-      .mah-flip-card.flipped .mah-flip-card-back { opacity: 1; pointer-events: auto; }
-      .mah-desktop-content { display: none !important; }
-    }
-  </style>`;
-
-  html += `<div class="mah-grid">`;
+  // Grid de tarjetas
+  html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
 
   items.forEach((item) => {
     const doctrina = escapeHtml(item.doctrina || "Doctrina");
     const fundamento = escapeHtml(item.fundamento || "");
     const desarrollo = escapeHtml(item.desarrollo || "");
     
-    html += `<div class="mah-flip-card">`;
-    html += `<div class="mah-flip-card-inner">`;
+    // Tarjeta completa (frente + reverso juntos en PC)
+    html += `<div class="mah-doctrine-card" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
     
-    // FRENTE (Visible en móvil y parte superior en PC)
-    html += `<div class="mah-flip-card-front">`;
-    html += `<div style="font-size: 2.5em; margin-bottom: 12px;">📚</div>`;
+    // Parte superior (frente)
+    html += `<div style="padding: 24px; text-align: center;">`;
+    html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
-    html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; width: 100%; box-sizing: border-box; font-weight: 500;">${fundamento}</div>`;
-    html += `<p class="mah-mobile-hint" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600;">👆 Toca para ver el desarrollo</p>`;
+    html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
+    html += `<p class="mah-mobile-only" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; display: none;">👆 Toca para ver el desarrollo</p>`;
     html += `</div>`;
     
-    // REVERSO (Visible al voltear en móvil y parte inferior en PC)
-    html += `<div class="mah-flip-card-back">`;
-    html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1.05em; border-bottom: 2px solid #d4ac0d; padding-bottom: 8px; font-family: 'Georgia', serif; font-weight: bold;">Desarrollo Teológico</h4>`;
-    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: left; font-family: 'Georgia', serif; font-weight: 400;">${desarrollo}</p>`;
+    // Parte inferior (desarrollo) - Visible en PC, oculta en móvil hasta hacer click
+    html += `<div class="mah-desktop-content mah-mobile-hidden" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d;">`;
+    html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
+    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
     html += `</div>`;
     
-    html += `</div></div>`;
+    html += `</div>`;
   });
 
   html += `</div>`;
 
-  // Script para el flip en móvil
+  // Script para comportamiento responsive
   html += `<script>
     (function() {
-      const cards = document.querySelectorAll('.mah-flip-card');
+      function updateLayout() {
+        const isMobile = window.innerWidth <= 768;
+        const mobileHints = document.querySelectorAll('.mah-mobile-only');
+        const mobileHidden = document.querySelectorAll('.mah-mobile-hidden');
+        const cards = document.querySelectorAll('.mah-doctrine-card');
+        
+        if (isMobile) {
+          // Modo móvil: ocultar desarrollo, mostrar hint
+          mobileHints.forEach(el => el.style.display = 'block');
+          mobileHidden.forEach(el => el.style.display = 'none');
+          cards.forEach(card => {
+            card.style.cursor = 'pointer';
+            card.onclick = function() {
+              const hidden = this.querySelector('.mah-mobile-hidden');
+              if (hidden.style.display === 'none' || hidden.style.display === '') {
+                hidden.style.display = 'block';
+              } else {
+                hidden.style.display = 'none';
+              }
+            };
+          });
+        } else {
+          // Modo PC: mostrar todo, ocultar hint
+          mobileHints.forEach(el => el.style.display = 'none');
+          mobileHidden.forEach(el => el.style.display = 'block');
+          cards.forEach(card => {
+            card.style.cursor = 'default';
+            card.onclick = null;
+          });
+        }
+      }
       
-      cards.forEach(card => {
-        card.addEventListener('click', function(e) {
-          // Solo activar en móvil (pantallas ≤ 768px)
-          if (window.innerWidth <= 768) {
-            e.preventDefault();
-            this.classList.toggle('flipped');
-          }
-        });
-      });
+      updateLayout();
+      window.addEventListener('resize', updateLayout);
     })();
   </script>`;
 
