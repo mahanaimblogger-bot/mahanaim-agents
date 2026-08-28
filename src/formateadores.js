@@ -178,14 +178,13 @@ export function formatInfografiaDoctrinal(json) {
     html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
     html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
-    html += `<button id="mah-open-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Georgia', serif; display: none;"> Toca para ver el desarrollo</button>`;
+    html += `<button id="mah-open-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Georgia', serif; display: none;">👆 Toca para ver el desarrollo</button>`;
     html += `</div>`;
     
     // Parte inferior (desarrollo) - Visible en PC, oculta en móvil hasta hacer click
     html += `<div id="mah-back-${index}" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d; display: none;">`;
     html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
-    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0 0 16px 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
-    html += `<button id="mah-close-${index}" style="background: transparent; border: 2px solid #d4ac0d; color: #d4ac0d; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9em; display: none;"> Cerrar</button>`;
+    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
     html += `</div>`;
     
     html += `</div>`;
@@ -195,49 +194,46 @@ export function formatInfografiaDoctrinal(json) {
 
   html += `<script>
     (function() {
+      let openCardIndex = -1;
+      
       function updateLayout() {
         const isMobile = window.innerWidth <= 768;
+        const totalCards = document.querySelectorAll('[id^="mah-back-"]').length;
         
-        document.querySelectorAll('[id^="mah-open-"]').forEach((btn, idx) => {
-          const back = document.getElementById('mah-back-' + idx);
-          const closeBtn = document.getElementById('mah-close-' + idx);
+        for (let i = 0; i < totalCards; i++) {
+          const openBtn = document.getElementById('mah-open-' + i);
+          const back = document.getElementById('mah-back-' + i);
           
           if (isMobile) {
-            // MÓVIL: Solo los botones controlan abrir/cerrar
-            btn.style.display = 'block';
+            // MÓVIL: Solo una tarjeta abierta a la vez
+            openBtn.style.display = 'block';
             back.style.display = 'none';
-            closeBtn.style.display = 'none';
             
-            btn.onclick = function(e) {
+            openBtn.onclick = function(e) {
               e.preventDefault();
               e.stopPropagation();
+              
+              // Cerrar la tarjeta anterior si está abierta
+              if (openCardIndex !== -1 && openCardIndex !== i) {
+                const prevBack = document.getElementById('mah-back-' + openCardIndex);
+                const prevBtn = document.getElementById('mah-open-' + openCardIndex);
+                prevBack.style.display = 'none';
+                prevBtn.style.display = 'block';
+              }
+              
+              // Abrir la tarjeta actual
               back.style.display = 'block';
-              closeBtn.style.display = 'inline-block';
-              btn.style.display = 'none';
-            };
-            
-            closeBtn.onclick = function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              back.style.display = 'none';
-              closeBtn.style.display = 'none';
-              btn.style.display = 'block';
-            };
-            
-            // Prevenir que clicks en la tarjeta cierren el contenido
-            back.onclick = function(e) {
-              e.stopPropagation();
+              openBtn.style.display = 'none';
+              openCardIndex = i;
             };
           } else {
             // PC: Mostrar todo, ocultar botones
-            btn.style.display = 'none';
+            openBtn.style.display = 'none';
             back.style.display = 'block';
-            closeBtn.style.display = 'none';
-            btn.onclick = null;
-            closeBtn.onclick = null;
-            back.onclick = null;
+            openBtn.onclick = null;
+            openCardIndex = -1;
           }
-        });
+        }
       }
       
       updateLayout();
@@ -247,7 +243,8 @@ export function formatInfografiaDoctrinal(json) {
 
   html += `</div>`;
   return html;
-}
+} 
+
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
