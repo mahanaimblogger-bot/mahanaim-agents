@@ -164,56 +164,73 @@ export function formatInfografiaDoctrinal(json) {
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
   
-  html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
+  html += `<div id="mah-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
 
   items.forEach((item, index) => {
     const doctrina = escapeHtml(item.doctrina || "Doctrina");
     const fundamento = escapeHtml(item.fundamento || "");
     const desarrollo = escapeHtml(item.desarrollo || "");
     
-    // details sin 'open' - se controla por JS según dispositivo
-    html += `<details class="mah-details-${index}" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">`;
+    html += `<div id="mah-card-${index}" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
     
-    // Summary (frente) - SIEMPRE VISIBLE, fondo blanco, texto oscuro
-    html += `<summary style="padding: 24px; text-align: center; cursor: pointer; list-style: none; background: #ffffff;">`;
+    // FRENTE (siempre visible)
+    html += `<div style="padding: 24px; text-align: center;">`;
     html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
     html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
-    html += `<p class="mah-hint-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600;">👆 Toca para ver el desarrollo</p>`;
-    html += `</summary>`;
-    
-    // Contenido (desarrollo) - fondo AZUL OSCURO, texto BLANCO PURO
-    html += `<div style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d;">`;
-    html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
-    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif; font-weight: 400;">${desarrollo}</p>`;
+    html += `<button id="mah-btn-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Georgia', serif; display: none;">👆 Toca para ver el desarrollo</button>`;
     html += `</div>`;
     
-    html += `</details>`;
+    // DESARROLLO (oculto en móvil, visible en PC)
+    html += `<div id="mah-dev-${index}" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d; display: none;">`;
+    html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
+    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
+    html += `</div>`;
+    
+    html += `</div>`;
   });
 
   html += `</div>`;
 
-  // Script para controlar apertura según dispositivo
   html += `<script>
     (function() {
+      const totalCards = ${items.length};
+      let openIndex = -1;
+      
       function updateLayout() {
         const isMobile = window.innerWidth <= 768;
-        const totalCards = ${items.length};
         
         for (let i = 0; i < totalCards; i++) {
-          const details = document.querySelector('.mah-details-' + i);
-          const hint = document.querySelector('.mah-hint-' + i);
+          const btn = document.getElementById('mah-btn-' + i);
+          const dev = document.getElementById('mah-dev-' + i);
           
-          if (!details || !hint) continue;
+          if (!btn || !dev) continue;
           
           if (isMobile) {
-            // MÓVIL: Cerrado por defecto, mostrar hint
-            details.removeAttribute('open');
-            hint.style.display = 'block';
+            // MÓVIL: Ocultar desarrollo, mostrar botón
+            dev.style.display = 'none';
+            btn.style.display = 'block';
+            
+            btn.onclick = function() {
+              // Cerrar la anterior
+              if (openIndex !== -1 && openIndex !== i) {
+                const prevBtn = document.getElementById('mah-btn-' + openIndex);
+                const prevDev = document.getElementById('mah-dev-' + openIndex);
+                if (prevBtn) prevBtn.style.display = 'block';
+                if (prevDev) prevDev.style.display = 'none';
+              }
+              
+              // Abrir esta
+              dev.style.display = 'block';
+              btn.style.display = 'none';
+              openIndex = i;
+            };
           } else {
-            // PC: Abierto por defecto, ocultar hint
-            details.setAttribute('open', '');
-            hint.style.display = 'none';
+            // PC: Mostrar todo, ocultar botones
+            dev.style.display = 'block';
+            btn.style.display = 'none';
+            btn.onclick = null;
+            openIndex = -1;
           }
         }
       }
@@ -226,7 +243,6 @@ export function formatInfografiaDoctrinal(json) {
   html += `</div>`;
   return html;
 }
-
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
