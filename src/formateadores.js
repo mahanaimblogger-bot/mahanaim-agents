@@ -15,6 +15,22 @@ export function escapeHtml(str) {
 
 export function limpiarHtml(html) {
   if (!html) return "";
+  
+  // Si el HTML comienza con un JSON mal formado ({"tipo":...), extraemos solo el contenido real
+  if (html.trim().startsWith('{')) {
+    // Buscar "contenido_html": y extraer todo lo que viene después
+    const match = html.match(/"contenido_html"\s*:\s*"([\s\S]*)"/);
+    if (match && match[1]) {
+      html = match[1];
+    } else {
+      // Si no encuentra el campo, buscar el primer <div o <h1 para empezar desde ahí
+      const htmlStart = html.match(/<(div|h1|h2|p)[\s>]/i);
+      if (htmlStart && htmlStart.index !== undefined) {
+        html = html.substring(htmlStart.index);
+      }
+    }
+  }
+  
   return html
     .replace(/```json|```/g, "")
     .replace(/&quot;/g, '"')
@@ -22,6 +38,7 @@ export function limpiarHtml(html) {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/\\n/g, '\n')
+    .replace(/^["']|["']$/g, '') // Quitar comillas al inicio/final si quedaron
     .trim();
 }
 
