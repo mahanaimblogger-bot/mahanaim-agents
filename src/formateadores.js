@@ -279,6 +279,170 @@ export function formatInfografiaDoctrinal(json) {
   return html;
 }
 
+export function formatParalelosCards(json) {
+  const items = json.paralelos || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron paralelos.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Paralelos Bíblicos")}</h1>`;
+  html += `<div id="par-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const referencia = escapeHtml(item.referencia || "");
+    const texto = escapeHtml(item.texto_cita || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;"></div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 12px 0;font-size:1.1em;font-weight:bold;font-family:Georgia,serif;">${referencia}</h3>`;
+    html += `<p style="font-style:italic;color:#3e2723;margin:0 0 12px 0;line-height:1.5;">"${texto}"</p>`;
+    html += `<button id="par-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;"> Ver conexión</button>`;
+    html += `</div>`;
+    html += `<div id="par-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<h4 style="color:#d4ac0d;margin:0 0 12px 0;font-size:1em;font-weight:bold;font-family:Georgia,serif;">Conexión Teológica</h4>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver conexión';b.setAttribute('aria-expanded','false');o=-1;}
+  function a(i){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';b.setAttribute('aria-expanded','true');o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('par-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('par-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';b.textContent='👆 Ver conexión';o=-1;}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatProfeciasCards(json) {
+  const items = json.profecias || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron profecías.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Profecías")}</h1>`;
+  html += `<div id="prof-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const profecia = escapeHtml(item.profecia || "");
+    const refProf = escapeHtml(item.referencia_profecia || "");
+    const estado = escapeHtml(item.estado || "");
+    const refCumpl = escapeHtml(item.referencia_cumplimiento || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+
+    const colorEstado = estado.includes('Cumplida') ? '#2d6a4f' : estado.includes('Parcial') ? '#b7950b' : '#c0392b';
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">🔮</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 8px 0;font-size:1.05em;font-weight:bold;font-family:Georgia,serif;">${profecia}</h3>`;
+    html += `<p style="color:#1a5276;margin:0 0 6px 0;font-size:0.9em;font-weight:600;">📍 ${refProf}</p>`;
+    html += `<span style="display:inline-block;background:${colorEstado};color:#fff;padding:4px 10px;border-radius:12px;font-size:0.8em;font-weight:600;margin-bottom:12px;">${estado}</span>`;
+    html += `<button id="prof-btn-${index}" style="color:#1a5276;margin-top:12px;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver cumplimiento</button>`;
+    html += `</div>`;
+    html += `<div id="prof-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<p style="color:#d4ac0d;margin:0 0 8px 0;font-size:0.9em;"><strong>Cumplimiento:</strong> ${refCumpl}</p>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent=' Ver cumplimiento';o=-1;}
+  function a(i){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('prof-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('prof-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatConexionesCards(json, tipo) {
+  const items = json.conexiones || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron conexiones.</p></div>`;
+  
+  const titulo = tipo === 'conexion_at' ? 'Conexión con el Antiguo Testamento' : 'Conexión con el Nuevo Testamento';
+  const emoji = tipo === 'conexion_at' ? '📜' : '✝️';
+  const refKey = tipo === 'conexion_at' ? 'referencia_at' : 'referencia_nt';
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || titulo)}</h1>`;
+  html += `<div id="con-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const referencia = escapeHtml(item[refKey] || "");
+    const texto = escapeHtml(item.texto_cita || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">${emoji}</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 12px 0;font-size:1.1em;font-weight:bold;font-family:Georgia,serif;">${referencia}</h3>`;
+    html += `<p style="font-style:italic;color:#3e2723;margin:0 0 12px 0;line-height:1.5;">"${texto}"</p>`;
+    html += `<button id="con-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver explicación</button>`;
+    html += `</div>`;
+    html += `<div id="con-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<h4 style="color:#d4ac0d;margin:0 0 12px 0;font-size:1em;font-weight:bold;font-family:Georgia,serif;">Conexión</h4>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver explicación';o=-1;}
+  function a(i){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('con-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('con-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatCronologiaCards(json) {
+  const items = json.cronologia || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No hay eventos cronológicos.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Cronología del Capítulo")}</h1>`;
+  html += `<div id="cron-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const evento = escapeHtml(item.evento || "");
+    const referencia = escapeHtml(item.referencia || "");
+    const detalles = escapeHtml(item.detalles || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">⏱️</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 8px 0;font-size:1.05em;font-weight:bold;font-family:Georgia,serif;">${evento}</h3>`;
+    html += `<p style="color:#1a5276;margin:0 0 12px 0;font-size:0.9em;font-weight:600;">📍 ${referencia}</p>`;
+    html += `<button id="cron-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver detalles</button>`;
+    html += `</div>`;
+    html += `<div id="cron-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${detalles}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver detalles';o=-1;}
+  function a(i){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent=' Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('cron-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('cron-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
