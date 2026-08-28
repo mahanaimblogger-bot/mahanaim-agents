@@ -164,7 +164,6 @@ export function formatInfografiaDoctrinal(json) {
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
   
-  // Grid de tarjetas
   html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
 
   items.forEach((item) => {
@@ -172,21 +171,21 @@ export function formatInfografiaDoctrinal(json) {
     const fundamento = escapeHtml(item.fundamento || "");
     const desarrollo = escapeHtml(item.desarrollo || "");
     
-    // Tarjeta completa (frente + reverso juntos en PC)
     html += `<div class="mah-doctrine-card" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
     
-    // Parte superior (frente)
-    html += `<div style="padding: 24px; text-align: center;">`;
+    // Parte superior (frente) - SIEMPRE VISIBLE
+    html += `<div class="mah-card-front" style="padding: 24px; text-align: center;">`;
     html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
     html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
-    html += `<p class="mah-mobile-only" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; display: none;">👆 Toca para ver el desarrollo</p>`;
+    html += `<p class="mah-mobile-hint" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; cursor: pointer; display: none;">👆 Toca para ver el desarrollo</p>`;
     html += `</div>`;
     
     // Parte inferior (desarrollo) - Visible en PC, oculta en móvil hasta hacer click
-    html += `<div class="mah-desktop-content mah-mobile-hidden" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d;">`;
+    html += `<div class="mah-card-back" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d; display: none;">`;
     html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
-    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
+    html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0 0 16px 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
+    html += `<button class="mah-close-btn" style="background: transparent; border: 2px solid #d4ac0d; color: #d4ac0d; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9em; display: none;">✕ Cerrar</button>`;
     html += `</div>`;
     
     html += `</div>`;
@@ -194,38 +193,47 @@ export function formatInfografiaDoctrinal(json) {
 
   html += `</div>`;
 
-  // Script para comportamiento responsive
   html += `<script>
     (function() {
       function updateLayout() {
         const isMobile = window.innerWidth <= 768;
-        const mobileHints = document.querySelectorAll('.mah-mobile-only');
-        const mobileHidden = document.querySelectorAll('.mah-mobile-hidden');
-        const cards = document.querySelectorAll('.mah-doctrine-card');
+        const hints = document.querySelectorAll('.mah-mobile-hint');
+        const backs = document.querySelectorAll('.mah-card-back');
+        const closeBtns = document.querySelectorAll('.mah-close-btn');
+        const fronts = document.querySelectorAll('.mah-card-front');
         
         if (isMobile) {
-          // Modo móvil: ocultar desarrollo, mostrar hint
-          mobileHints.forEach(el => el.style.display = 'block');
-          mobileHidden.forEach(el => el.style.display = 'none');
-          cards.forEach(card => {
-            card.style.cursor = 'pointer';
-            card.onclick = function() {
-              const hidden = this.querySelector('.mah-mobile-hidden');
-              if (hidden.style.display === 'none' || hidden.style.display === '') {
-                hidden.style.display = 'block';
-              } else {
-                hidden.style.display = 'none';
-              }
+          // MÓVIL: Ocultar desarrollo, mostrar botón abrir
+          hints.forEach(h => h.style.display = 'block');
+          backs.forEach(b => b.style.display = 'none');
+          closeBtns.forEach(b => b.style.display = 'none');
+          
+          // Click en "Toca para ver" abre el desarrollo
+          hints.forEach((hint, idx) => {
+            hint.onclick = function(e) {
+              e.stopPropagation();
+              backs[idx].style.display = 'block';
+              closeBtns[idx].style.display = 'inline-block';
+              hint.style.display = 'none';
+            };
+          });
+          
+          // Click en "Cerrar" oculta el desarrollo
+          closeBtns.forEach((btn, idx) => {
+            btn.onclick = function(e) {
+              e.stopPropagation();
+              backs[idx].style.display = 'none';
+              btn.style.display = 'none';
+              hints[idx].style.display = 'block';
             };
           });
         } else {
-          // Modo PC: mostrar todo, ocultar hint
-          mobileHints.forEach(el => el.style.display = 'none');
-          mobileHidden.forEach(el => el.style.display = 'block');
-          cards.forEach(card => {
-            card.style.cursor = 'default';
-            card.onclick = null;
-          });
+          // PC: Mostrar todo, ocultar botones
+          hints.forEach(h => h.style.display = 'none');
+          backs.forEach(b => b.style.display = 'block');
+          closeBtns.forEach(b => b.style.display = 'none');
+          hints.forEach(h => h.onclick = null);
+          closeBtns.forEach(b => b.onclick = null);
         }
       }
       
