@@ -163,23 +163,81 @@ export function formatInfografiaDoctrinal(json) {
 
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
-  // Contenedor CON scroll horizontal solo para infografía
-  html += `<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #d4c4a8; border-radius: 8px;"><table style="width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; font-size: 0.9em; color: #3e2723; min-width: 600px;">`;
-  html += `<thead><tr>`;
-  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Doctrina (Teología Sistemática)</th>`;
-  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Fundamento Bíblico</th>`;
-  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Desarrollo Teológico y Referencias Cruzadas</th>`;
-  html += `</tr></thead><tbody>`;
   
-  items.forEach((item, index) => {
-    const bgColor = index % 2 === 0 ? '#ffffff' : '#fdfbf7';
-    html += `<tr style="background-color: ${bgColor};">`;
-    html += `<td style="${ESTILOS.tablaCelda}; font-weight: bold; color: #1a5276;">${escapeHtml(item.doctrina || "—")}</td>`;
-    html += `<td style="${ESTILOS.tablaCelda}; font-style: italic;">${escapeHtml(item.fundamento || "—")}</td>`;
-    html += `<td style="${ESTILOS.tablaCelda}">${escapeHtml(item.desarrollo || "—")}</td>`;
-    html += `</tr>`;
+  // Estilos CSS específicos para las tarjetas (Scoped con prefijo mah-)
+  html += `<style>
+    .mah-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px; }
+    .mah-flip-card { background-color: transparent; width: 100%; height: 340px; perspective: 1000px; cursor: pointer; }
+    .mah-flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s; transform-style: preserve-3d; }
+    .mah-flip-card.flipped .mah-flip-card-inner { transform: rotateY(180deg); }
+    .mah-flip-card-front, .mah-flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; padding: 24px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .mah-flip-card-front { background-color: #ffffff; border: 1px solid #d4c4a8; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .mah-flip-card-back { background: linear-gradient(135deg, #1a3a5c 0%, #2d5a7a 100%); color: white; transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; text-align: left; overflow-y: auto; }
+    
+    /* COMPORTAMIENTO EN PC/DESKTOP (Pantallas mayores a 768px) */
+    @media (min-width: 769px) {
+      .mah-flip-card { height: auto; perspective: none; cursor: default; }
+      .mah-flip-card-inner { transform: none !important; transition: none; display: flex; flex-direction: column; }
+      .mah-flip-card-front { position: relative; height: auto; border-radius: 12px 12px 0 0; align-items: flex-start; text-align: left; border-bottom: none; }
+      .mah-flip-card-back { position: relative; transform: none !important; height: auto; border-radius: 0 0 12px 12px; border-top: 3px solid #d4ac0d; padding-top: 16px; }
+    }
+  </style>`;
+
+  // Contenedor Grid
+  html += `<div class="mah-grid">`;
+
+  items.forEach((item) => {
+    const doctrina = escapeHtml(item.doctrina || "Doctrina");
+    const fundamento = escapeHtml(item.fundamento || "");
+    const desarrollo = escapeHtml(item.desarrollo || "");
+    
+    html += `<div class="mah-flip-card">`;
+    html += `<div class="mah-flip-card-inner">`;
+    
+    // FRENTE DE LA TARJETA (Visible en móvil y parte superior en PC)
+    html += `<div class="mah-flip-card-front">`;
+    html += `<div style="font-size: 2.5em; margin-bottom: 12px;">📚</div>`;
+    html += `<h3 style="color: #1a5276; margin: 0 0 16px 0; font-size: 1.15em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
+    html += `<div style="background: #fdfbf7; padding: 12px 16px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; width: 100%; box-sizing: border-box;">${fundamento}</div>`;
+    html += `<p class="mah-mobile-hint" style="color: #999; margin-top: 16px; font-size: 0.8em; font-style: italic;">👆 Toca para ver el desarrollo</p>`;
+    html += `</div>`;
+    
+    // REVERSO DE LA TARJETA (Visible al voltear en móvil y parte inferior en PC)
+    html += `<div class="mah-flip-card-back">`;
+    html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; border-bottom: 1px dashed rgba(212, 172, 13, 0.5); padding-bottom: 8px; font-family: 'Georgia', serif;">Desarrollo Teológico</h4>`;
+    html += `<p style="color: #f0f0f0; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
+    html += `</div>`;
+    
+    html += `</div></div>`;
   });
-  html += `</tbody></table></div></div>`;
+
+  html += `</div>`;
+
+  // Script para el efecto flip (solo en móvil)
+  html += `<script>
+    (function() {
+      const cards = document.querySelectorAll('.mah-flip-card');
+      const hints = document.querySelectorAll('.mah-mobile-hint');
+      
+      function checkScreen() {
+        const isMobile = window.innerWidth <= 768;
+        hints.forEach(h => h.style.display = isMobile ? 'block' : 'none');
+      }
+      
+      cards.forEach(card => {
+        card.addEventListener('click', function() {
+          if (window.innerWidth <= 768) {
+            this.classList.toggle('flipped');
+          }
+        });
+      });
+      
+      checkScreen();
+      window.addEventListener('resize', checkScreen);
+    })();
+  </script>`;
+
+  html += `</div>`;
   return html;
 }
 
