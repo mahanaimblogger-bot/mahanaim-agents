@@ -16,6 +16,7 @@ export function escapeHtml(str) {
 export function limpiarHtml(html) {
   if (!html) return "";
   
+  // Si el HTML comienza con un JSON mal formado, extraemos solo el contenido real
   if (html.trim().startsWith('{')) {
     const match = html.match(/"contenido_html"\s*:\s*"([\s\S]*)"/);
     if (match && match[1]) {
@@ -28,7 +29,7 @@ export function limpiarHtml(html) {
     }
   }
   
-  return html
+  let htmlLimpio = html
     .replace(/```json|```/g, "")
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, '&')
@@ -37,6 +38,14 @@ export function limpiarHtml(html) {
     .replace(/\\n/g, '\n')
     .replace(/^["']|["']$/g, '')
     .trim();
+
+  //  CLAVE: Envolver en contenedor responsivo para evitar desbordamiento
+  // Solo si no está ya envuelto en un contenedor con max-width
+  if (!htmlLimpio.includes('max-width') && !htmlLimpio.startsWith('<div style="')) {
+    htmlLimpio = `<div style="font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word; overflow-x: auto;">${htmlLimpio}</div>`;
+  }
+
+  return htmlLimpio;
 }
 
 const ESTILOS = {
