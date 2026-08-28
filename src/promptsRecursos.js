@@ -48,8 +48,8 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
     case "diagrama_estructura":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "diagrama_estructura", "titulo": "Diagrama de Estructura Literaria: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe mostrar el tipo de estructura (ej: quiasmo) y un diagrama textual en una etiqueta <pre>. Incluye el significado teológico de la estructura.`;
     
-    case "cronologia":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "cronologia", "titulo": "Cronología del Capítulo: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe ser una tabla con clase "tabla-comparativa" listando los eventos en orden cronológico con su referencia bíblica exacta.`;
+        case "cronologia":
+      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "cronologia", "titulo": "Cronología del capítulo ${capitulo}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe ser una tabla con clase "tabla-comparativa" listando los eventos en orden cronológico con su referencia bíblica exacta. El título DEBE ser exactamente "Cronología del capítulo ${capitulo}".`;
     
     case "conexion_at":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "conexion_at", "titulo": "Conexión con el A.T.: ${ctx}", "conexiones": [{"referencia_at": "Ref AT real", "texto_cita": "Cita textual RVR1960", "explicacion": "Cómo se relaciona con este pasaje del NT"}]}. 3 a 5 conexiones REALES.`;
