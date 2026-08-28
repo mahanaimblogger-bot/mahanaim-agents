@@ -491,25 +491,17 @@ export function formatearRecurso(tipo, datos) {
       return formatQuizInteractivo(datos);
     
     case "paralelos":
-      return formatTablaGenerica(datos, "Paralelos Bíblicos", {
-        dataKey: "paralelos",
-        headers: ["Referencia", "Cita bíblica", "Conexión"],
-        keys: ["referencia", "texto_cita", "explicacion"]
-      });
+      return formatParalelosCards(datos);
 
     case "palabras_clave":
     case "glosario":
       return formatPalabrasClaveHtml(datos);
 
     case "infografia":
-     return formatInfografiaDoctrinal(datos);  // <-- NUEVO CASO  
+      return formatInfografiaDoctrinal(datos);
 
     case "profecias":
-      return formatTablaGenerica(datos, "Profecías", {
-        dataKey: "profecias",
-        headers: ["Profecía", "Ref. Profecía", "Estado", "Cumplimiento", "Explicación"],
-        keys: ["profecia", "referencia_profecia", "estado", "referencia_cumplimiento", "explicacion"]
-      });
+      return formatProfeciasCards(datos);
 
     case "citas_teologos":
     case "citas_libros":
@@ -517,12 +509,10 @@ export function formatearRecurso(tipo, datos) {
 
     case "conexion_at":
     case "conexion_nt":
-      const refKey = tipo === "conexion_at" ? "referencia_at" : "referencia_nt";
-      return formatTablaGenerica(datos, datos.titulo || "Conexiones", {
-        dataKey: "conexiones",
-        headers: ["Referencia", "Texto", "Explicación"],
-        keys: [refKey, "texto_cita", "explicacion"]
-      });
+      return formatConexionesCards(datos, tipo);
+
+    case "cronologia":
+      return formatCronologiaCards(datos);
 
     default:
       return `<div style="${ESTILOS.contenedor}"><pre style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word;">${escapeHtml(JSON.stringify(datos, null, 2))}</pre></div>`;
