@@ -164,6 +164,22 @@ export function formatInfografiaDoctrinal(json) {
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
   
+  // Estilos para el elemento details nativo
+  html += `<style>
+    .mah-details { background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .mah-details summary { padding: 24px; text-align: center; cursor: pointer; list-style: none; user-select: none; }
+    .mah-details summary::-webkit-details-marker { display: none; }
+    .mah-details summary::marker { display: none; content: ''; }
+    .mah-details[open] summary { border-bottom: 2px solid #d4c4a8; }
+    .mah-details-content { background: #1a3a5c; padding: 20px; }
+    
+    /* En PC: siempre abierto */
+    @media (min-width: 769px) {
+      .mah-details { display: block; }
+      .mah-details summary { cursor: default; }
+    }
+  </style>`;
+
   html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
 
   items.forEach((item, index) => {
@@ -171,99 +187,47 @@ export function formatInfografiaDoctrinal(json) {
     const fundamento = escapeHtml(item.fundamento || "");
     const desarrollo = escapeHtml(item.desarrollo || "");
     
-    html += `<div class="mah-card-${index}" style="background: #ffffff; border: 2px solid #d4c4a8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
+    // En móvil: cerrado por defecto. En PC: abierto por defecto.
+    const isOpen = 'open';
     
-    // Parte superior (frente)
-    html += `<div style="padding: 24px; text-align: center;">`;
+    html += `<details class="mah-details" ${isOpen}>`;
+    
+    // Summary (frente de la tarjeta - siempre visible)
+    html += `<summary>`;
     html += `<div style="font-size: 2.5em; margin-bottom: 12px;"></div>`;
     html += `<h3 style="color: #1a5276; margin: 0 0 12px 0; font-size: 1.2em; font-weight: bold; font-family: 'Georgia', serif;">${doctrina}</h3>`;
     html += `<div style="background: #fdfbf7; padding: 12px; border-radius: 6px; border-left: 4px solid #d4ac0d; font-style: italic; color: #3e2723; font-size: 0.95em; font-weight: 500;">${fundamento}</div>`;
-    html += `<button id="mah-open-${index}" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Georgia', serif; display: none;">👆 Ver desarrollo</button>`;
-    html += `</div>`;
+    html += `<p class="mah-hint" style="color: #1a5276; margin-top: 16px; font-size: 0.85em; font-weight: 600;">👆 Toca para ver el desarrollo</p>`;
+    html += `</summary>`;
     
-    // Parte inferior (desarrollo)
-    html += `<div id="mah-back-${index}" style="background: #1a3a5c; padding: 20px; border-top: 3px solid #d4ac0d; display: none;">`;
+    // Contenido (desarrollo - se muestra al hacer click)
+    html += `<div class="mah-details-content">`;
     html += `<h4 style="color: #d4ac0d; margin: 0 0 12px 0; font-size: 1em; font-weight: bold; font-family: 'Georgia', serif; border-bottom: 1px solid rgba(212, 172, 13, 0.3); padding-bottom: 8px;">Desarrollo Teológico</h4>`;
     html += `<p style="color: #ffffff; line-height: 1.6; font-size: 0.95em; margin: 0; text-align: justify; font-family: 'Georgia', serif;">${desarrollo}</p>`;
     html += `</div>`;
     
-    html += `</div>`;
+    html += `</details>`;
   });
 
   html += `</div>`;
 
+  // Script mínimo solo para ocultar el hint en PC
   html += `<script>
     (function() {
-      let openCardIndex = -1;
-      
-      function openCard(index) {
-        const back = document.getElementById('mah-back-' + index);
-        const btn = document.getElementById('mah-open-' + index);
-        
-        // Cerrar la tarjeta anterior si existe y es diferente
-        if (openCardIndex !== -1 && openCardIndex !== index) {
-          const prevBack = document.getElementById('mah-back-' + openCardIndex);
-          const prevBtn = document.getElementById('mah-open-' + openCardIndex);
-          prevBack.style.display = 'none';
-          prevBtn.style.display = 'block';
-        }
-        
-        // Abrir la nueva tarjeta
-        back.style.display = 'block';
-        btn.style.display = 'none';
-        openCardIndex = index;
-      }
-      
-      function updateLayout() {
+      function updateHint() {
         const isMobile = window.innerWidth <= 768;
-        const totalCards = document.querySelectorAll('[id^="mah-back-"]').length;
-        
-        if (totalCards === 0) return;
-        
-        for (let i = 0; i < totalCards; i++) {
-          const openBtn = document.getElementById('mah-open-' + i);
-          const back = document.getElementById('mah-back-' + i);
-          
-          if (isMobile) {
-            // MÓVIL: Configurar eventos
-            openBtn.style.display = 'block';
-            back.style.display = 'none';
-            
-            openBtn.onclick = function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              openCard(i);
-            };
-            
-            // Click en el desarrollo no hace nada (no se puede cerrar)
-            back.onclick = function(e) {
-              e.stopPropagation();
-            };
-          } else {
-            // PC: Mostrar todo, ocultar botones
-            openBtn.style.display = 'none';
-            back.style.display = 'block';
-            openBtn.onclick = null;
-            back.onclick = null;
-          }
-        }
-        
-        // En móvil, abrir automáticamente la ÚLTIMA tarjeta al cargar
-        if (isMobile && openCardIndex === -1) {
-          const lastIndex = totalCards - 1;
-          openCard(lastIndex);
-        }
+        document.querySelectorAll('.mah-hint').forEach(h => {
+          h.style.display = isMobile ? 'block' : 'none';
+        });
       }
-      
-      updateLayout();
-      window.addEventListener('resize', updateLayout);
+      updateHint();
+      window.addEventListener('resize', updateHint);
     })();
   </script>`;
 
   html += `</div>`;
   return html;
 }
-
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
