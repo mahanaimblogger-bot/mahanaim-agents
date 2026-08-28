@@ -39,8 +39,15 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "") 
     case "citas_teologos":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_teologos", "titulo": "Citas de Teólogos: ${ctx}", "citas": [{"autor": "Nombre real", "obra": "Obra real", "cita": "Cita textual pertinente"}]}. 3 a 5 citas. SOLO autores y obras REALES y VERIFICABLES.`;
     
-    case "citas_libros":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_libros", "titulo": "Citas de Libros: ${ctx}", "citas": [{"autor": "Nombre real", "titulo_libro": "Título real", "cita": "Cita textual pertinente"}]}. 3 a 5 citas. SOLO autores y libros REALES.`;
+        case "citas_libros":
+      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_libros", "titulo": "Citas de Libros: ${ctx}", "citas": [{"autor": "Nombre del autor", "titulo_libro": "Título del libro", "cita": "Cita textual del libro"}]}. 
+
+        ⚠️ IMPORTANTE: 
+        - Estos NO son versículos bíblicos. Son citas de LIBROS EXTERNOS a la Biblia.
+        - Los libros deben ser: comentarios bíblicos, obras teológicas, libros de devocionales, o escritos de autores cristianos reconocidos (ej: Juan Calvino, Matthew Henry, Charles Spurgeon, C.S. Lewis, A.W. Tozer, etc.).
+        - Cada cita debe ser un fragmento textual de ese libro externo que hable específicamente sobre ${ctx}.
+        - 3 a 5 citas de libros REALES y VERIFICABLES.
+        - NO incluyas referencias bíblicas como "título_libro". Solo libros externos.`;
     
     case "contexto_arqueologico":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener secciones: Contexto Histórico, Contexto Arqueológico (datos REALES), Implicaciones para la Interpretación. ${clasesCSS}`;
