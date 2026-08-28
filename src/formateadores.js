@@ -157,6 +157,32 @@ export function formatTablaGenerica(json, tipoLabel, columnas) {
   return html;
 }
 
+export function formatInfografiaDoctrinal(json) {
+  const items = json.doctrinas || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron doctrinas.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
+  // Contenedor CON scroll horizontal solo para infografía
+  html += `<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #d4c4a8; border-radius: 8px;"><table style="width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; font-size: 0.9em; color: #3e2723; min-width: 600px;">`;
+  html += `<thead><tr>`;
+  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Doctrina (Teología Sistemática)</th>`;
+  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Fundamento Bíblico</th>`;
+  html += `<th style="${ESTILOS.tablaHeader}; white-space: nowrap;">Desarrollo Teológico y Referencias Cruzadas</th>`;
+  html += `</tr></thead><tbody>`;
+  
+  items.forEach((item, index) => {
+    const bgColor = index % 2 === 0 ? '#ffffff' : '#fdfbf7';
+    html += `<tr style="background-color: ${bgColor};">`;
+    html += `<td style="${ESTILOS.tablaCelda}; font-weight: bold; color: #1a5276;">${escapeHtml(item.doctrina || "—")}</td>`;
+    html += `<td style="${ESTILOS.tablaCelda}; font-style: italic;">${escapeHtml(item.fundamento || "—")}</td>`;
+    html += `<td style="${ESTILOS.tablaCelda}">${escapeHtml(item.desarrollo || "—")}</td>`;
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  return html;
+}
+
 export function formatCitasHtml(json, tipoLabel) {
   const citas = json.citas || [];
   if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
@@ -214,6 +240,9 @@ export function formatearRecurso(tipo, datos) {
     case "palabras_clave":
     case "glosario":
       return formatPalabrasClaveHtml(datos);
+
+    case "infografia":
+     return formatInfografiaDoctrinal(datos);  // <-- NUEVO CASO  
 
     case "profecias":
       return formatTablaGenerica(datos, "Profecías", {
