@@ -10,23 +10,53 @@ const openai = new OpenAI({
 const bookSlug = process.env.BOOK_SLUG;
 const chapterNumber = parseInt(process.env.CHAPTER_NUMBER);
 
+// Función para limpiar HTML y dejar solo texto plano
+function cleanHtml(html) {
+  if (!html) return '';
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function fetchChapterResources() {
   console.log(`🔍 Buscando recursos para ${bookSlug} capítulo ${chapterNumber}...`);
   
-  const { data: chapter, error } = await supabase
-    .from('chapters')
-    .select('id, numero, books(nombre, slug)')
-    .eq('numero', chapterNumber)
-    .eq('books.slug', bookSlug)
+  // Primero buscamos el libro
+  const { data: book, error: bookError } = await supabase
+    .from('books')
+    .select('id, nombre, slug')
+    .eq('slug', bookSlug)
     .single();
 
-  if (error || !chapter) {
-    throw new Error(`Capítulo no encontrado: ${bookSlug} ${chapterNumber}. Detalle: ${error?.message}`);
+  if (bookError || !book) {
+    throw new Error(`Libro no encontrado: ${bookSlug}. Detalle: ${bookError?.message}`);
+  }
+
+  // Luego buscamos el capítulo usando el book_id
+  const { data: chapter, error: chapterError } = await supabase
+    .from('chapters')
+    .select('id, numero')
+    .eq('book_id', book.id)
+    .eq('numero', chapterNumber)
+    .single();
+
+  if (chapterError || !chapter) {
+    throw new Error(`Capítulo ${chapterNumber} no encontrado para ${bookSlug}. Detalle: ${chapterError?.message}`);
   }
 
   return {
     chapterId: chapter.id,
-    bookName: chapter.books?.nombre || bookSlug,
+    bookName: book.nombre,
+    bookSlug: book.slug,
     chapterNumber
   };
 }
@@ -50,6 +80,45 @@ async function getResourcesForChapter(chapterId) {
     citasTeologos: resources.find(r => r.tipo === 'citas_teologos')?.contenido_html || '',
     citasLibros: resources.find(r => r.tipo === 'citas_libros')?.contenido_html || '',
   };
+}
+
+// Función para generar el texto plano consolidado
+function buildPlainTextSource(bookName, chapterNum, context) {
+  let source = `FUENTE CONSOLIDADA PARA NOTEBOOKLM\n`;
+  source += `LIBRO: ${bookName}\n`;
+  source += `CAPÍTULO: ${chapterNum}\n`;
+  source += `========================================\n\n`;
+
+  if (context.estudio) {
+    source += `--- ESTUDIO BÍBLICO ---\n`;
+    source += cleanHtml(context.estudio) + `\n\n`;
+  }
+  if (context.sermon) {
+    source += `--- SERMÓN ---\n`;
+    source += cleanHtml(context.sermon) + `\n\n`;
+  }
+  if (context.infografia) {
+    source += `--- INFOGRAFÍA DOCTRINAL ---\n`;
+    source += cleanHtml(context.infografia) + `\n\n`;
+  }
+  if (context.arqueologia) {
+    source += `--- CONTEXTO ARQUEOLÓGICO ---\n`;
+    source += cleanHtml(context.arqueologia) + `\n\n`;
+  }
+  if (context.palabras) {
+    source += `--- PALABRAS CLAVE ---\n`;
+    source += cleanHtml(context.palabras) + `\n\n`;
+  }
+  if (context.citasTeologos) {
+    source += `--- CITAS DE TEÓLOGOS ---\n`;
+    source += cleanHtml(context.citasTeologos) + `\n\n`;
+  }
+  if (context.citasLibros) {
+    source += `--- CITAS DE LIBROS ---\n`;
+    source += cleanHtml(context.citasLibros) + `\n\n`;
+  }
+
+  return source;
 }
 
 function buildPrompts(bookName, chapterNum, context) {
@@ -91,7 +160,7 @@ function buildPrompts(bookName, chapterNum, context) {
 }
 
 async function generateWithAI(promptData) {
-  console.log(` Generando: ${promptData.type}...`);
+  console.log(`🤖 Generando: ${promptData.type}...`);
   try {
     const response = await openai.chat.completions.create({
       model: "deepseek-chat", 
@@ -109,9 +178,10 @@ async function generateWithAI(promptData) {
   }
 }
 
-async function savePrompts(chapterId, results) {
-  console.log("💾 Guardando prompts en Supabase...");
+async function saveToSupabase(chapterId, results, plainTextSource) {
+  console.log("💾 Guardando en Supabase...");
   
+  // Guardar los 4 prompts generados por IA
   for (const result of results) {
     if (!result) continue;
     
@@ -126,6 +196,25 @@ async function savePrompts(chapterId, results) {
 
     if (error) console.error(`⚠️ Error guardando ${result.type}:`, error.message);
   }
+
+  // Guardar el texto plano consolidado para NotebookLM
+  if (plainTextSource) {
+    const { error: sourceError } = await supabase.from('resources').insert({
+      chapter_id: chapterId,
+      tipo: 'fuente_notebooklm',
+      titulo: 'Fuente Consolidada para NotebookLM (Texto Plano)',
+      contenido_html: plainTextSource,
+      modo: 'text',
+      estado: 'aprobado'
+    });
+
+    if (sourceError) {
+      console.error(`⚠️ Error guardando fuente_notebooklm:`, sourceError.message);
+    } else {
+      console.log("✅ Texto plano consolidado guardado exitosamente.");
+    }
+  }
+
   console.log("✅ ¡Proceso completado con éxito!");
 }
 
@@ -135,6 +224,11 @@ async function main() {
     console.log(`✅ Capítulo encontrado: ID ${chapterInfo.chapterId}, Libro: ${chapterInfo.bookName}`);
     
     const context = await getResourcesForChapter(chapterInfo.chapterId);
+    
+    // Generar texto plano consolidado
+    const plainTextSource = buildPlainTextSource(chapterInfo.bookName, chapterInfo.chapterNumber, context);
+    console.log(`📝 Texto plano generado: ${plainTextSource.length} caracteres`);
+    
     const promptsToGenerate = buildPrompts(chapterInfo.bookName, chapterInfo.chapterNumber, context);
     
     const results = [];
@@ -145,7 +239,7 @@ async function main() {
       }
     }
 
-    await savePrompts(chapterInfo.chapterId, results);
+    await saveToSupabase(chapterInfo.chapterId, results, plainTextSource);
 
   } catch (error) {
     console.error("❌ Error fatal en el workflow:", error.message);
