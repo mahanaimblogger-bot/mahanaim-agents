@@ -11,7 +11,6 @@ const openai = new OpenAI({
 const bookSlug = process.env.BOOK_SLUG;
 const chapterNumber = parseInt(process.env.CHAPTER_NUMBER);
 
-// Función para limpiar HTML y dejar solo texto plano
 function cleanHtml(html) {
   if (!html) return '';
   return html
@@ -67,6 +66,7 @@ async function getResourcesForChapter(chapterId) {
   if (error) throw error;
 
   return {
+    estudioTitulo: resources.find(r => r.tipo === 'estudio')?.titulo || 'Estudio Bíblico',
     estudio: resources.find(r => r.tipo === 'estudio')?.contenido_html || '',
     sermon: resources.find(r => r.tipo === 'sermon')?.contenido_html || '',
     infografia: resources.find(r => r.tipo === 'infografia')?.contenido_html || '',
@@ -78,32 +78,27 @@ async function getResourcesForChapter(chapterId) {
 }
 
 function buildPlainTextSource(bookName, chapterNum, context) {
-  let source = `FUENTE CONSOLIDADA PARA NOTEBOOKLM\n`;
-  source += `LIBRO: ${bookName}\n`;
-  source += `CAPÍTULO: ${chapterNum}\n`;
-  source += `========================================\n\n`;
-
-  if (context.estudio) { source += `--- ESTUDIO BÍBLICO ---\n${cleanHtml(context.estudio)}\n\n`; }
-  if (context.sermon) { source += `--- SERMÓN ---\n${cleanHtml(context.sermon)}\n\n`; }
-  if (context.infografia) { source += `--- INFOGRAFÍA DOCTRINAL ---\n${cleanHtml(context.infografia)}\n\n`; }
-  if (context.arqueologia) { source += `--- CONTEXTO ARQUEOLÓGICO ---\n${cleanHtml(context.arqueologia)}\n\n`; }
-  if (context.palabras) { source += `--- PALABRAS CLAVE ---\n${cleanHtml(context.palabras)}\n\n`; }
-  if (context.citasTeologos) { source += `--- CITAS DE TEÓLOGOS ---\n${cleanHtml(context.citasTeologos)}\n\n`; }
-  if (context.citasLibros) { source += `--- CITAS DE LIBROS ---\n${cleanHtml(context.citasLibros)}\n\n`; }
-
+  let source = `FUENTE CONSOLIDADA PARA NOTEBOOKLM\nLIBRO: ${bookName}\nCAPÍTULO: ${chapterNum}\n========================================\n\n`;
+  if (context.estudio) source += `--- ESTUDIO BÍBLICO: ${context.estudioTitulo} ---\n${cleanHtml(context.estudio)}\n\n`;
+  if (context.sermon) source += `--- SERMÓN ---\n${cleanHtml(context.sermon)}\n\n`;
+  if (context.infografia) source += `--- INFOGRAFÍA DOCTRINAL ---\n${cleanHtml(context.infografia)}\n\n`;
+  if (context.arqueologia) source += `--- CONTEXTO ARQUEOLÓGICO ---\n${cleanHtml(context.arqueologia)}\n\n`;
+  if (context.palabras) source += `--- PALABRAS CLAVE ---\n${cleanHtml(context.palabras)}\n\n`;
+  if (context.citasTeologos) source += `--- CITAS DE TEÓLOGOS ---\n${cleanHtml(context.citasTeologos)}\n\n`;
+  if (context.citasLibros) source += `--- CITAS DE LIBROS ---\n${cleanHtml(context.citasLibros)}\n\n`;
   return source;
 }
 
 function buildPrompts(bookName, chapterNum, context) {
   const baseInfo = `
   LIBRO: ${bookName} | CAPÍTULO: ${chapterNum}
+  TÍTULO DEL ESTUDIO: "${context.estudioTitulo}"
   [ESTUDIO]: ${context.estudio.substring(0, 1500)}
   [SERMÓN]: ${context.sermon.substring(0, 1500)}
   [INFOGRAFÍA]: ${context.infografia.substring(0, 1000)}
   [ARQUEOLOGÍA]: ${context.arqueologia.substring(0, 800)}
   [PALABRAS]: ${context.palabras.substring(0, 800)}
-  [CITAS TEÓLOGOS]: ${context.citasTeologos.substring(0, 800)}
-  [CITAS LIBROS]: ${context.citasLibros.substring(0, 800)}
+  [CITAS]: ${context.citasTeologos.substring(0, 800)} ${context.citasLibros.substring(0, 800)}
   `;
 
   return [
@@ -126,6 +121,20 @@ function buildPrompts(bookName, chapterNum, context) {
       type: 'prompt_diapositivas',
       system: "Eres un experto en educación bíblica y diseño instruccional.",
       user: `Analiza esta información y genera 1 prompt para una presentación de 5 a 7 diapositivas en NotebookLM (máx 4000 chars). Estructura: Portada, Desarrollo, Conclusión. Formato JSON: { "prompt_diapositivas": "..." }.\n\nINFO:\n${baseInfo}`
+    },
+    {
+      type: 'prompt_miniatura',
+      system: "Eres un experto en diseño de miniaturas virales para YouTube de contenido cristiano y prompt engineering para IA generativa de imágenes (Midjourney v6 / DALL-E 3).",
+      user: `Analiza esta información y genera UN prompt en INGLÉS (para mejor resultado en IA de imágenes) diseñado para crear una miniatura de YouTube ultra-llamativa. 
+      
+      REQUISITOS OBLIGATORIOS DEL PROMPT:
+      1. ESTILO VISUAL: Cinematográfico, hiperrealista, alto contraste, iluminación dramática (claroscuro), estilo épico bíblico.
+      2. COMPOSICIÓN: Deja espacio negativo claro para el texto. Sujeto principal emocional y poderoso (ej. rostro con determinación, escena épica de fondo).
+      3. TEXTO EN IMAGEN: Instruye a la IA para que incluya EXACTAMENTE este texto en letras grandes, gruesas, 3D o con borde brillante, de alta legibilidad: "${context.estudioTitulo}". El estilo de la fuente debe coincidir con el tema (ej. antigua, desgastada, dorada, o moderna y audaz según el contexto).
+      4. COLORES: Paleta de colores vibrantes y complementarios que destaquen en el feed de YouTube (ej. azul profundo y dorado, rojo fuego y negro, etc.).
+      5. FORMATO DE SALIDA: JSON { "prompt_miniatura_youtube": "..." } (El prompt generado debe estar en inglés, pero describiendo el texto en español tal cual se pidió).
+      
+      INFO DEL CAPÍTULO:\n${baseInfo}`
     }
   ];
 }
@@ -140,7 +149,7 @@ async function generateWithAI(promptData) {
         { role: "user", content: promptData.user }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.7,
+      temperature: 0.8, // Un poco más de creatividad para el diseño visual
     });
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
@@ -149,7 +158,7 @@ async function generateWithAI(promptData) {
   }
 }
 
-async function saveFilesLocally(results, plainTextSource, bookName, chapterNum) {
+async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, studyTitle) {
   console.log("💾 Generando archivos de texto para descargar...");
   const outputDir = 'prompts_output';
   mkdirSync(outputDir, { recursive: true });
@@ -162,16 +171,19 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum) 
 
     if (result.type === 'prompt_video') {
       fileName = `1_VIDEO_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPTS PARA VIDEO - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 PROMPT 1 - ESTILO VISUAL (Pegar en "Describe un estilo visual personalizado"):\n───────────────────────────────────────────\n${jsonData.prompt_estilo_visual}\n\n📋 PROMPT 2 - CONTENIDO NARRATIVO (Pegar en "¿En qué deben centrarse los presentadores de IA?"):\n───────────────────────────────────────────\n${jsonData.prompt_contenido_narrativo}\n`;
+      fileContent = `═══════════════════════════════════════════\nPROMPTS PARA VIDEO - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 PROMPT 1 - ESTILO VISUAL:\n───────────────────────────────────────────\n${jsonData.prompt_estilo_visual}\n\n📋 PROMPT 2 - CONTENIDO NARRATIVO:\n───────────────────────────────────────────\n${jsonData.prompt_contenido_narrativo}\n`;
     } else if (result.type === 'prompt_audio') {
       fileName = `2_AUDIO_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES (Pegar en "¿En qué deben centrarse los presentadores de IA?"):\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
     } else if (result.type === 'prompt_mapa') {
       fileName = `3_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
     } else if (result.type === 'prompt_diapositivas') {
       fileName = `4_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
+    } else if (result.type === 'prompt_miniatura') {
+      fileName = `5_MINIATURA_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (está en inglés para que herramientas como Midjourney v6 o DALL-E 3 lo entiendan mejor) y pégalo en tu generador de imágenes favorito.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto exacto, genera la imagen sin texto y agrega el título "${studyTitle}" después usando Canva o Photoshop con una fuente gruesa y con borde (stroke) para máximo impacto.`;
     }
 
     writeFileSync(`${outputDir}/${fileName}`, fileContent, 'utf8');
@@ -200,11 +212,11 @@ async function main() {
       if (aiResponse) results.push({ type: p.type, data: aiResponse });
     }
 
-    await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber);
+    await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber, context.estudioTitulo);
     console.log("🎉 ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
 
   } catch (error) {
-    console.error(" Error fatal en el workflow:", error.message);
+    console.error("❌ Error fatal en el workflow:", error.message);
     process.exit(1);
   }
 }
