@@ -1,46 +1,47 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-// 1. Inicializar clientes
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const openai = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: 'https://api.deepseek.com/v1', // Endpoint de DeepSeek
+  baseURL: 'https://api.deepseek.com/v1',
 });
 
 const bookSlug = process.env.BOOK_SLUG;
 const chapterNumber = parseInt(process.env.CHAPTER_NUMBER);
 
-// 2. Función para obtener todos los recursos del capítulo
 async function fetchChapterResources() {
   console.log(`🔍 Buscando recursos para ${bookSlug} capítulo ${chapterNumber}...`);
   
-  const { data: chapter, error: chapterError } = await supabase
+  const { data: chapter, error } = await supabase
     .from('chapters')
-    .select('id, books(name)')
+    .select('id, numero, books(nombre, slug)')
     .eq('numero', chapterNumber)
     .eq('books.slug', bookSlug)
     .single();
 
-  if (chapterError || !chapter) {
-    throw new Error(`Capítulo no encontrado: ${bookSlug} ${chapterNumber}`);
+  if (error || !chapter) {
+    throw new Error(`Capítulo no encontrado: ${bookSlug} ${chapterNumber}. Detalle: ${error?.message}`);
   }
 
-  const chapterId = chapter.id;
-  const bookName = chapter.books.name;
+  return {
+    chapterId: chapter.id,
+    bookName: chapter.books?.nombre || bookSlug,
+    chapterNumber
+  };
+}
 
-  const { data: resources, error: resourcesError } = await supabase
+async function getResourcesForChapter(chapterId) {
+  console.log(`📚 Obteniendo recursos para chapter_id: ${chapterId}...`);
+  
+  const { data: resources, error } = await supabase
     .from('resources')
     .select('tipo, contenido_html, titulo')
     .eq('chapter_id', chapterId);
 
-  if (resourcesError) throw resourcesError;
+  if (error) throw error;
 
-  // Agrupar recursos por tipo para inyectarlos en el prompt
-  const context = {
-    chapterId,
-    bookName,
-    chapterNumber,
+  return {
     estudio: resources.find(r => r.tipo === 'estudio')?.contenido_html || '',
     sermon: resources.find(r => r.tipo === 'sermon')?.contenido_html || '',
     infografia: resources.find(r => r.tipo === 'infografia')?.contenido_html || '',
@@ -49,15 +50,12 @@ async function fetchChapterResources() {
     citasTeologos: resources.find(r => r.tipo === 'citas_teologos')?.contenido_html || '',
     citasLibros: resources.find(r => r.tipo === 'citas_libros')?.contenido_html || '',
   };
-
-  return context;
 }
 
-// 3. Los 4 Prompts Maestros (Plantillas)
-function buildPrompts(context) {
+function buildPrompts(bookName, chapterNum, context) {
   const baseInfo = `
-  LIBRO: ${context.bookName}
-  CAPÍTULO: ${context.chapterNumber}
+  LIBRO: ${bookName}
+  CAPÍTULO: ${chapterNum}
   
   [ESTUDIO BÍBLICO]: ${context.estudio.substring(0, 1500)}...
   [SERMÓN]: ${context.sermon.substring(0, 1500)}...
@@ -72,7 +70,7 @@ function buildPrompts(context) {
     {
       type: 'prompt_video',
       system: "Eres un experto en producción de contenido viral cristiano con profundidad teológica.",
-      user: `Analiza esta información de ${context.bookName} ${context.chapterNumber} y genera 2 prompts para NotebookLM (Estilo Visual máx 4000 chars, Contenido Narrativo máx 4000 chars). Regla de oro: usa solo 1 cita de autoridad (teólogo O libro). Formato de salida: JSON { "prompt_estilo_visual": "...", "prompt_contenido_narrativo": "..." }.\n\nINFO:\n${baseInfo}`
+      user: `Analiza esta información de ${bookName} ${chapterNum} y genera 2 prompts para NotebookLM (Estilo Visual máx 4000 chars, Contenido Narrativo máx 4000 chars). Regla de oro: usa solo 1 cita de autoridad (teólogo O libro). Formato de salida: JSON { "prompt_estilo_visual": "...", "prompt_contenido_narrativo": "..." }.\n\nINFO:\n${baseInfo}`
     },
     {
       type: 'prompt_audio',
@@ -92,9 +90,8 @@ function buildPrompts(context) {
   ];
 }
 
-// 4. Función para llamar a la IA (DeepSeek)
 async function generateWithAI(promptData) {
-  console.log(`🤖 Generando: ${promptData.type}...`);
+  console.log(` Generando: ${promptData.type}...`);
   try {
     const response = await openai.chat.completions.create({
       model: "deepseek-chat", 
@@ -102,18 +99,16 @@ async function generateWithAI(promptData) {
         { role: "system", content: promptData.system },
         { role: "user", content: promptData.user }
       ],
-      response_format: { type: "json_object" }, // Fuerza salida JSON
+      response_format: { type: "json_object" },
       temperature: 0.7,
     });
-
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    console.error(`Error en IA para ${promptData.type}:`, error);
+    console.error(`❌ Error en IA para ${promptData.type}:`, error.message);
     return null;
   }
 }
 
-// 5. Función para guardar en Supabase
 async function savePrompts(chapterId, results) {
   console.log("💾 Guardando prompts en Supabase...");
   
@@ -129,16 +124,18 @@ async function savePrompts(chapterId, results) {
       estado: 'aprobado'
     });
 
-    if (error) console.error(`Error guardando ${result.type}:`, error);
+    if (error) console.error(`⚠️ Error guardando ${result.type}:`, error.message);
   }
   console.log("✅ ¡Proceso completado con éxito!");
 }
 
-// 6. Ejecución principal
 async function main() {
   try {
-    const context = await fetchChapterResources();
-    const promptsToGenerate = buildPrompts(context);
+    const chapterInfo = await fetchChapterResources();
+    console.log(`✅ Capítulo encontrado: ID ${chapterInfo.chapterId}, Libro: ${chapterInfo.bookName}`);
+    
+    const context = await getResourcesForChapter(chapterInfo.chapterId);
+    const promptsToGenerate = buildPrompts(chapterInfo.bookName, chapterInfo.chapterNumber, context);
     
     const results = [];
     for (const p of promptsToGenerate) {
@@ -148,10 +145,10 @@ async function main() {
       }
     }
 
-    await savePrompts(context.chapterId, results);
+    await savePrompts(chapterInfo.chapterId, results);
 
   } catch (error) {
-    console.error("❌ Error fatal en el workflow:", error);
+    console.error("❌ Error fatal en el workflow:", error.message);
     process.exit(1);
   }
 }
