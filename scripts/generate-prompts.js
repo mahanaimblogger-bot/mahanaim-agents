@@ -1,5 +1,5 @@
-const { createClient } = require('@supabase/supabase-js');
-const OpenAI = require('openai');
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
 
 // 1. Inicializar clientes
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -38,6 +38,7 @@ async function fetchChapterResources() {
 
   // Agrupar recursos por tipo para inyectarlos en el prompt
   const context = {
+    chapterId,
     bookName,
     chapterNumber,
     estudio: resources.find(r => r.tipo === 'estudio')?.contenido_html || '',
@@ -96,7 +97,7 @@ async function generateWithAI(promptData) {
   console.log(`🤖 Generando: ${promptData.type}...`);
   try {
     const response = await openai.chat.completions.create({
-      model: "deepseek-chat", // O "deepseek-reasoner" si prefieres
+      model: "deepseek-chat", 
       messages: [
         { role: "system", content: promptData.system },
         { role: "user", content: promptData.user }
@@ -119,13 +120,11 @@ async function savePrompts(chapterId, results) {
   for (const result of results) {
     if (!result) continue;
     
-    // Guardamos cada prompt como un recurso nuevo vinculado al capítulo
-    // Ajusta 'tipo' y 'contenido_html' según tu esquema real
     const { error } = await supabase.from('resources').insert({
       chapter_id: chapterId,
-      tipo: result.type, // ej: 'prompt_video', 'prompt_audio'
+      tipo: result.type, 
       titulo: `Prompt Generado: ${result.type}`,
-      contenido_html: JSON.stringify(result.data), // Guardamos el JSON generado
+      contenido_html: JSON.stringify(result.data), 
       modo: 'json',
       estado: 'aprobado'
     });
@@ -149,9 +148,7 @@ async function main() {
       }
     }
 
-    // Necesitamos el chapter_id para guardar, lo volvemos a obtener o lo pasamos
-    const { data: chap } = await supabase.from('chapters').select('id').eq('numero', chapterNumber).eq('books.slug', bookSlug).single();
-    await savePrompts(chap.id, results);
+    await savePrompts(context.chapterId, results);
 
   } catch (error) {
     console.error("❌ Error fatal en el workflow:", error);
