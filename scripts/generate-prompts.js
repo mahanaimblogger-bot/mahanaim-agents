@@ -124,17 +124,26 @@ function buildPrompts(bookName, chapterNum, context) {
     },
     {
       type: 'prompt_miniatura',
-      system: "Eres un experto en diseño de miniaturas virales para YouTube de contenido cristiano y prompt engineering para IA generativa de imágenes (Midjourney v6 / DALL-E 3).",
-      user: `Analiza esta información y genera UN prompt en INGLÉS (para mejor resultado en IA de imágenes) diseñado para crear una miniatura de YouTube ultra-llamativa. 
+      system: "Eres un experto en diseño de miniaturas virales para YouTube y prompt engineering para IA generativa de imágenes.",
+      user: `Analiza esta información y genera UN prompt en INGLÉS para crear una miniatura de YouTube ultra-llamativa. 
+      REQUISITOS: 1. Estilo cinematográfico/hiperrealista. 2. Alto contraste y espacio negativo para texto. 3. Instruye a la IA para incluir el texto exacto: "${context.estudioTitulo}" en letras grandes y legibles. 4. Colores vibrantes. 
+      Formato JSON: { "prompt_miniatura_youtube": "..." }.\n\nINFO:\n${baseInfo}`
+    },
+    {
+      type: 'prompt_descripcion',
+      system: "Eres un experto en SEO para YouTube y Copywriting cristiano.",
+      user: `Analiza esta información y genera una descripción completa y optimizada para SEO para el video de YouTube sobre este capítulo.
       
-      REQUISITOS OBLIGATORIOS DEL PROMPT:
-      1. ESTILO VISUAL: Cinematográfico, hiperrealista, alto contraste, iluminación dramática (claroscuro), estilo épico bíblico.
-      2. COMPOSICIÓN: Deja espacio negativo claro para el texto. Sujeto principal emocional y poderoso (ej. rostro con determinación, escena épica de fondo).
-      3. TEXTO EN IMAGEN: Instruye a la IA para que incluya EXACTAMENTE este texto en letras grandes, gruesas, 3D o con borde brillante, de alta legibilidad: "${context.estudioTitulo}". El estilo de la fuente debe coincidir con el tema (ej. antigua, desgastada, dorada, o moderna y audaz según el contexto).
-      4. COLORES: Paleta de colores vibrantes y complementarios que destaquen en el feed de YouTube (ej. azul profundo y dorado, rojo fuego y negro, etc.).
-      5. FORMATO DE SALIDA: JSON { "prompt_miniatura_youtube": "..." } (El prompt generado debe estar en inglés, pero describiendo el texto en español tal cual se pidió).
+      ESTRUCTURA OBLIGATORIA DE LA DESCRIPCIÓN:
+      1. TÍTULO SUGERIDO: 3 opciones de títulos virales y con gancho (máx 60 caracteres).
+      2. GANCHO INICIAL: Las primeras 2 líneas que atrapan al lector (lo que se ve antes de "mostrar más").
+      3. RESUMEN: Un párrafo corto explicando qué aprenderá el espectador (usa palabras clave del estudio).
+      4. TIMESTAMPS: Sugiere una lista de capítulos con tiempos (ej: 0:00 Intro, 0:45 El conflicto, etc.) basada en la estructura del video.
+      5. VERSÍCULO CLAVE: Cita el versículo principal del capítulo.
+      6. LLAMADO A LA ACCIÓN: Invitación a suscribirse y comentar.
+      7. HASHTAGS: 5 hashtags relevantes al final.
       
-      INFO DEL CAPÍTULO:\n${baseInfo}`
+      Formato JSON: { "descripcion_youtube": "..." } (Usa saltos de línea \n para formatear).\n\nINFO:\n${baseInfo}`
     }
   ];
 }
@@ -149,11 +158,11 @@ async function generateWithAI(promptData) {
         { role: "user", content: promptData.user }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.8, // Un poco más de creatividad para el diseño visual
+      temperature: 0.8,
     });
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    console.error(`❌ Error en IA para ${promptData.type}:`, error.message);
+    console.error(` Error en IA para ${promptData.type}:`, error.message);
     return null;
   }
 }
@@ -174,16 +183,19 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
       fileContent = `═══════════════════════════════════════════\nPROMPTS PARA VIDEO - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 PROMPT 1 - ESTILO VISUAL:\n───────────────────────────────────────────\n${jsonData.prompt_estilo_visual}\n\n📋 PROMPT 2 - CONTENIDO NARRATIVO:\n───────────────────────────────────────────\n${jsonData.prompt_contenido_narrativo}\n`;
     } else if (result.type === 'prompt_audio') {
       fileName = `2_AUDIO_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
     } else if (result.type === 'prompt_mapa') {
       fileName = `3_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
     } else if (result.type === 'prompt_diapositivas') {
       fileName = `4_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
     } else if (result.type === 'prompt_miniatura') {
       fileName = `5_MINIATURA_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (está en inglés para que herramientas como Midjourney v6 o DALL-E 3 lo entiendan mejor) y pégalo en tu generador de imágenes favorito.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto exacto, genera la imagen sin texto y agrega el título "${studyTitle}" después usando Canva o Photoshop con una fuente gruesa y con borde (stroke) para máximo impacto.`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (en inglés) y pégalo en Midjourney/DALL-E 3.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto, genera la imagen sin texto y agrégalo luego en Canva con fuente gruesa.`;
+    } else if (result.type === 'prompt_descripcion') {
+      fileName = `6_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
+      fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
     }
 
     writeFileSync(`${outputDir}/${fileName}`, fileContent, 'utf8');
@@ -213,7 +225,7 @@ async function main() {
     }
 
     await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber, context.estudioTitulo);
-    console.log("🎉 ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
+    console.log(" ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
 
   } catch (error) {
     console.error("❌ Error fatal en el workflow:", error.message);
