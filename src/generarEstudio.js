@@ -115,6 +115,7 @@ INSTRUCCIONES OBLIGATORIAS:
 1. Cualquier cita del capítulo que estás estudiando DEBE ser una copia exacta, palabra por palabra, del texto proporcionado arriba. TIENES PROHIBIDO parafrasear, inventar, o modificar una sola coma.
 2. Para las REFERENCIAS CRUZADAS a otros libros/capítulos: usa SOLO citas que conozcas con 100% de certeza en la versión RVR1960. Si tienes la más mínima duda del texto exacto de una referencia cruzada, NO pongas el texto en el tooltip — solo deja la referencia (ej: "Ver Hebreos 11:4") sin el tooltip de texto.
 3. NUNCA inventes un versículo. Es preferible omitir un tooltip a inventar una cita.
+4.  REGLA CRÍTICA SOBRE IMÁGENES: No sugieras, insertes ni marques placeholders (como [Imagen aquí] o <img>) para imágenes en el cuerpo del HTML del estudio. El texto debe fluir limpio, usando solo los separadores y viñetas de diseño indicados en el Prompt Maestro. ÚNICAMENTE debes sugerir UNA (1) sola imagen al final de tu respuesta, bajo la clave "imagen_portada", que servirá como cabecera principal del estudio. Bajo ninguna circunstancia sugieras imágenes para el cuerpo del texto.
 =========================================================
 
 Genera el estudio completo siguiendo EXACTAMENTE las instrucciones del Prompt Maestro.
