@@ -11,6 +11,88 @@ const openai = new OpenAI({
 const bookSlug = process.env.BOOK_SLUG;
 const chapterNumber = parseInt(process.env.CHAPTER_NUMBER);
 
+// ============================================================
+// FUNCIONES AUXILIARES PARA MAPAS INTERACTIVOS
+// ============================================================
+
+function generateGoogleMapsEmbedUrl(lat, lng, placeName = '') {
+  const nameParam = placeName ? encodeURIComponent(placeName) : '';
+  return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat}, ${lng}!5e1!3m2!1ses!2s!4v1`;
+}
+
+function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
+  let html = `
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">${titulo}</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">${bookName} Capítulo ${chapterNum}</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;">📍 Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+`;
+
+  ubicaciones.forEach((ubicacion, index) => {
+    const embedUrl = generateGoogleMapsEmbedUrl(ubicacion.latitud, ubicacion.longitud, ubicacion.nombre);
+    const certezaIcon = ubicacion.certeza === 'confirmada' ? '✅' : 
+                        ubicacion.certeza === 'probable' ? '🟡' : '⚠️';
+    
+    html += `
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    ${index + 1}. ${ubicacion.nombre} ${certezaIcon}
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe 
+      src="${embedUrl}" 
+      width="100%" 
+      height="400" 
+      style="border:0;" 
+      allowfullscreen="" 
+      loading="lazy" 
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> ${ubicacion.referencia_biblica}</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> ${ubicacion.latitud}°N, ${ubicacion.longitud}°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> ${ubicacion.contexto_historico}</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> ${ubicacion.importancia_teologica}</p>
+  </div>
+  
+  <div style="background: ${ubicacion.certeza === 'confirmada' ? '#d4edda' : '#fff3cd'}; 
+              padding: 0.8rem; border-radius: 6px; border-left: 4px solid ${ubicacion.certeza === 'confirmada' ? '#28a745' : '#ffc107'};">
+    <strong>Nivel de certeza:</strong> ${ubicacion.certeza.charAt(0).toUpperCase() + ubicacion.certeza.slice(1)}
+  </div>
+</div>
+`;
+  });
+
+  html += `
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios 
+    geográficos históricos, limitaciones arqueológicas o interpretaciones divergentes de los textos antiguos.
+  </p>
+</div>
+`;
+
+  return html;
+}
+
+// ============================================================
+// FUNCIONES EXISTENTES
+// ============================================================
+
 function cleanHtml(html) {
   if (!html) return '';
   return html
@@ -143,7 +225,54 @@ function buildPrompts(bookName, chapterNum, context) {
       6. LLAMADO A LA ACCIÓN: Invitación a suscribirse y comentar.
       7. HASHTAGS: 5 hashtags relevantes al final.
       
-      Formato JSON: { "descripcion_youtube": "..." } (Usa saltos de línea \n para formatear).\n\nINFO:\n${baseInfo}`
+      Formato JSON: { "descripcion_youtube": "..." } (Usa saltos de línea \\n para formatear).\n\nINFO:\n${baseInfo}`
+    },
+    {
+      type: 'prompt_mapa_interactivo',
+      system: "Eres un experto en geografía bíblica, arqueología del antiguo oriente próximo y teología. Tu trabajo es identificar ubicaciones geográficas mencionadas en el estudio bíblico y crear recursos de mapa interactivo educativos.",
+      user: `Analiza este estudio bíblico de ${bookName} capítulo ${chapterNum} e identifica TODAS las ubicaciones geográficas mencionadas (ciudades, montes, ríos, regiones, etc.).
+
+Para CADA ubicación identificada, genera:
+
+**INFORMACIÓN REQUERIDA:**
+1. **Nombre del lugar** (en español)
+2. **Coordenadas GPS aproximadas** (latitud, longitud)
+3. **Referencia bíblica** donde se menciona
+4. **Contexto histórico/arqueológico** breve
+5. **Importancia teológica** en el capítulo
+
+**UBICACIONES CON CERTEZA vs INCERTIDUMBRE:**
+- Si la ubicación es **confirmada** arqueológicamente: proporciona coordenadas exactas
+- Si es **probable pero debatida**: proporciona la teoría más aceptada y menciona la incertidumbre
+- Si es **desconocida**: usa la región general más probable según el contexto
+
+**FORMATO DE SALIDA JSON:**
+{
+  "titulo_recurso": "Mapa Interactivo: [Tema del capítulo] - Ubicaciones Bíblicas",
+  "ubicaciones": [
+    {
+      "nombre": "Nombre del lugar",
+      "latitud": 31.0103,
+      "longitud": 47.4344,
+      "referencia_biblica": "Génesis 2:14",
+      "contexto_historico": "Descripción breve del contexto histórico y arqueológico",
+      "importancia_teologica": "Significado teológico en el pasaje",
+      "certeza": "confirmada | probable | debatida | desconocida"
+    }
+  ],
+  "nota_metodologica": "Explicación sobre la certeza/incertidumbre de las ubicaciones"
+}
+
+**EJEMPLO DE UBICACIONES PARA ÉXODO 5:**
+1. Pi-Ramsés (capital de Faraón) - 30.8080, 31.2859
+2. Ladrilleras del Delta - 30.7500, 31.3000
+3. Monte Sinaí (Horeb) - 28.5394, 33.9746
+4. Tierra de Gosén - 30.8500, 31.6500
+
+**INFORMACIÓN DEL ESTUDIO:**
+${baseInfo}
+
+Genera el recurso de mapa en formato JSON completo.`
     }
   ];
 }
@@ -196,6 +325,54 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
     } else if (result.type === 'prompt_descripcion') {
       fileName = `6_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
+    } else if (result.type === 'prompt_mapa_interactivo') {
+      fileName = `7_MAPA_INTERACTIVO_${bookName}_Cap${chapterNum}.txt`;
+      
+      const mapaData = jsonData;
+      const htmlGenerado = generateMapResourceHTML(
+        mapaData.titulo_recurso,
+        mapaData.ubicaciones,
+        bookName,
+        chapterNum
+      );
+      
+      fileContent = `═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: ${bookName} | Capítulo: ${chapterNum}
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: ${mapaData.titulo_recurso}
+
+TIPO: mapa
+
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+${htmlGenerado}
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+${mapaData.ubicaciones.map((u, i) => `${i + 1}. ${u.nombre} (${u.latitud}, ${u.longitud}) - ${u.certeza}`).join('\n')}
+
+📝 NOTA METODOLÓGICA:
+${mapaData.nota_metodologica || 'Las ubicaciones varían en certeza según la evidencia arqueológica disponible.'}
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: ${bookName}, Capítulo: ${chapterNum}
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío (o pon la primera URL de mapa si quieres)
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
+`;
     }
 
     writeFileSync(`${outputDir}/${fileName}`, fileContent, 'utf8');
@@ -225,7 +402,7 @@ async function main() {
     }
 
     await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber, context.estudioTitulo);
-    console.log(" ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
+    console.log("✨ ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
 
   } catch (error) {
     console.error("❌ Error fatal en el workflow:", error.message);
