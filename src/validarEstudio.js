@@ -70,14 +70,13 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
     errores.push("Quedó un [PLACEHOLDER] sin rellenar.");
   }
 
+  // Validación de la imagen de portada (ÚNICA imagen permitida)
   if (!/<!--\s*IMAGEN_SUGERIDA_PORTADA:/i.test(html)) {
-    errores.push("Falta el marcador de imagen de portada.");
+    errores.push("Falta el marcador de imagen de portada (<!-- IMAGEN_SUGERIDA_PORTADA: ... -->).");
   }
 
-  const marcadoresContenido = (html.match(/<!--\s*IMAGEN_SUGERIDA:/gi) || []).length;
-  if (marcadoresContenido < 2) {
-    errores.push(`Solo ${marcadoresContenido} marcador(es) de imagen, mínimo: 2.`);
-  }
+  // NOTA: Se eliminó la validación de mínimo 2 imágenes en el contenido, 
+  // ya que el nuevo estándar es usar SOLO la imagen de portada para mantener el diseño limpio.
 
   // ==========================================================
   // CORRECCIÓN AUTOMÁTICA DE CITAS BÍBLICAS
