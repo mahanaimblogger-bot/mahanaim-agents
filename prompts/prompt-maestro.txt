@@ -915,6 +915,60 @@ REGLAS OBLIGATORIAS PARA EL APÉNDICE:
    - VI. Ecos intertextuales en toda la Escritura (id="apendice-ecos")
 6. El apéndice cierra con <div class="separador">✦ ✦ ✦</div>.
 
+========================================================================
+REGLA CRÍTICA: ESTRUCTURA HTML PARA RECURSO "DEVOCIONAL"
+========================================================================
+Cuando el tipo de recurso sea "devocional", DEBES generar el contenido usando EXACTAMENTE la siguiente estructura HTML con estilos en línea (inline styles). NO uses clases CSS externas, NO uses divs anidados innecesarios. Usa la paleta de colores Mahanaim: Azul oscuro (#1a3a5c), Dorado (#d4ac0d), Crema (#fdfbf7) y Marrón texto (#3e2723).
+
+Estructura obligatoria:
+
+1. TÍTULO DEL DEVOCIONAL:
+<h2 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 1.8rem; text-align: center; margin-bottom: 1.5rem; border-bottom: 2px solid #d4ac0d; padding-bottom: 0.5rem; display: inline-block; width: 100%;">
+  [Título atractivo y espiritual del devocional]
+</h2>
+
+2. VERSÍCULO CLAVE (Caja destacada):
+<div style="background-color: #1a3a5c; color: #fdfbf7; padding: 2rem; border-radius: 12px; border-left: 6px solid #d4ac0d; margin: 2rem 0; text-align: center; box-shadow: 0 4px 12px rgba(26, 58, 92, 0.15);">
+  <p style="font-family: 'Georgia', serif; font-size: 1.3rem; font-style: italic; line-height: 1.6; margin: 0;">
+    "[Texto exacto del versículo bíblico principal entre comillas]"
+  </p>
+  <p style="color: #d4ac0d; font-weight: bold; margin-top: 1rem; font-size: 1.1rem; letter-spacing: 1px;">
+    — [Referencia Bíblica, ej: Salmos 23:1] —
+  </p>
+</div>
+
+3. REFLEXIÓN (Cuerpo del mensaje):
+<div style="margin: 2rem 0;">
+  <p style="font-size: 1.1rem; line-height: 1.8; color: #3e2723; margin-bottom: 1.5rem; text-align: justify;">
+    [Primer párrafo de la reflexión: conecta el versículo con una verdad bíblica o una situación de la vida real. Tono cálido, pastoral y alentador.]
+  </p>
+  <p style="font-size: 1.1rem; line-height: 1.8; color: #3e2723; margin-bottom: 1.5rem; text-align: justify;">
+    [Segundo párrafo de la reflexión: profundiza en la aplicación espiritual o el consuelo que ofrece el pasaje.]
+  </p>
+</div>
+
+4. APLICACIÓN PRÁCTICA (Caja de acción):
+<div style="background-color: #f5f2eb; padding: 1.5rem; border-radius: 8px; border: 1px solid #d4c4a8; margin: 2rem 0;">
+  <h3 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 1.2rem; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    💡 Aplicación para Hoy
+  </h3>
+  <p style="font-size: 1.05rem; line-height: 1.7; color: #5d4037; margin: 0;">
+    [Una o dos oraciones concretas y accionables sobre cómo vivir esta verdad en el día a día.]
+  </p>
+</div>
+
+5. ORACIÓN FINAL (Cierre espiritual):
+<div style="background-color: #fdfbf7; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #d4ac0d; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+  <h3 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 1.2rem; margin-top: 0; margin-bottom: 1rem;">
+    🙏 Oración
+  </h3>
+  <p style="font-style: italic; color: #5d4037; line-height: 1.7; margin: 0;">
+    "[Redacta una oración breve, sincera y dirigida a Dios, basada en el tema del devocional, para que el lector pueda orarla en voz alta.]"
+  </p>
+</div>
+
+RECORDATORIO: Mantén el tono teológico reformado, cálido y pastoral. NO inventes versículos. Usa la versión Reina-Valera 1960 o LBLA para las citas.
+
 ══════════════════════════════════════════════════
 FIN DEL PROMPT MAESTRO v2
 ══════════════════════════════════════════════════
