@@ -375,13 +375,13 @@ ${mapaData.nota_metodologica || 'Las ubicaciones varÃ­an en certeza segÃºn l
 `;
     }
 
-    writeFileSync(`${outputDir}/${fileName}`, fileContent, 'utf8');
+    writeFileSync(`${outputDir}/${fileName}`, '\uFEFF' + fileContent, 'utf8');
     console.log(`âœ… Archivo creado: ${fileName}`);
   }
 
   if (plainTextSource) {
     const sourceFileName = `0_FUENTE_CONSOLIDADA_${bookName}_Cap${chapterNum}.txt`;
-    writeFileSync(`${outputDir}/${sourceFileName}`, plainTextSource, 'utf8');
+    writeFileSync(`${outputDir}/${sourceFileName}`, '\uFEFF' + plainTextSource, 'utf8');
     console.log(`âœ… Archivo creado: ${sourceFileName}`);
   }
 }
