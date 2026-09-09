@@ -1,14 +1,26 @@
 import "dotenv/config";
-import { supabase, obtenerBookIdPorSlug, obtenerOCrearChapterId, obtenerTextoCapituloCompleto, guardarRecursoComoBorrador } from "./supabaseClient.js";
+import { supabase, obtenerBookIdPorSlug, obtenerOCrearChapterId, obtenerTextoCapituloCompleto, obtenerRecurso, guardarRecursoComoBorrador } from "./supabaseClient.js";
 import { generarPromptRecurso } from "./promptsRecursos.js";
 import { formatearRecurso } from "./formateadores.js"; // <-- NUEVO IMPORT
 
 // Recursos que la IA puede generar automáticamente
 const RECURSOS_IA = [
-  "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos", 
-  "palabras_clave", "infografia", "citas_teologos", "citas_libros", 
-  "contexto_arqueologico", "diagrama_estructura", "cronologia", "devocional", "profecias"
+  "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos",
+  "palabras_clave", "infografia", "citas_teologos", "citas_libros",
+  "contexto_arqueologico", "diagrama_estructura", "cronologia", "devocional", "profecias",
+  "podcast_guion"
 ];
+
+// Cadena homilética: cada uno se nutre de la/s fuente/s previas del mismo capítulo.
+// fuente_tipos[l] = tipos que deben existir (o poder generarse antes) para poder generar l.
+const FUENTES_CADENA = {
+  sermon:        ["estudio"],
+  bosquejo:      ["sermon"],
+  podcast_guion: ["estudio", "sermon"],
+};
+const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
+// Tipos que NUNCA se guardan en la DB (solo se producen como archivo descargable).
+const TIPOS_TXT_SOLO = new Set(["podcast_guion"]);
 
 // Recursos externos que requieren URL
 const RECURSOS_EXTERNOS = ["video", "imagen", "audio", "mapa", "diapositiva", "testimonio"];
@@ -23,8 +35,8 @@ async function llamarIA(prompt) {
     body: JSON.stringify({
       model: process.env.LLM_MODEL || "deepseek-chat",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.3,
-      max_tokens: 4000
+            temperature: 0.3,
+      max_tokens: 8000
     })
   });
   const data = await response.json();
@@ -73,7 +85,7 @@ async function main() {
     : [...RECURSOS_IA, "conexion_nt"];
 
   // 3. Determinar faltantes de IA
-  const faltantesIA = recursosIATotales.filter(tipo => !tiposExistentes.includes(tipo));
+  const faltantesIA = recursosIATotales.filter(tipo => TIPOS_TXT_SOLO.has(tipo) || !tiposExistentes.includes(tipo));
   
   if (faltantesIA.length === 0) {
     console.log("✅ Todos los recursos de IA para este capítulo ya están generados.");
@@ -82,12 +94,68 @@ async function main() {
     
     const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
 
-    for (const tipo of faltantesIA) {
+        // ---- ORDENAMIENTO PARA RESPETAR LA CADENA HOMILÉTICA (estudio->sermón->bosquejo->podcast) ----
+    const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
+    const fueraCadena = faltantesIA.filter(t => !TIPOS_CADENA.has(t));
+    const ordenCadena = ["sermon", "bosquejo", "podcast_guion"].filter(t => enCadena.includes(t));
+    const colaGeneracion = [...ordenCadena, ...fueraCadena];
+
+    function displayTipo(t) {
+      if (t === "sermon") return "sermón";
+      if (t === "podcast_guion") return "guion de podcast";
+      return t;
+    }
+
+    // Caché/lectura de fuentes desde Supabase (lo más reciente, borrador o publicado).
+    const cacheFuentes = {};
+    async function leerFuentePara(tipoFuente) {
+      if (tipoFuente in cacheFuentes) return cacheFuentes[tipoFuente];
+      const rec = await obtenerRecurso(chapterId, tipoFuente);
+      cacheFuentes[tipoFuente] = rec || null;
+      return rec;
+    }
+
+    for (const tipo of colaGeneracion) {
       console.log(`\n Generando: ${tipo}...`);
       try {
-        const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo);
-        const respuestaCruda = await llamarIA(prompt);
-        
+        // Validar y reunir las fuentes de este tipo (si es parte de la cadena homilética).
+        const materiales = {};
+        const fuentesTipo = FUENTES_CADENA[tipo] || [];
+        const ausentes = [];
+        const hallados = {};
+        for (const fTipo of fuentesTipo) {
+          const src = await leerFuentePara(fTipo);
+          if (src) hallados[fTipo] = src.contenido_html || "";
+          else ausentes.push(fTipo);
+        }
+        if (ausentes.length > 0) {
+          const lista = ausentes.map(displayTipo).join(" y ");
+          console.log(`   ⛔ No se generó "${displayTipo(tipo)}" porque falta el recurso fuente: ${lista} de ${libro} ${capituloNum}. Crea/verifica primero ese(os) recurso(s) y vuelve a correr el orquestador.`);
+          continue; // No generar sin su fuente; avisamos cuál falta.
+        }
+        if (hallados.estudio) materiales.estudio_html = hallados.estudio;
+        if (hallados.sermon) materiales.sermon_html = hallados.sermon;
+
+        const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
+                const respuestaCruda = await llamarIA(prompt);
+
+        // PODCAST_GUION: no se publica en Supabase; se guarda como .txt listo para TTS
+        if (tipo === "podcast_guion") {
+          const fsMod = await import("node:fs");
+          const pathMod = await import("node:path");
+          const outDir = pathMod.join(process.cwd(), "output");
+          fsMod.mkdirSync(outDir, { recursive: true });
+          const textoGuion = respuestaCruda
+            .replace(/^```(?:txt)?\s*/i, "")
+            .replace(/\s*```$/i, "")
+            .trim();
+          const archivo = pathMod.join(outDir, `${libro}-${capituloNum}-podcast_guion.txt`);
+          fsMod.writeFileSync(archivo, textoGuion, "utf8");
+          console.log(`   ✔ Guion de podcast guardado en: ${archivo} (listo para el conversor de texto a voz).`);
+          await new Promise((r) => setTimeout(r, 3000));
+          continue;
+        }
+
         // Limpieza básica de markdown JSON
         const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
         let datos;
