@@ -331,3 +331,41 @@ export async function obtenerVersiculoPorSlug(slugLibro, capitulo, verso) {
 
   return await obtenerVersiculo(libroInfo.id, capitulo, verso);
 }
+
+/**
+ * Guarda un recurso generado en Supabase con publicado=true (listo para la web).
+ * Ideal para el Orquestador Maestro cuando la validación automática ya pasó.
+ */
+export async function guardarRecursoComoPublicado({
+  chapterId,
+  tipo,
+  titulo,
+  slug,
+  contenidoHtml,
+}) {
+  if (!supabase) {
+    console.warn(
+      "No hay conexión a Supabase configurada — no se guardó nada."
+    );
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("resources")
+    .insert({
+      chapter_id: chapterId,
+      tipo,
+      titulo,
+      slug,
+      contenido_html: contenidoHtml,
+      modo: "html",
+      publicado: true, // <-- AQUÍ ESTÁ LA CLAVE
+    })
+    .select();
+
+  if (error) {
+    throw new Error(`Error guardando en Supabase: ${error.message}`);
+  }
+
+  return data;
+}
