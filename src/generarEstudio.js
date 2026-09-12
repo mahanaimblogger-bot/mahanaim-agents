@@ -3,14 +3,14 @@ import path from "path";
 import { generarConDeepSeek } from "./deepseekClient.js";
 import { leerIndicacionEspecial } from "./leerIndicaciones.js";
 import { validarEstudio } from "./validarEstudio.js";
-import {
-  obtenerBookIdPorSlug,
-  obtenerOCrearChapterId,
-  existeRecurso,
-  eliminarRecursoExistente,
-  guardarRecursoComoBorrador,
-  obtenerTextoCapituloCompleto,
-} from "./supabaseClient.js";
+   import {
+     obtenerBookIdPorSlug,
+     obtenerOCrearChapterId,
+     existeRecurso,
+     eliminarRecursoExistente,
+     guardarRecursoComoPublicado, // <--- NUEVO NOMBRE
+     obtenerTextoCapituloCompleto,
+   } from "./supabaseClient.js";
 
 /**
  * Genera el encabezado HTML "Oro Metálico" para los estudios bíblicos.
