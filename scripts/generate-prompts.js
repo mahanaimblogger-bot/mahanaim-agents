@@ -252,21 +252,23 @@ ${baseInfo}
 
 Genera el recurso de mapa en formato JSON completo.`
     },
-    {
+       {
       type: 'prompt_podcast_guion',
-      system: "Eres un experto en guionización de podcasts cristianos y producción de audio. Tu tarea es transformar el estudio bíblico, el sermón y el bosquejo en un guion de podcast fluido, conversacional y teológicamente profundo, listo para ser leído por un locutor o convertido a voz por IA (TTS).",
-      user: `Basado en la siguiente información del estudio, sermón y bosquejo, escribe un guion de podcast completo (duración estimada 10-15 minutos).
+      system: "Eres un experto en guionización de podcasts cristianos. Tu tarea es transformar el estudio bíblico, el sermón y el bosquejo en un guion de podcast fluido. DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON.",
+      user: `Basado en la siguiente información, escribe un guion de podcast completo.
       
       ESTRUCTURA DEL GUION:
       1. INTRODUCCIÓN (1-2 min): Gancho atractivo, presentación del tema y el texto base.
-      2. DESARROLLO (6-10 min): Explicación exegética clara, aplicación práctica, uso de las citas de teólogos y el contexto arqueológico proporcionados.
-      3. CONCLUSIÓN Y LLAMADO (2-3 min): Resumen de la verdad central, aplicación para la vida diaria y una oración o reflexión final.
+      2. DESARROLLO (6-10 min): Explicación exegética clara, aplicación práctica.
+      3. CONCLUSIÓN Y LLAMADO (2-3 min): Resumen de la verdad central y oración final.
       
-      TONO: Cálido, pastoral, claro y profundo. Usa un lenguaje conversacional pero respetuoso.
-      FORMATO: Usa indicaciones de locución entre corchetes, ej: [Música suave de fondo], [Pausa dramática], [Énfasis].
+      TONO: Cálido, pastoral, claro. Usa indicaciones de locución entre corchetes, ej: [Música suave], [Pausa].
       
       INFO DEL ESTUDIO:
-      ${baseInfo}`
+      ${baseInfo}
+      
+      FORMATO DE SALIDA JSON OBLIGATORIO:
+      { "guion_podcast": "Aquí va el texto completo del guion..." }`
     }
   ];
 }
