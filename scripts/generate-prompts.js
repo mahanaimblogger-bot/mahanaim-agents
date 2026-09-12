@@ -9,11 +9,8 @@ const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com/v1',
 });
 
-const bookSlug = (process.env.BOOK_SLUG || '').trim().toLowerCase();
-const chapterNumber = parseInt(process.env.CHAPTER_NUMBER);
-
 // ============================================================
-// FUNCIONES AUXILIARES PARA MAPAS INTERACTIVOS
+// FUNCIONES AUXILIARES
 // ============================================================
 
 function generateGoogleMapsEmbedUrl(lat, lng, placeName = '') {
@@ -29,7 +26,7 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
 </div>
 
 <div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
-  <h3 style="color: #1a3a5c; margin-top: 0;">📍 Ubicaciones Bíblicas del Capítulo</h3>
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
   <p style="line-height: 1.8; color: #3e2723;">
     Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
     Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
@@ -40,7 +37,7 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
   ubicaciones.forEach((ubicacion, index) => {
     const embedUrl = generateGoogleMapsEmbedUrl(ubicacion.latitud, ubicacion.longitud, ubicacion.nombre);
     const certezaIcon = ubicacion.certeza === 'confirmada' ? '✅' : 
-                        ubicacion.certeza === 'probable' ? '🟡' : '⚠️';
+                        ubicacion.certeza === 'probable' ? '🟡' : '️';
     
     html += `
 <div style="margin-bottom: 2.5rem;">
@@ -49,15 +46,7 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe 
-      src="${embedUrl}" 
-      width="100%" 
-      height="400" 
-      style="border:0;" 
-      allowfullscreen="" 
-      loading="lazy" 
-      referrerpolicy="strict-origin-when-cross-origin">
-    </iframe>
+    <iframe src="${embedUrl}" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
@@ -67,8 +56,7 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
     <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> ${ubicacion.importancia_teologica}</p>
   </div>
   
-  <div style="background: ${ubicacion.certeza === 'confirmada' ? '#d4edda' : '#fff3cd'}; 
-              padding: 0.8rem; border-radius: 6px; border-left: 4px solid ${ubicacion.certeza === 'confirmada' ? '#28a745' : '#ffc107'};">
+  <div style="background: ${ubicacion.certeza === 'confirmada' ? '#d4edda' : '#fff3cd'}; padding: 0.8rem; border-radius: 6px; border-left: 4px solid ${ubicacion.certeza === 'confirmada' ? '#28a745' : '#ffc107'};">
     <strong>Nivel de certeza:</strong> ${ubicacion.certeza.charAt(0).toUpperCase() + ubicacion.certeza.slice(1)}
   </div>
 </div>
@@ -81,18 +69,12 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
   <p style="line-height: 1.8; margin: 0;">
     Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
     Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
-    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios 
-    geográficos históricos, limitaciones arqueológicas o interpretaciones divergentes de los textos antiguos.
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
   </p>
 </div>
 `;
-
   return html;
 }
-
-// ============================================================
-// FUNCIONES EXISTENTES
-// ============================================================
 
 function cleanHtml(html) {
   if (!html) return '';
@@ -110,7 +92,7 @@ function cleanHtml(html) {
     .trim();
 }
 
-async function fetchChapterResources() {
+async function fetchChapterResources(bookSlug, chapterNumber) {
   console.log(`🔍 Buscando recursos para ${bookSlug} capítulo ${chapterNumber}...`);
   
   const { data: book, error: bookError } = await supabase
@@ -139,8 +121,6 @@ async function fetchChapterResources() {
 }
 
 async function getResourcesForChapter(chapterId) {
-  console.log(`📚 Obteniendo recursos para chapter_id: ${chapterId}...`);
-  
   const { data: resources, error } = await supabase
     .from('resources')
     .select('tipo, contenido_html, titulo')
@@ -152,6 +132,7 @@ async function getResourcesForChapter(chapterId) {
     estudioTitulo: resources.find(r => r.tipo === 'estudio')?.titulo || 'Estudio Bíblico',
     estudio: resources.find(r => r.tipo === 'estudio')?.contenido_html || '',
     sermon: resources.find(r => r.tipo === 'sermon')?.contenido_html || '',
+    bosquejo: resources.find(r => r.tipo === 'bosquejo')?.contenido_html || '', // Agregado para el podcast
     infografia: resources.find(r => r.tipo === 'infografia')?.contenido_html || '',
     arqueologia: resources.find(r => r.tipo === 'contexto_arqueologico')?.contenido_html || '',
     palabras: resources.find(r => r.tipo === 'palabras_clave')?.contenido_html || '',
@@ -178,6 +159,7 @@ function buildPrompts(bookName, chapterNum, context) {
   TÍTULO DEL ESTUDIO: "${context.estudioTitulo}"
   [ESTUDIO]: ${context.estudio.substring(0, 1500)}
   [SERMÓN]: ${context.sermon.substring(0, 1500)}
+  [BOSQUEJO]: ${context.bosquejo.substring(0, 1000)}
   [INFOGRAFÍA]: ${context.infografia.substring(0, 1000)}
   [ARQUEOLOGÍA]: ${context.arqueologia.substring(0, 800)}
   [PALABRAS]: ${context.palabras.substring(0, 800)}
@@ -189,11 +171,6 @@ function buildPrompts(bookName, chapterNum, context) {
       type: 'prompt_video',
       system: "Eres un experto en producción de contenido viral cristiano con profundidad teológica.",
       user: `Analiza esta información y genera 2 prompts para NotebookLM (Estilo Visual máx 4000 chars, Contenido Narrativo máx 4000 chars). Regla: usa solo 1 cita de autoridad. Formato JSON: { "prompt_estilo_visual": "...", "prompt_contenido_narrativo": "..." }.\n\nINFO:\n${baseInfo}`
-    },
-    {
-      type: 'prompt_audio',
-      system: "Eres un experto en producción de podcasts cristianos con profundidad teológica.",
-      user: `Analiza esta información y genera 1 prompt para NotebookLM (Audio Debate, máx 4000 chars). Fases: Apertura, Exploración Exegética, Tensión Teológica y Cierre Pastoral. Regla: solo 1 cita. Formato JSON: { "prompt_audio": "..." }.\n\nINFO:\n${baseInfo}`
     },
     {
       type: 'prompt_mapa',
@@ -277,8 +254,8 @@ Genera el recurso de mapa en formato JSON completo.`
     },
     {
       type: 'prompt_podcast_guion',
-      system: "Eres un experto en guionización de podcasts cristianos y producción de audio. Tu tarea es transformar el estudio bíblico y el sermón en un guion de podcast fluido, conversacional y teológicamente profundo, listo para ser leído por un locutor o convertido a voz por IA (TTS).",
-      user: `Basado en la siguiente información del estudio y sermón, escribe un guion de podcast completo (duración estimada 10-15 minutos).
+      system: "Eres un experto en guionización de podcasts cristianos y producción de audio. Tu tarea es transformar el estudio bíblico, el sermón y el bosquejo en un guion de podcast fluido, conversacional y teológicamente profundo, listo para ser leído por un locutor o convertido a voz por IA (TTS).",
+      user: `Basado en la siguiente información del estudio, sermón y bosquejo, escribe un guion de podcast completo (duración estimada 10-15 minutos).
       
       ESTRUCTURA DEL GUION:
       1. INTRODUCCIÓN (1-2 min): Gancho atractivo, presentación del tema y el texto base.
@@ -295,7 +272,7 @@ Genera el recurso de mapa en formato JSON completo.`
 }
 
 async function generateWithAI(promptData) {
-  console.log(`🤖 Generando: ${promptData.type}...`);
+  console.log(`   🤖 Generando: ${promptData.type}...`);
   try {
     const response = await openai.chat.completions.create({
       model: "deepseek-chat", 
@@ -308,13 +285,13 @@ async function generateWithAI(promptData) {
     });
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    console.error(`❌ Error en IA para ${promptData.type}:`, error.message);
+    console.error(`   ❌ Error en IA para ${promptData.type}:`, error.message);
     return null;
   }
 }
 
 async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, studyTitle) {
-  console.log("💾 Generando archivos de texto para descargar...");
+  console.log(`   💾 Generando archivos de texto para descargar...`);
   
   // 📁 CREAR CARPETA ORGANIZADA: prompts_output/{libro}/Capitulo_{numero}/
   const outputDir = path.join('prompts_output', bookName.toLowerCase(), `Capitulo_${chapterNum}`);
@@ -329,31 +306,23 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
     if (result.type === 'prompt_video') {
       fileName = `1_VIDEO_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPTS PARA VIDEO - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 PROMPT 1 - ESTILO VISUAL:\n───────────────────────────────────────────\n${jsonData.prompt_estilo_visual}\n\n📋 PROMPT 2 - CONTENIDO NARRATIVO:\n───────────────────────────────────────────\n${jsonData.prompt_contenido_narrativo}\n`;
-    } else if (result.type === 'prompt_audio') {
-      fileName = `2_AUDIO_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n🎙️ INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
     } else if (result.type === 'prompt_mapa') {
-      fileName = `3_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `2_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
     } else if (result.type === 'prompt_diapositivas') {
-      fileName = `4_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `3_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
     } else if (result.type === 'prompt_miniatura') {
-      fileName = `5_MINIATURA_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `4_MINIATURA_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (en inglés) y pégalo en Midjourney/DALL-E 3.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto, genera la imagen sin texto y agrégalo luego en Canva con fuente gruesa.`;
     } else if (result.type === 'prompt_descripcion') {
-      fileName = `6_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `5_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
     } else if (result.type === 'prompt_mapa_interactivo') {
-      fileName = `7_MAPA_INTERACTIVO_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `6_MAPA_INTERACTIVO_${bookName}_Cap${chapterNum}.txt`;
       
       const mapaData = jsonData;
-      const htmlGenerado = generateMapResourceHTML(
-        mapaData.titulo_recurso,
-        mapaData.ubicaciones,
-        bookName,
-        chapterNum
-      );
+      const htmlGenerado = generateMapResourceHTML(mapaData.titulo_recurso, mapaData.ubicaciones, bookName, chapterNum);
       
       fileContent = `═══════════════════════════════════════════
 RECURSO DE MAPA INTERACTIVO - MAHANAIM
@@ -363,11 +332,8 @@ Libro: ${bookName} | Capítulo: ${chapterNum}
 📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
 
 TÍTULO: ${mapaData.titulo_recurso}
-
 TIPO: mapa
-
 URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
-
 MODO: html
 
 CONTENIDO HTML:
@@ -378,7 +344,7 @@ ${htmlGenerado}
 📍 UBICACIONES IDENTIFICADAS:
 ${mapaData.ubicaciones.map((u, i) => `${i + 1}. ${u.nombre} (${u.latitud}, ${u.longitud}) - ${u.certeza}`).join('\n')}
 
-📝 NOTA METODOLÓGICA:
+ NOTA METODOLÓGICA:
 ${mapaData.nota_metodologica || 'Las ubicaciones varían en certeza según la evidencia arqueológica disponible.'}
 
 💡 INSTRUCCIONES:
@@ -387,13 +353,13 @@ ${mapaData.nota_metodologica || 'Las ubicaciones varían en certeza según la ev
 3. Selecciona Libro: ${bookName}, Capítulo: ${chapterNum}
 4. Tipo: "mapa"
 5. Pega el HTML en "Contenido HTML"
-6. Deja "URL del recurso" vacío (o pon la primera URL de mapa si quieres)
+6. Deja "URL del recurso" vacío
 7. Guarda y publica
 
 ✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
 `;
     } else if (result.type === 'prompt_podcast_guion') {
-      fileName = `8_PODCAST_GUION_${bookName}_Cap${chapterNum}.txt`;
+      fileName = `7_PODCAST_GUION_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════
 GUION DE PODCAST PARA NOTEBOOKLM / TTS
 Libro: ${bookName} | Capítulo: ${chapterNum}
@@ -406,26 +372,29 @@ Copia este texto y pégalo en NotebookLM (como fuente de audio) o en tu herramie
 ${jsonData.guion_podcast}
 ───────────────────────────────────────────
 
-💡 NOTA: Este guion fue generado siguiendo la cadena homilética (Estudio -> Sermón -> Guion) para garantizar profundidad teológica y fluidez narrativa.
+💡 NOTA: Este guion fue generado siguiendo la cadena homilética (Estudio -> Sermón -> Bosquejo -> Guion) para garantizar profundidad teológica y fluidez narrativa.
 `;
     }
 
     // 🛡️ Guardar con BOM UTF-8 para compatibilidad perfecta con Windows
     writeFileSync(path.join(outputDir, fileName), '\uFEFF' + fileContent, 'utf8');
-    console.log(`✅ Archivo creado: ${fileName}`);
+    console.log(`   ✅ Archivo creado: ${fileName}`);
   }
 
   if (plainTextSource) {
     const sourceFileName = `0_FUENTE_CONSOLIDADA_${bookName}_Cap${chapterNum}.txt`;
     writeFileSync(path.join(outputDir, sourceFileName), '\uFEFF' + plainTextSource, 'utf8');
-    console.log(`✅ Archivo creado: ${sourceFileName}`);
+    console.log(`   ✅ Archivo creado: ${sourceFileName}`);
   }
 }
 
-async function main() {
+// ============================================================
+// FUNCIÓN PRINCIPAL EXPORTADA (PARA SER USADA POR EL ORQUESTADOR)
+// ============================================================
+export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
   try {
-    const chapterInfo = await fetchChapterResources();
-    console.log(`✅ Capítulo encontrado: ID ${chapterInfo.chapterId}, Libro: ${chapterInfo.bookName}`);
+    const chapterInfo = await fetchChapterResources(bookSlug, chapterNumber);
+    console.log(`   ✅ Capítulo encontrado: ID ${chapterInfo.chapterId}, Libro: ${chapterInfo.bookName}`);
     
     const context = await getResourcesForChapter(chapterInfo.chapterId);
     const plainTextSource = buildPlainTextSource(chapterInfo.bookName, chapterInfo.chapterNumber, context);
@@ -438,12 +407,11 @@ async function main() {
     }
 
     await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber, context.estudioTitulo);
-    console.log("✨ ¡Todo listo! Los archivos están en la carpeta prompts_output para ser subidos como artifacts.");
+    console.log(`   ✨ ¡Prompts listos para ${bookSlug} ${chapterNumber}!`);
+    return true;
 
   } catch (error) {
-    console.error("❌ Error fatal en el workflow:", error.message);
-    process.exit(1);
+    console.error(`   ❌ Error fatal en el workflow de prompts:`, error.message);
+    return false;
   }
 }
-
-main();
