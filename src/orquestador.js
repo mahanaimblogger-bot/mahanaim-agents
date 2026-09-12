@@ -8,7 +8,6 @@ const RECURSOS_IA = [
   "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos",
   "palabras_clave", "infografia", "citas_teologos", "citas_libros",
   "contexto_arqueologico", "diagrama_estructura", "cronologia", "devocional", "profecias",
-  "podcast_guion"
 ];
 
 // Cadena homilética: cada uno se nutre de la/s fuente/s previas del mismo capítulo.
@@ -16,7 +15,6 @@ const RECURSOS_IA = [
 const FUENTES_CADENA = {
   sermon:        ["estudio"],
   bosquejo:      ["sermon"],
-  podcast_guion: ["estudio", "sermon"],
 };
 const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 // Tipos que NUNCA se guardan en la DB (solo se producen como archivo descargable).
@@ -140,22 +138,7 @@ async function main() {
                 const respuestaCruda = await llamarIA(prompt);
 
         // PODCAST_GUION: no se publica en Supabase; se guarda como .txt listo para TTS
-        if (tipo === "podcast_guion") {
-          const fsMod = await import("node:fs");
-          const pathMod = await import("node:path");
-          const outDir = pathMod.join(process.cwd(), "output");
-          fsMod.mkdirSync(outDir, { recursive: true });
-          const textoGuion = respuestaCruda
-            .replace(/^```(?:txt)?\s*/i, "")
-            .replace(/\s*```$/i, "")
-            .trim();
-          const archivo = pathMod.join(outDir, `${libro}-${capituloNum}-podcast_guion.txt`);
-          fsMod.writeFileSync(archivo, textoGuion, "utf8");
-          console.log(`   ✔ Guion de podcast guardado en: ${archivo} (listo para el conversor de texto a voz).`);
-          await new Promise((r) => setTimeout(r, 3000));
-          continue;
-        }
-
+        
         // Limpieza básica de markdown JSON
         const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
         let datos;
