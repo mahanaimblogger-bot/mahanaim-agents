@@ -13,7 +13,7 @@ import { generarPromptRecurso } from "./promptsRecursos.js";
 import { formatearRecurso } from "./formateadores.js";
 
 // ============================================================
-// CONFIGURACIÓN DE RECURSOS (Sin podcast_guion, ya está en prompts)
+// CONFIGURACIÓN DE RECURSOS
 // ============================================================
 const RECURSOS_IA = [
   "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos",
@@ -30,9 +30,11 @@ const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colosenses", "1-tesalonicenses", "2-tesalonicenses", "1-timoteo", "2-timoteo", "tito", "filemon", "hebreos", "santiago", "1-pedro", "2-pedro", "1-juan", "2-juan", "3-juan", "judas", "apocalipsis"];
 
 // ============================================================
-// FUNCIONES AUXILIARES
+// FUNCIÓN PARA LLAMAR A LA IA (CON DEBUG MEJORADO)
 // ============================================================
-async function llamarIA(prompt) {
+async function llamarIA(prompt, tipoRecurso) {
+  console.log(`   🔍 [${tipoRecurso}] Enviando prompt a la IA... (longitud: ${prompt.length} chars)`);
+  
   const response = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -46,9 +48,24 @@ async function llamarIA(prompt) {
       max_tokens: 8000
     })
   });
+
+  console.log(`    [${tipoRecurso}] Status HTTP: ${response.status}`);
+  
   const data = await response.json();
-  if (!response.ok) throw new Error(`Error IA: ${data.error?.message || response.statusText}`);
-  return data.choices[0].message.content;
+  
+  if (!response.ok) {
+    console.error(`   ❌ [${tipoRecurso}] Error de API:`, data.error?.message || response.statusText);
+    throw new Error(`Error IA: ${data.error?.message || response.statusText}`);
+  }
+  
+  const contenido = data.choices[0]?.message?.content;
+  console.log(`   🔍 [${tipoRecurso}] Respuesta recibida (primeros 200 chars):`, contenido?.substring(0, 200));
+  
+  if (!contenido || contenido.trim() === "") {
+    throw new Error("La IA devolvió una respuesta vacía");
+  }
+  
+  return contenido;
 }
 
 function parsearRango(rangoStr) {
@@ -81,6 +98,8 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
     console.log(`   ✅ Todos los recursos de IA ya existen para ${libro} ${capituloNum}.`);
     return;
   }
+
+  console.log(`   📋 Recursos a generar: ${faltantesIA.join(", ")}`);
 
   const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
   const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
@@ -117,17 +136,13 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       if (hallados.estudio) materiales.estudio_html = hallados.estudio;
       if (hallados.sermon) materiales.sermon_html = hallados.sermon;
 
-            const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
-      const respuestaCruda = await llamarIA(prompt);
+      const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
       
-      // 🕵️ DEBUG: Ver qué responde la IA realmente
-      console.log(`   🔍 [${tipo}] Respuesta IA (primeros 150 chars):`, respuestaCruda?.substring(0, 150));
-
-      if (!respuestaCruda || respuestaCruda.trim() === "") {
-        console.log(`   ⛔ [${tipo}] La IA devolvió una respuesta vacía. Se omite.`);
-        continue; // Saltamos este recurso en lugar de romper todo el proceso
-      }
-
+      // 🕵️ DEBUG: Ver el prompt que se envía
+      console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
+      
+      const respuestaCruda = await llamarIA(prompt, tipo);
+      
       const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
       
       let datos;
@@ -135,8 +150,9 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
         datos = JSON.parse(jsonLimpio); 
       } catch (err) {
         console.log(`   ⚠️ [${tipo}] No es JSON válido. Guardando como texto plano.`);
-        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: respuestaCruda }; // Usamos la respuesta cruda completa
+        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: respuestaCruda }; 
       }
+
       const htmlFinal = formatearRecurso(tipo, datos);
       await guardarRecursoComoBorrador({
         chapterId,
@@ -146,9 +162,9 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
         contenidoHtml: htmlFinal,
       });
       console.log(`   ✅ ${tipo} guardado.`);
-      await new Promise(r => setTimeout(r, 2000)); // Pausa para no saturar la API
+      await new Promise(r => setTimeout(r, 2000));
     } catch (err) {
-      console.error(`   ❌ Error generando ${tipo}:`, err.message);
+      console.error(`    Error generando ${tipo}:`, err.message);
     }
   }
 }
@@ -172,7 +188,7 @@ async function main() {
   const capitulos = parsearRango(rango);
   console.log(`\n🚀 INICIANDO ORQUESTADOR MAESTRO`);
   console.log(`📖 Libro: ${libro}`);
-  console.log(` Capítulos a procesar: ${capitulos.join(", ")}`);
+  console.log(`📚 Capítulos a procesar: ${capitulos.join(", ")}`);
   console.log(`════════════════════════════════════════════\n`);
 
   const libroInfo = await obtenerBookIdPorSlug(libro);
@@ -182,7 +198,7 @@ async function main() {
     try {
       const chapterId = await obtenerOCrearChapterId(libroInfo.id, capituloNum);
 
-      // PASO 1: Generar Estudio (con Oro Metálico)
+      // PASO 1: Generar Estudio (con Oro Metálico y publicación automática)
       console.log(`\n   📝 [Paso 1/3] Generando estudio...`);
       await generarEstudio({
         libro,
@@ -190,7 +206,7 @@ async function main() {
         video: "SIN VIDEO",
         imagen: "SIN IMAGEN",
         minimoPalabras: 3500,
-        forzar: false, // No regenera si ya existe
+        forzar: false,
         indicacionManual: null,
       });
 
@@ -204,12 +220,11 @@ async function main() {
       console.log(`\n   🎉 ¡Capítulo ${capituloNum} completado exitosamente!`);
     } catch (error) {
       console.error(`\n   💥 ERROR CRÍTICO en capítulo ${capituloNum}:`, error.message);
-      // Continuamos con el siguiente capítulo aunque uno falle
     }
   }
 
   console.log(`\n\n🏁 ══════ LOTE FINALIZADO ══════`);
-  console.log(` Todos los prompts están en: prompts_output/${libro.toLowerCase()}/`);
+  console.log(`📁 Todos los prompts están en: prompts_output/${libro.toLowerCase()}/`);
 }
 
 main().catch(console.error);
