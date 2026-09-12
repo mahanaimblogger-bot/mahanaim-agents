@@ -205,17 +205,15 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
   // Sobrescribimos el archivo local para que la previsualización incluya el encabezado
   await writeFile(rutaLocal, htmlFinalConEncabezado, "utf-8");
 
-  await guardarRecursoComoBorrador({
-    chapterId,
-    tipo: "estudio",
-    titulo,
-    slug,
-    contenidoHtml: htmlFinalConEncabezado, // <-- AQUÍ USAMOS EL HTML CON EL ENCABEZADO
-  });
-  
-  console.log(`   ☁️  Guardado en Supabase como BORRADOR (publicado=false). Título: "${titulo}"`);
-  console.log(`   👉 Corre el agente "Aprobar estudio" cuando lo hayas revisado y quieras publicarlo.`);  console.log(
-    `   👉 Corre el agente "Aprobar estudio" cuando lo hayas revisado y quieras publicarlo.`
+    await guardarRecursoComoPublicado({
+     chapterId,
+     tipo: "estudio",
+     titulo,
+     slug,
+     contenidoHtml: htmlFinalConEncabezado,
+   });
+   console.log(`   ☁️  Guardado en Supabase como PUBLICADO (publicado=true). Título: "${titulo}"`);
+   console.log(`   🎉 ¡El estudio ya está visible en tu sitio web!`);
   );
 
   return { valido: true, rutaLocal, titulo };
