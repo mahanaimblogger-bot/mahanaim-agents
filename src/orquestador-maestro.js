@@ -117,11 +117,15 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       if (hallados.estudio) materiales.estudio_html = hallados.estudio;
       if (hallados.sermon) materiales.sermon_html = hallados.sermon;
 
-      const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
-            const respuestaCruda = await llamarIA(prompt);
+            const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
+      const respuestaCruda = await llamarIA(prompt);
       
+      // 🕵️ DEBUG: Ver qué responde la IA realmente
+      console.log(`   🔍 [${tipo}] Respuesta IA (primeros 150 chars):`, respuestaCruda?.substring(0, 150));
+
       if (!respuestaCruda || respuestaCruda.trim() === "") {
-        throw new Error("La IA devolvió una respuesta vacía. Posible límite de tokens o error de API.");
+        console.log(`   ⛔ [${tipo}] La IA devolvió una respuesta vacía. Se omite.`);
+        continue; // Saltamos este recurso en lugar de romper todo el proceso
       }
 
       const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
@@ -130,10 +134,9 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       try { 
         datos = JSON.parse(jsonLimpio); 
       } catch (err) {
-        console.log(`   ⚠️ [${tipo}] La IA no devolvió JSON válido. Usando respuesta cruda.`);
-        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: jsonLimpio }; 
+        console.log(`   ⚠️ [${tipo}] No es JSON válido. Guardando como texto plano.`);
+        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: respuestaCruda }; // Usamos la respuesta cruda completa
       }
-
       const htmlFinal = formatearRecurso(tipo, datos);
       await guardarRecursoComoBorrador({
         chapterId,
