@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { writeFileSync, mkdirSync } from 'fs';
+import path from 'path';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const openai = new OpenAI({
@@ -39,7 +40,7 @@ function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
   ubicaciones.forEach((ubicacion, index) => {
     const embedUrl = generateGoogleMapsEmbedUrl(ubicacion.latitud, ubicacion.longitud, ubicacion.nombre);
     const certezaIcon = ubicacion.certeza === 'confirmada' ? '✅' : 
-                        ubicacion.certeza === 'probable' ? '' : '⚠️';
+                        ubicacion.certeza === 'probable' ? '🟡' : '⚠️';
     
     html += `
 <div style="margin-bottom: 2.5rem;">
@@ -273,6 +274,22 @@ Para CADA ubicación identificada, genera:
 ${baseInfo}
 
 Genera el recurso de mapa en formato JSON completo.`
+    },
+    {
+      type: 'prompt_podcast_guion',
+      system: "Eres un experto en guionización de podcasts cristianos y producción de audio. Tu tarea es transformar el estudio bíblico y el sermón en un guion de podcast fluido, conversacional y teológicamente profundo, listo para ser leído por un locutor o convertido a voz por IA (TTS).",
+      user: `Basado en la siguiente información del estudio y sermón, escribe un guion de podcast completo (duración estimada 10-15 minutos).
+      
+      ESTRUCTURA DEL GUION:
+      1. INTRODUCCIÓN (1-2 min): Gancho atractivo, presentación del tema y el texto base.
+      2. DESARROLLO (6-10 min): Explicación exegética clara, aplicación práctica, uso de las citas de teólogos y el contexto arqueológico proporcionados.
+      3. CONCLUSIÓN Y LLAMADO (2-3 min): Resumen de la verdad central, aplicación para la vida diaria y una oración o reflexión final.
+      
+      TONO: Cálido, pastoral, claro y profundo. Usa un lenguaje conversacional pero respetuoso.
+      FORMATO: Usa indicaciones de locución entre corchetes, ej: [Música suave de fondo], [Pausa dramática], [Énfasis].
+      
+      INFO DEL ESTUDIO:
+      ${baseInfo}`
     }
   ];
 }
@@ -298,7 +315,9 @@ async function generateWithAI(promptData) {
 
 async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, studyTitle) {
   console.log("💾 Generando archivos de texto para descargar...");
-  const outputDir = 'prompts_output';
+  
+  // 📁 CREAR CARPETA ORGANIZADA: prompts_output/{libro}/Capitulo_{numero}/
+  const outputDir = path.join('prompts_output', bookName.toLowerCase(), `Capitulo_${chapterNum}`);
   mkdirSync(outputDir, { recursive: true });
 
   for (const result of results) {
@@ -315,7 +334,7 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA AUDIO/PODCAST - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n🎙️ INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_audio}\n`;
     } else if (result.type === 'prompt_mapa') {
       fileName = `3_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
+      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
     } else if (result.type === 'prompt_diapositivas') {
       fileName = `4_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
@@ -324,7 +343,7 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
       fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (en inglés) y pégalo en Midjourney/DALL-E 3.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto, genera la imagen sin texto y agrégalo luego en Canva con fuente gruesa.`;
     } else if (result.type === 'prompt_descripcion') {
       fileName = `6_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
+      fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
     } else if (result.type === 'prompt_mapa_interactivo') {
       fileName = `7_MAPA_INTERACTIVO_${bookName}_Cap${chapterNum}.txt`;
       
@@ -356,7 +375,7 @@ CONTENIDO HTML:
 ${htmlGenerado}
 ───────────────────────────────────────────
 
- UBICACIONES IDENTIFICADAS:
+📍 UBICACIONES IDENTIFICADAS:
 ${mapaData.ubicaciones.map((u, i) => `${i + 1}. ${u.nombre} (${u.latitud}, ${u.longitud}) - ${u.certeza}`).join('\n')}
 
 📝 NOTA METODOLÓGICA:
@@ -373,15 +392,32 @@ ${mapaData.nota_metodologica || 'Las ubicaciones varían en certeza según la ev
 
 ✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
 `;
+    } else if (result.type === 'prompt_podcast_guion') {
+      fileName = `8_PODCAST_GUION_${bookName}_Cap${chapterNum}.txt`;
+      fileContent = `═══════════════════════════════════════════
+GUION DE PODCAST PARA NOTEBOOKLM / TTS
+Libro: ${bookName} | Capítulo: ${chapterNum}
+═══════════════════════════════════════════
+
+🎙️ INSTRUCCIONES:
+Copia este texto y pégalo en NotebookLM (como fuente de audio) o en tu herramienta de Texto a Voz (ElevenLabs, etc.) preferida.
+
+───────────────────────────────────────────
+${jsonData.guion_podcast}
+───────────────────────────────────────────
+
+💡 NOTA: Este guion fue generado siguiendo la cadena homilética (Estudio -> Sermón -> Guion) para garantizar profundidad teológica y fluidez narrativa.
+`;
     }
 
-    writeFileSync(`${outputDir}/${fileName}`, '\uFEFF' + fileContent, 'utf8');
+    // 🛡️ Guardar con BOM UTF-8 para compatibilidad perfecta con Windows
+    writeFileSync(path.join(outputDir, fileName), '\uFEFF' + fileContent, 'utf8');
     console.log(`✅ Archivo creado: ${fileName}`);
   }
 
   if (plainTextSource) {
     const sourceFileName = `0_FUENTE_CONSOLIDADA_${bookName}_Cap${chapterNum}.txt`;
-    writeFileSync(`${outputDir}/${sourceFileName}`, '\uFEFF' + plainTextSource, 'utf8');
+    writeFileSync(path.join(outputDir, sourceFileName), '\uFEFF' + plainTextSource, 'utf8');
     console.log(`✅ Archivo creado: ${sourceFileName}`);
   }
 }
