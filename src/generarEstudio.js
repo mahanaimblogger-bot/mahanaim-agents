@@ -13,6 +13,33 @@ import {
 } from "./supabaseClient.js";
 
 /**
+ * Genera el encabezado HTML "Oro Metálico" para los estudios bíblicos.
+ * Elimina la necesidad de subir imágenes de portada manualmente.
+ */
+function generarEncabezadoOroMetalico(nombreLibro, numeroCapitulo, tituloEstudio) {
+  return `
+<div style="background: #0f172a; border-left: 10px solid #d4ac0d; border-radius: 0 12px 12px 0; padding: 3rem 2.5rem; box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.4); position: relative; margin-bottom: 2rem;">
+  <div style="position: absolute; top: 0; right: 0; width: 40%; height: 3px; background: linear-gradient(90deg, #d4ac0d 0%, transparent 100%);"></div>
+  
+  <p style="color: #d4ac0d; font-family: Georgia, 'Times New Roman', serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin: 0 0 1rem 0;">
+    Estudio Bíblico Expositivo
+  </p>
+  
+  <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 4.5rem; margin: 0; font-weight: 700; line-height: 1.1; background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0px 2px 10px rgba(212, 172, 13, 0.3);">
+    ${nombreLibro} <span style="color: #ffffff; font-weight: 400; -webkit-text-fill-color: #ffffff;">${numeroCapitulo}</span>
+  </h1>
+  
+  <div style="border-top: 2px dotted #334155; width: 35%; margin: 1.5rem 0;"></div>
+  
+  ${tituloEstudio ? `<h2 style="font-family: Georgia, serif; font-style: italic; color: #f8fafc; font-size: 1.6rem; font-weight: 400; margin: 0; line-height: 1.4;">"${tituloEstudio}"</h2>` : ''}
+  
+  <div style="position: absolute; bottom: 0; right: 0; width: 40%; height: 3px; background: linear-gradient(90deg, transparent 0%, #d4ac0d 100%);"></div>
+</div>
+`;
+}
+
+
+/**
  * Extrae el título del <h1 class="titulo-entrada">...</h1> generado por
  * el Prompt Maestro.
  */
@@ -168,19 +195,26 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
     console.log(`   🔧 ${citasCorregidas} cita(s) bíblica(s) fueron corregidas automáticamente con el texto de Supabase.`);
   }
 
-  const titulo = extraerTitulo(htmlCorregido, libro, capitulo);
+    const titulo = extraerTitulo(htmlCorregido, libro, capitulo);
   const slug = generarSlug(libro, capitulo, "estudio");
+
+  // 🌟 INYECTAR ENCABEZADO ORO METÁLICO AUTOMÁTICO
+  const encabezadoOro = generarEncabezadoOroMetalico(libroInfo.nombre, capitulo, titulo);
+  const htmlFinalConEncabezado = encabezadoOro + htmlCorregido;
+
+  // Sobrescribimos el archivo local para que la previsualización incluya el encabezado
+  await writeFile(rutaLocal, htmlFinalConEncabezado, "utf-8");
 
   await guardarRecursoComoBorrador({
     chapterId,
     tipo: "estudio",
     titulo,
     slug,
-    contenidoHtml: htmlCorregido,
-  });  console.log(
-    `   ☁️  Guardado en Supabase como BORRADOR (publicado=false). Título: "${titulo}"`
-  );
-  console.log(
+    contenidoHtml: htmlFinalConEncabezado, // <-- AQUÍ USAMOS EL HTML CON EL ENCABEZADO
+  });
+  
+  console.log(`   ☁️  Guardado en Supabase como BORRADOR (publicado=false). Título: "${titulo}"`);
+  console.log(`   👉 Corre el agente "Aprobar estudio" cuando lo hayas revisado y quieras publicarlo.`);  console.log(
     `   👉 Corre el agente "Aprobar estudio" cuando lo hayas revisado y quieras publicarlo.`
   );
 
