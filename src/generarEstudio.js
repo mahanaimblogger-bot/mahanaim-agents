@@ -138,7 +138,7 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
     .replace(/```\s*/gi, '')
     .trim();
 
-  const { valido, errores, htmlCorregido, citasCorregidas } = await validarEstudio(html, minimoPalabras);
+  const { valido, errores, htmlCorregido, citasCorregidas } = await validarEstudio(htmlLimpio, minimoPalabras);
 
   await mkdir(path.join(process.cwd(), "output"), { recursive: true });
   const rutaLocal = path.join(process.cwd(), "output", `${libro}-${capitulo}.html`);
