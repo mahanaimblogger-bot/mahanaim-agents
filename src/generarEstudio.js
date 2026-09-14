@@ -31,9 +31,20 @@ function generarSlug(libro, capitulo, tipo) {
 
 function limpiarCercasDeCodigo(texto) {
   return texto
+    // Eliminar marcadores de código
     .replace(/^```html\s*/i, "")
     .replace(/^```\s*/i, "")
     .replace(/```\s*$/i, "")
+    // Eliminar texto introductorio común que la IA agrega
+    .replace(/Aquí tienes[\s\S]*?Prompt Maestro[\s\S]*?/gi, "")
+    .replace(/y las notas proporcionadas[.\s]*/gi, "")
+    .replace(/siguiendo estrictamente[\s\S]*?Prompt Maestro[\s\S]*?/gi, "")
+    .replace(/en formato HTML[\s\S]*?/gi, "")
+    .replace(/A continuación[\s\S]*?estudio[\s\S]*?/gi, "")
+    .replace(/Generado[\s\S]*?Prompt[\s\S]*?/gi, "")
+    // Eliminar cualquier texto antes del primer <h1 o <div
+    .replace(/^[\s\S]*?(?=<h1|<div)/i, "")
+    // Limpieza final
     .trim();
 }
 
