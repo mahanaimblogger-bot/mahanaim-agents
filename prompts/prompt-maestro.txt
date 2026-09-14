@@ -833,26 +833,103 @@ ul { list-style-type: square; margin-left: 20px; }
 .contenedor-video .btn-play::after { content: ''; border-style: solid; border-width: 11px 0 11px 20px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
 .contenedor-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-/* TOOLTIPS */
-.biblia-ref { position: relative; color: #1a3a5c; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; transition: color .2s; }
-.biblia-ref:hover { color: #c9a227; }
-.biblia-ref .tooltip-text { visibility: hidden; opacity: 0; position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); width: 320px; max-width: 90vw; background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: #fff; padding: 15px 18px; border-radius: 8px; font-size: .9em; font-weight: normal; line-height: 1.5; text-align: left; font-style: italic; box-shadow: 0 8px 25px rgba(0,0,0,.3); z-index: 1000; transition: opacity .3s, visibility .3s; border: 2px solid #c9a227; }
-.biblia-ref .tooltip-text::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #2d4a6c; }
-.biblia-ref .tooltip-cita { display: block; color: #c9a227; font-weight: bold; font-style: normal; margin-bottom: 8px; font-size: .85em; text-align: center; border-bottom: 1px solid #4a6a8c; padding-bottom: 8px; }
-.biblia-ref:hover .tooltip-text { visibility: visible; opacity: 1; }
+/* ============================================
+   TOOLTIPS BÍBLICOS (RESPONSIVOS)
+   ============================================ */
+.biblia-ref { 
+  position: relative; 
+  color: #1a3a5c; 
+  font-weight: bold; 
+  cursor: pointer; 
+  text-decoration: underline; 
+  text-decoration-style: dotted; 
+  text-underline-offset: 3px; 
+  transition: color .2s; 
+}
+.biblia-ref:hover { 
+  color: #c9a227; 
+}
+.biblia-ref .tooltip-text { 
+  visibility: hidden; 
+  opacity: 0; 
+  position: absolute; 
+  left: 50%; 
+  bottom: calc(100% + 10px); 
+  transform: translateX(-50%); 
+  width: 320px; 
+  max-width: 90vw; 
+  background: linear-gradient(135deg, #1a3a5c, #2d4a6c); 
+  color: #fff; 
+  padding: 15px 18px; 
+  border-radius: 8px; 
+  font-size: .9em; 
+  font-weight: normal; 
+  line-height: 1.5; 
+  text-align: left; 
+  font-style: italic; 
+  box-shadow: 0 8px 25px rgba(0,0,0,.3); 
+  z-index: 1000; 
+  transition: opacity .3s, visibility .3s; 
+  border: 2px solid #c9a227;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.biblia-ref .tooltip-text::after { 
+  content: ''; 
+  position: absolute; 
+  top: 100%; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  border: 10px solid transparent; 
+  border-top-color: #2d4a6c; 
+}
+.biblia-ref .tooltip-cita { 
+  display: block; 
+  color: #c9a227; 
+  font-weight: bold; 
+  font-style: normal; 
+  margin-bottom: 8px; 
+  font-size: .85em; 
+  text-align: center; 
+  border-bottom: 1px solid #4a6a8c; 
+  padding-bottom: 8px; 
+}
+.biblia-ref:hover .tooltip-text { 
+  visibility: visible; 
+  opacity: 1; 
+}
 
+/* MÓVIL: Fija el tooltip en la parte inferior para que no se salga de la pantalla */
 @media (max-width: 768px) {
-    .contenedor-blog { padding: 15px; }
-    h1.titulo-entrada { font-size: 24px; }
-    .destacado-dramatico { padding: 18px 15px; font-size: 1em; }
-    .biblia-ref .tooltip-text { position: fixed; bottom: 20px; left: 15px; right: 15px; width: auto; transform: none; max-width: none; max-height: 50vh; overflow-y: auto; }
-    .biblia-ref .tooltip-text::after { display: none; }
-    .indice-nav { padding: 20px 20px; }
-    .indice-nav .punto-principal > li > a { font-size: 0.88em; }
-    .indice-nav .sub-notas a { font-size: 0.78em; padding-left: 12px; }
-    .indice-nav .sub-notas a:hover { padding-left: 18px; }
-    .tabla-comparativa { font-size: 0.85em; }
-    .tabla-comparativa th, .tabla-comparativa td { padding: 8px 10px; }
+  .contenedor-blog { padding: 15px; }
+  h1.titulo-entrada { font-size: 24px; }
+  .destacado-dramatico { padding: 18px 15px; font-size: 1em; }
+  
+  .biblia-ref .tooltip-text { 
+    position: fixed; 
+    bottom: 20px; 
+    left: 15px; 
+    right: 15px; 
+    width: auto; 
+    max-width: none;
+    transform: none; 
+    max-height: 50vh; 
+    overflow-y: auto; 
+    z-index: 9999;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .biblia-ref .tooltip-text::after { 
+    display: none; 
+  }
+  
+  .indice-nav { padding: 20px 20px; }
+  .indice-nav .punto-principal > li > a { font-size: 0.88em; }
+  .indice-nav .sub-notas a { font-size: 0.78em; padding-left: 12px; }
+  .indice-nav .sub-notas a:hover { padding-left: 18px; }
+  .tabla-comparativa { font-size: 0.85em; }
+  .tabla-comparativa th, .tabla-comparativa td { padding: 8px 10px; }
 }
 
 ══════════════════════════════════════════════════
