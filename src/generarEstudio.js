@@ -42,20 +42,20 @@ function limpiarCercasDeCodigo(texto) {
  */
 function generarEncabezadoOroMetalico(nombreLibro, numeroCapitulo, tituloEstudio) {
   return `
-<div style="background: #0f172a; border-left: 10px solid #d4ac0d; border-radius: 0 12px 12px 0; padding: 3rem 2.5rem; box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.4); position: relative; margin-bottom: 2rem;">
+<div style="background: #0f172a; border-left: 10px solid #d4ac0d; border-radius: 0 12px 12px 0; padding: 2rem 1.5rem; box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.4); position: relative; margin-bottom: 2rem; overflow: hidden;">
   <div style="position: absolute; top: 0; right: 0; width: 40%; height: 3px; background: linear-gradient(90deg, #d4ac0d 0%, transparent 100%);"></div>
   
-  <p style="color: #d4ac0d; font-family: Georgia, 'Times New Roman', serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin: 0 0 1rem 0;">
+  <p style="color: #d4ac0d; font-family: Georgia, 'Times New Roman', serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 0.8rem 0; line-height: 1.3;">
     Estudio Bíblico Expositivo
   </p>
   
-  <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 4.5rem; margin: 0; font-weight: 700; line-height: 1.1; background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0px 2px 10px rgba(212, 172, 13, 0.3);">
+  <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 8vw, 3.5rem); margin: 0; font-weight: 700; line-height: 1.1; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto; background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0px 2px 10px rgba(212, 172, 13, 0.3); max-width: 100%;">
     ${nombreLibro} <span style="color: #ffffff; font-weight: 400; -webkit-text-fill-color: #ffffff;">${numeroCapitulo}</span>
   </h1>
   
-  <div style="border-top: 2px dotted #334155; width: 35%; margin: 1.5rem 0;"></div>
+  <div style="border-top: 2px dotted #334155; width: 35%; margin: 1rem 0;"></div>
   
-  ${tituloEstudio ? `<h2 style="font-family: Georgia, serif; font-style: italic; color: #f8fafc; font-size: 1.6rem; font-weight: 400; margin: 0; line-height: 1.4;">"${tituloEstudio}"</h2>` : ''}
+  ${tituloEstudio ? `<h2 style="font-family: Georgia, serif; font-style: italic; color: #f8fafc; font-size: clamp(1rem, 4vw, 1.4rem); font-weight: 400; margin: 0; line-height: 1.4; word-wrap: break-word;">"${tituloEstudio}"</h2>` : ''}
   
   <div style="position: absolute; bottom: 0; right: 0; width: 40%; height: 3px; background: linear-gradient(90deg, transparent 0%, #d4ac0d 100%);"></div>
 </div>
