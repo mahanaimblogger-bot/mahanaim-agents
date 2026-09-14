@@ -16,14 +16,19 @@ import { formatearRecurso } from "./formateadores.js";
 // CONFIGURACIÓN DE RECURSOS
 // ============================================================
 const RECURSOS_IA = [
-  "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos",
-  "palabras_clave", "infografia", "citas_teologos", "citas_libros",
-  "contexto_arqueologico", "diagrama_estructura", "cronologia", "devocional", "profecias",
+  "sermon",                    // Homilético completo (palabra por palabra)
+  "bosquejo",                  // Del sermón (solo puntos y subpuntos)
+  "quiz",                      // Interactivo
+  "glosario",                  // Términos técnicos
+  "palabras_clave",            // Hebreo/Griego
+  "contexto_arqueologico",     // Histórico
+  "aplicaciones_practicas"     // NUEVO: Acciones concretas
 ];
 
 const FUENTES_CADENA = {
   sermon: ["estudio"],
   bosquejo: ["sermon"],
+  aplicaciones_practicas: ["sermon"]
 };
 const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 
