@@ -130,6 +130,13 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
 
   const respuestaCruda = await generarConDeepSeek(promptMaestro, mensajeUsuario, 32000);
   const html = limpiarCercasDeCodigo(respuestaCruda);
+    // 🧹 Limpieza adicional: Eliminar texto introductorio no deseado y marcadores de código
+  let htmlLimpio = html
+    .replace(/Aquí tienes[\s\S]*?Prompt Maestro[\s\S]*?/gi, '')
+    .replace(/```html\s*/gi, '')
+    .replace(/```markdown\s*/gi, '')
+    .replace(/```\s*/gi, '')
+    .trim();
 
   const { valido, errores, htmlCorregido, citasCorregidas } = await validarEstudio(html, minimoPalabras);
 
