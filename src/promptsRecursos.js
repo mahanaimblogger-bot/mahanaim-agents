@@ -31,8 +31,8 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", 
 
   switch (tipo) {
     case "sermon": {
-      const fuenteEstudio = recortarFuente(materiales.estudio_html);
-      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+  const fuenteEstudio = recortarFuente(materiales.estudio_html);
+  return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
 ### TAREA: Generar un SERMÓN HOMILÉTICO COMPLETO Y EXTENSO (mínimo 3,500 palabras) para ${ctx}.
 
 #### REGLA DE ARMONÍA (obligatoria)
@@ -40,6 +40,7 @@ Este sermón se genera DESDE el ESTUDIO ya existente de este mismo capítulo. De
 
 #### CARACTERÍSTICAS OBLIGATORIAS:
 1. **SERMÓN "PALABRA POR PALABRA"**: Debe estar redactado completo, listo para ser leído en el púlpito sin necesidad de improvisar nada. Si el predicador lo lee tal cual, debe sonar como un mensaje fluido, natural y pastoral.
+
 2. **ESTRUCTURA HOMILÉTICA CLARA**:
    - INTRODUCCIÓN (400-500 palabras): Gancho impactante, planteamiento del tema, lectura del texto base.
    - 3-4 PUNTOS PRINCIPALES (cada uno 800-1000 palabras):
@@ -49,16 +50,105 @@ Este sermón se genera DESDE el ESTUDIO ya existente de este mismo capítulo. De
      * Aplicación pastoral concreta.
      * Transición fluida al siguiente punto.
    - CONCLUSIÓN (400-500 palabras): Recapitulación, llamado a la acción, oración final.
+
 3. **TONO Y ESTILO**: Pastoral, cálido pero firme. Conversacional (usa frases como: "Hermanos...", "Quiero que vean...", "Imaginen por un momento...", "Dios nos enseña aquí que..."). Incluye preguntas retóricas.
+
 4. **PROFUNDIDAD TEOLÓGICA**: Extrae verdades teológicas del pasaje y conecta con el plan redentor de Dios.
+
+#### DISEÑO HTML OBLIGATORIO (ESTILO "PASTORAL ÍNTIMO"):
+El sermón DEBE usar EXACTAMENTE estas clases CSS y estructura visual. NO uses fondo blanco plano ni fragmentos largos de texto sin elementos visuales. Rompe el texto con cajas, ilustraciones y separadores cada 3-4 párrafos máximo.
+
+**ESTRUCTURA HTML:**
+
+\`\`\`html
+<div class="sermon-pastoral">
+
+<div class="titulo-wrapper">
+  <p class="etiqueta-tipo">Sermón Expositivo</p>
+  <h1 class="titulo-sermon">[TÍTULO IMPACTANTE DEL SERMÓN]</h1>
+  <p class="texto-base">[Texto base: Libro Capítulo:Versículos]</p>
+</div>
+
+<h2>Introducción</h2>
+<p>[Párrafo de introducción conversacional]</p>
+
+<div class="ilustracion-pastoral">
+  <span class="etiqueta">Ilustración</span>
+  [Descripción visual o historia ilustrativa]
+</div>
+
+<p>[Más desarrollo de la introducción]</p>
+
+<div class="aplicacion-pastoral">
+  <span class="etiqueta">Para reflexionar antes de comenzar</span>
+  [Pregunta o reflexión inicial]
+</div>
+
+<div class="separador-ornamental">❦  ❦</div>
+
+<h2 class="punto">I. [TÍTULO DEL PRIMER PUNTO]</h2>
+
+<div class="cita-versiculo">
+  <span class="ref"> [Referencia bíblica]</span>
+  "[Texto bíblico citado]"
+</div>
+
+<p>[Desarrollo expositivo del punto]</p>
+
+<div class="nota-pastoral">
+  <span class="etiqueta">Nota lingüística / teológica</span>
+  [Explicación de términos hebreos/griegos o concepto teológico]
+</div>
+
+<p>[Más desarrollo]</p>
+
+<div class="aplicacion-pastoral">
+  <span class="etiqueta">Aplicación pastoral</span>
+  [Aplicación concreta para la vida]
+</div>
+
+<div class="separador-ornamental">❦  ❦</div>
+
+[REPETIR ESTRUCTURA PARA CADA PUNTO]
+
+<div class="conclusion-pastoral">
+  <h2>Conclusión y Llamado</h2>
+  <p>[Recapitulación del mensaje]</p>
+  
+  <div class="punto-final">
+    <strong>Primero:</strong> [Verdad 1]
+  </div>
+  <div class="punto-final">
+    <strong>Segundo:</strong> [Verdad 2]
+  </div>
+  <div class="punto-final">
+    <strong>Tercero:</strong> [Verdad 3]
+  </div>
+
+  <div class="oracion-final">
+    <span class="etiqueta">Oración</span>
+    "[Oración escrita completa para cerrar el sermón]"
+  </div>
+</div>
+
+</div>
+\`\`\`
+
+**REGLAS DE DISEÑO:**
+- Máximo 3-4 párrafos seguidos sin un elemento visual (caja, cita, separador).
+- Usa <div class="separador-ornamental">❦  ❦</div> entre puntos principales.
+- Las ilustraciones van en <div class="ilustracion-pastoral"> con <span class="etiqueta">Ilustración</span>.
+- Las aplicaciones van en <div class="aplicacion-pastoral"> con <span class="etiqueta">Aplicación pastoral</span>.
+- Las notas teológicas/lingüísticas van en <div class="nota-pastoral"> con <span class="etiqueta">Nota lingüística</span>.
+- Las citas bíblicas van en <div class="cita-versiculo"> con <span class="ref"> Referencia</span>.
+- La conclusión va en <div class="conclusion-pastoral"> con fondo oscuro y puntos finales destacados.
 
 ### FUENTE (ESTUDIO del capítulo)
 ${fuenteEstudio}
 
 #### FORMATO DE SALIDA
-Devolvé SOLO un objeto JSON: {"tipo": "sermon", "titulo": "Título impactante del sermón", "texto_base": "${ctx}", "contenido_html": "<div class='sermon-completo'>[HTML completo del sermón palabra por palabra]</div>"}. Castellano perfecto.`;
-    }
-
+Devolvé SOLO un objeto JSON: {"tipo": "sermon", "titulo": "Título impactante del sermón", "texto_base": "${ctx}", "contenido_html": "[HTML completo del sermón con diseño Pastoral Íntimo]"}. Castellano perfecto.`;
+}
     case "bosquejo": {
       const fuenteSermon = recortarFuente(materiales.sermon_html);
       return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
