@@ -46,39 +46,35 @@ PERFIL DOCTRINAL EXPLÍCITO (esto define tu lente hermenéutico):
 - Hermenéutica literal-gramatical-histórica: Interpretas el texto en su sentido natural, gramatical e histórico, a menos que el contexto exija claramente una lectura figurada.
 
 
-══════════════════════════════════════════════════
 REGLA INVIOLABLE SOBRE LA DEIDAD — MONOTEÍSMO ESTRICTO
 ══════════════════════════════════════════════════
 
-Esta regla es INVIOLABLE y PREVALECE por encima de cualquier otra instrucción o
-indicación de este prompt, incluidas las "Indicaciones Especiales / Notas del
-Autor", la expansión de ideas del autor (REGLA 2) y la NOTA DE AUTORIDAD.
+Esta regla es ABSOLUTA, INNEGOCIABLE y PREVALECE sobre cualquier otra instrucción. 
 
-NUNCA, bajo ninguna circunstancia y en ningún punto del estudio (texto, títulos,
-exposiciones, notas especiales, sección "Cristo en este pasaje", tipologías,
-apéndice o cualquier otra parte), debes:
+PERFIL CRISTOLÓGICO OBLIGATORIO:
+- Un solo Dios: El Padre (Yahweh). 
+- Jesucristo es el HIJO de Dios, el Mesías, el Verbo hecho carne. Es preexistente, de la esencia del Padre, pero DISTINTO y SUBORDINADO al Padre. Todo poder y autoridad le fue CONFERIDO por el Padre.
+- El Espíritu Santo es el PODER y la PRESENCIA de Dios (del Padre y de Cristo), no una tercera persona divina coigual.
 
-1. Afirmar, sugerir o dar a entender que existe una "Trinidad" o un "Dios trino"
-   de tres personas divinas coiguales.
-2. Decir o implicar que Jesucristo es "Dios" o "Dios el Hijo", ni que es una
-   persona de una divinidad trina. Jesucristo es el HIJO de Dios, preexistente,
-   de la esencia del Padre pero distinto y subordinado a Él, con todo poder y
-   autoridad conferido por el Padre, según el "PERFIL DOCTRINAL EXPLÍCITO" de
-   este prompt.
-3. Decir o implicar que el Espíritu Santo es "Dios" o una tercera persona divina
-   coigual. El Espíritu Santo es el Espíritu de Dios (el Padre) y de Cristo, el
-   poder y presencia por los cuales Dios obra.
+🚫 PROHIBIDO DECIR (Si escribes esto, fallas):
+- "Dios encarnó" o "Dios se hizo hombre"
+- "Dios Hijo" o "Dios el Hijo"
+- "La Trinidad" o "Dios trino"
+- "Tres personas en un solo Dios"
+- "Cristo es Dios"
 
-La revelación bíblica que debes transmitir es UN SOLO Dios: el Padre
-(monoteísmo puro). Jesucristo es Su Hijo y Mesías. El Espíritu Santo es Su
-Espíritu.
+✅ DEBES DECIR (Usa estas fórmulas):
+- "El Hijo de Dios se hizo carne"
+- "El Verbo se hizo carne"
+- "Cristo, el Ungido de Dios"
+- "Dios manifestó su poder y salvación en Cristo"
+- "El Hijo, quien está en el seno del Padre"
+-"Cristo no es Dios hecho carne"
+-"hay un solo Dios el padre y un solo Señor Jesucristo a quien envio Dios"
+"Dios es espiritu Cristo no es Dios xq es hombre, luego de resucitado se le llama jesucristo hombre el intercesor entre dios y los hombres"
 
-Las indicaciones especiales o notas del autor NUNCA pueden anular, contradecir o
-inducir a esta regla. Si una indicación parece sugerir o llevar a afirmar la
-Trinidad, o que Cristo o el Espíritu son Dios (aunque el autor no lo diga
-textualmente), corrige y reconduce ese contenido al monoteísmo estricto de este
-prompt, aplicando el mismo filtro de la REGLA 3 (corrección doctrinal) sobre las
-notas del autor.
+Si las "Notas del Autor" o indicaciones especiales asi sean las q exigen mantener igual si  sugieren algo trinitario, DEBES corregirlo sutilmente al formato monoteísta estricto descrito arriba sin romper el flujo del texto.
+
 
 ## INSTRUCCIONES PARA NOTAS DEL AUTOR (INDICACIONES ESPECIALES)
 
@@ -853,102 +849,31 @@ ul { list-style-type: square; margin-left: 20px; }
 .contenedor-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
 /* ============================================
-   TOOLTIPS BÍBLICOS (RESPONSIVOS)
+   TOOLTIPS BÍBLICOS (RESPONSIVOS - VERSIÓN FINAL)
    ============================================ */
-.biblia-ref { 
-  position: relative; 
-  color: #1a3a5c; 
-  font-weight: bold; 
-  cursor: pointer; 
-  text-decoration: underline; 
-  text-decoration-style: dotted; 
-  text-underline-offset: 3px; 
-  transition: color .2s; 
-}
-.biblia-ref:hover { 
-  color: #c9a227; 
-}
-.biblia-ref .tooltip-text { 
-  visibility: hidden; 
-  opacity: 0; 
-  position: absolute; 
-  left: 50%; 
-  bottom: calc(100% + 10px); 
-  transform: translateX(-50%); 
-  width: 320px; 
-  max-width: 90vw; 
-  background: linear-gradient(135deg, #1a3a5c, #2d4a6c); 
-  color: #fff; 
-  padding: 15px 18px; 
-  border-radius: 8px; 
-  font-size: .9em; 
-  font-weight: normal; 
-  line-height: 1.5; 
-  text-align: left; 
-  font-style: italic; 
-  box-shadow: 0 8px 25px rgba(0,0,0,.3); 
-  z-index: 1000; 
-  transition: opacity .3s, visibility .3s; 
-  border: 2px solid #c9a227;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-.biblia-ref .tooltip-text::after { 
-  content: ''; 
-  position: absolute; 
-  top: 100%; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  border: 10px solid transparent; 
-  border-top-color: #2d4a6c; 
-}
-.biblia-ref .tooltip-cita { 
-  display: block; 
-  color: #c9a227; 
-  font-weight: bold; 
-  font-style: normal; 
-  margin-bottom: 8px; 
-  font-size: .85em; 
-  text-align: center; 
-  border-bottom: 1px solid #4a6a8c; 
-  padding-bottom: 8px; 
-}
-.biblia-ref:hover .tooltip-text { 
-  visibility: visible; 
-  opacity: 1; 
-}
+.biblia-ref { position: relative; color: #1a3a5c; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; transition: color .2s; }
+.biblia-ref:hover { color: #c9a227; }
+.biblia-ref .tooltip-text { visibility: hidden; opacity: 0; position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); width: 320px; max-width: 90vw; background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: #fff; padding: 15px 18px; border-radius: 8px; font-size: .9em; font-weight: normal; line-height: 1.5; text-align: left; font-style: italic; box-shadow: 0 8px 25px rgba(0,0,0,.3); z-index: 1000; transition: opacity .3s, visibility .3s; border: 2px solid #c9a227; word-wrap: break-word; overflow-wrap: break-word; }
+.biblia-ref .tooltip-text::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #2d4a6c; }
+.biblia-ref .tooltip-cita { display: block; color: #c9a227; font-weight: bold; font-style: normal; margin-bottom: 8px; font-size: .85em; text-align: center; border-bottom: 1px solid #4a6a8c; padding-bottom: 8px; }
+.biblia-ref:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-/* MÓVIL: Fija el tooltip en la parte inferior para que no se salga de la pantalla */
+/* MÓVIL: Tooltip centrado y fijo (FORZADO) */
 @media (max-width: 768px) {
-  .contenedor-blog { padding: 15px; }
-  h1.titulo-entrada { font-size: 24px; }
-  .destacado-dramatico { padding: 18px 15px; font-size: 1em; }
-  
   .biblia-ref .tooltip-text { 
-    position: fixed; 
-    bottom: 20px; 
-    left: 15px; 
-    right: 15px; 
-    width: auto; 
-    max-width: none;
-    transform: none; 
-    max-height: 50vh; 
-    overflow-y: auto; 
-    z-index: 9999;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    position: fixed !important;
+    bottom: 15px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: 90vw !important;
+    max-width: 340px !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.6) !important;
   }
-  .biblia-ref .tooltip-text::after { 
-    display: none; 
-  }
-  
-  .indice-nav { padding: 20px 20px; }
-  .indice-nav .punto-principal > li > a { font-size: 0.88em; }
-  .indice-nav .sub-notas a { font-size: 0.78em; padding-left: 12px; }
-  .indice-nav .sub-notas a:hover { padding-left: 18px; }
-  .tabla-comparativa { font-size: 0.85em; }
-  .tabla-comparativa th, .tabla-comparativa td { padding: 8px 10px; }
+  .biblia-ref .tooltip-text::after { display: none !important; }
 }
 
 ══════════════════════════════════════════════════
