@@ -2,6 +2,25 @@ ROMPT MAESTRO — ESTUDIO EXPOSITIVO BÍBLICO EN HTML (Versión con Índice y Ap
 ===================================================
 
 ---
+/* MÓVIL: Tooltip centrado y fijo */
+@media (max-width: 768px) {
+  .biblia-ref .tooltip-text { 
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: 90vw !important;
+    max-width: 340px !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.5) !important;
+  }
+  .biblia-ref .tooltip-text::after { 
+    display: none !important;
+  }
+}
 
 DATOS DE ENTRADA:
 - Libro: [genesis ]
