@@ -90,10 +90,7 @@ function parsearRango(rangoStr) {
 async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
   console.log(`\n   🤖 [Paso 2/3] Generando recursos de IA para ${libro} ${capituloNum}...`);
   
-  const esNT = librosNT.includes(libro.toLowerCase());
-  const recursosIATotales = esNT 
-    ? [...RECURSOS_IA, "conexion_at"] 
-    : [...RECURSOS_IA, "conexion_nt"];
+  const recursosIATotales = [...RECURSOS_IA];
 
   const { data: recursosDB } = await supabase.from("resources").select("tipo").eq("chapter_id", chapterId);
   const tiposExistentes = recursosDB ? recursosDB.map(r => r.tipo) : [];
@@ -109,7 +106,7 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
   const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
   const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
   const fueraCadena = faltantesIA.filter(t => !TIPOS_CADENA.has(t));
-  const ordenCadena = ["sermon", "bosquejo"].filter(t => enCadena.includes(t));
+  const ordenCadena = ["sermon", "bosquejo", "aplicaciones_practicas"].filter(t => enCadena.includes(t));
   const colaGeneracion = [...ordenCadena, ...fueraCadena];
 
   const cacheFuentes = {};
