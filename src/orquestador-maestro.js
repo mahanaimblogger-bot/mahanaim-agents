@@ -173,19 +173,18 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       // 🕵️ DEBUG: Ver el prompt que se envía
       console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
       
-      const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
-      
-      const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-      
-      let datos;
-      try { 
-        datos = JSON.parse(jsonLimpio); 
-      } catch (err) {
-        console.log(`   ⚠️ [${tipo}] No es JSON válido. Guardando como texto plano.`);
-        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: respuestaCruda }; 
+            const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
+
+      const datos = extraerJSONDeRespuesta(respuestaCruda);
+
+      if (!datos) {
+        console.error(`   ❌ [${tipo}] No se pudo extraer JSON válido.${truncado ? " (Causa probable: respuesta truncada por max_tokens)" : ""}`);
+        console.error(`   📄 Primeros 300 chars de la respuesta cruda:`, respuestaCruda.substring(0, 300));
+        continue;
       }
 
       const htmlFinal = formatearRecurso(tipo, datos);
+      
       await guardarRecursoComoBorrador({
         chapterId,
         tipo: datos.tipo || tipo,
