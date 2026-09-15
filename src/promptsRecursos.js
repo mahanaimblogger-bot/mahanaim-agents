@@ -30,86 +30,80 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", 
 `;
 
   switch (tipo) {
-    case "sermon": {
-  const fuenteEstudio = recortarFuente(materiales.estudio_html);
-  return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: Generar un SERMÓN HOMILÉTICO COMPLETO (mínimo 3,500 palabras) para ${ctx}.
+
+        case "sermon": {
+      const fuenteEstudio = recortarFuente(materiales.estudio_html);
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar un SERMÓN HOMILÉTICO COMPLETO (mínimo 3,000 palabras) para ${ctx}.
 
 #### REGLA DE ARMONÍA
 Desarrolla el TEMA del estudio. No inventes temas distintos.
 
-#### ESTRUCTURA HOMILÉTICA:
-1. INTRODUCCIÓN (400-500 palabras): Gancho + texto base
-2. 3-4 PUNTOS (800-1000 palabras cada uno): Título + exposición + ilustración + aplicación
-3. CONCLUSIÓN (400-500 palabras): Recapitulación + llamado + oración
+#### DISEÑO HTML OBLIGATORIO (ESTILO RICO Y VISUAL):
+NO generes párrafos largos de texto plano. DEBES usar esta estructura HTML con estilos en línea para garantizar el diseño:
 
-#### TONO: Pastoral, cálido, conversacional. Usa "Hermanos...", "Imaginen...", "Dios nos enseña..."
+<div style="background: #fdfbf7; padding: 40px 30px; border-radius: 12px; border: 1px solid #e8dcc8; font-family: Georgia, serif; color: #3e2723; line-height: 1.8;">
+  
+  <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px dashed #d4ac0d; padding-bottom: 20px;">
+    <p style="color: #8b6914; font-style: italic; font-size: 1.1em; margin: 0;">Sermón Expositivo</p>
+    <h1 style="color: #1a3a5c; font-size: 2.2em; margin: 10px 0;">[TÍTULO IMPACTANTE]</h1>
+    <p style="color: #5d4037; font-weight: bold; letter-spacing: 1px;">TEXTO BASE: [Libro Capítulo:Versículos]</p>
+  </div>
 
-#### DISEÑO HTML OBLIGATORIO - ESTILO "PASTORAL ÍNTIMO":
-DEBES usar EXACTAMENTE estas clases CSS. NO generes HTML plano.
+  <h2 style="color: #1a3a5c; border-left: 4px solid #d4ac0d; padding-left: 15px; margin-top: 30px;">Introducción</h2>
+  <p>[Párrafo de gancho conversacional]</p>
+  
+  <div style="background: linear-gradient(135deg, #2c0a0a, #4a1010); color: #f0e6d0; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid #d4ac0d;">
+    <strong style="color: #d4ac0d; display: block; margin-bottom: 10px;">💡 Ilustración:</strong>
+    [Historia o analogía visual breve]
+  </div>
 
-EJEMPLO DE ESTRUCTURA QUE DEBES SEGUIR:
+  <div style="margin: 30px 0; border-top: 1px solid #d4c4a8; border-bottom: 1px solid #d4c4a8; padding: 15px 0; text-align: center; color: #d4ac0d; font-size: 1.5em; letter-spacing: 10px;">❦ ❦</div>
 
-<div class="sermon-pastoral">
-  <div class="titulo-wrapper">
-    <p class="etiqueta-tipo">Sermón Expositivo</p>
-    <h1 class="titulo-sermon">[TÍTULO]</h1>
-    <p class="texto-base">[Texto base]</p>
+  <h2 style="color: #1a3a5c; border-left: 4px solid #d4ac0d; padding-left: 15px; margin-top: 30px;">I. [TÍTULO DEL PRIMER PUNTO]</h2>
+  
+  <div style="background: #fef9e7; border-left: 4px solid #b7950b; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #5d4037;">
+    <strong style="color: #1a3a5c; font-style: normal; display: block; margin-bottom: 5px;">📖 [Referencia Bíblica]</strong>
+    "[Texto bíblico citado]"
   </div>
-  
-  <h2>Introducción</h2>
-  <p>[Párrafo]</p>
-  
-  <div class="ilustracion-pastoral">
-    <span class="etiqueta">Ilustración</span>
-    [Historia ilustrativa]
+
+  <p>[Exposición del punto]</p>
+
+  <div style="background: #f4ecf7; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8e44ad;">
+    <strong style="color: #6c3483; display: block; margin-bottom: 5px;">📜 Nota Teológica:</strong>
+    [Explicación breve de término hebreo/griego o doctrina]
   </div>
-  
-  <div class="separador-ornamental">❦ ❦</div>
-  
-  <h2 class="punto">I. [TÍTULO PUNTO 1]</h2>
-  
-  <div class="cita-versiculo">
-    <span class="ref">[Referencia]</span>
-    "[Texto bíblico]"
+
+  <div style="background: #e8f8f5; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #1abc9c;">
+    <strong style="color: #117a65; display: block; margin-bottom: 5px;">✅ Aplicación:</strong>
+    [Acción concreta para la vida]
   </div>
-  
-  <p>[Exposición]</p>
-  
-  <div class="nota-pastoral">
-    <span class="etiqueta">Nota lingüística</span>
-    [Explicación hebreo/griego]
-  </div>
-  
-  <div class="aplicacion-pastoral">
-    <span class="etiqueta">Aplicación pastoral</span>
-    [Aplicación concreta]
-  </div>
-  
-  <div class="separador-ornamental">❦ ❦</div>
-  
-  [REPITE PARA CADA PUNTO]
-  
-  <div class="conclusion-pastoral">
-    <h2>Conclusión y Llamado</h2>
-    <div class="punto-final"><strong>1.</strong> [Verdad]</div>
-    <div class="punto-final"><strong>2.</strong> [Verdad]</div>
-    <div class="oracion-final">
-      <span class="etiqueta">Oración</span>
-      "[Oración completa]"
+
+  [REPITE LA ESTRUCTURA DE PUNTOS CON SUS CAJAS DE COLORES]
+
+  <div style="background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: white; padding: 30px; border-radius: 12px; margin-top: 40px; text-align: center; border: 2px solid #d4ac0d;">
+    <h2 style="color: #d4ac0d; margin-top: 0;">Conclusión y Llamado</h2>
+    <p>[Recapitulación breve]</p>
+    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left;">
+      <strong>1.</strong> [Verdad 1]<br>
+      <strong>2.</strong> [Verdad 2]<br>
+      <strong>3.</strong> [Verdad 3]
+    </div>
+    <div style="background: #fdfbf7; color: #3e2723; padding: 20px; border-radius: 8px; margin-top: 20px; font-style: italic;">
+      <strong style="display: block; margin-bottom: 10px; color: #8b6914;">🙏 Oración Final:</strong>
+      "[Oración completa escrita]"
     </div>
   </div>
+
 </div>
 
-REGLAS CRÍTICAS:
-- Máximo 3 párrafos seguidos sin una caja visual
-- Usa TODAS las clases: titulo-wrapper, ilustracion-pastoral, nota-pastoral, aplicacion-pastoral, cita-versiculo, separador-ornamental, conclusion-pastoral
-- NO uses <p> largos sin romper con cajas
+REGLA: Máximo 3 párrafos seguidos sin una caja de color o separador.
 
 ### FUENTE: ${fuenteEstudio}
 
-FORMATO JSON: {"tipo": "sermon", "titulo": "...", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño Pastoral Íntimo]"}`;
-}
+FORMATO JSON: {"tipo": "sermon", "titulo": "...", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño rico y cajas de colores]"}`;
+    }
+      
     case "bosquejo": {
       const fuenteSermon = recortarFuente(materiales.sermon_html);
       return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
@@ -142,33 +136,49 @@ ${fuenteSermon}
 Devolvé SOLO un objeto JSON: {"tipo": "bosquejo", "titulo": "Bosquejo: <tema del sermón>", "texto_base": "${ctx}", "contenido_html": "<div class='bosquejo-sermon'>[HTML con la estructura esquemática]</div>"}. Castellano perfecto.`;
     }
 
-    case "aplicaciones_practicas": {
-      const fuenteSermonApp = recortarFuente(materiales.sermon_html);
-      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: Generar APLICACIONES PRÁCTICAS Y ACCIONABLES basadas en ${ctx}.
+        case "aplicaciones_practicas": {
+      return `Genera APLICACIONES PRÁCTICAS, CONCRETAS Y RESUMIDAS para ${ctx}.
 
-#### CARACTERÍSTICAS OBLIGATORIAS:
-1. **ACCIONES CONCRETAS**: No teoría, sino "qué hacer" específicamente.
-2. **CATEGORÍAS DE APLICACIÓN** (mínimo 3 aplicaciones por categoría):
-   - **VIDA DEVOCIONAL**: Cómo aplicar esto en tu tiempo con Dios.
-   - **FAMILIA**: Cómo vivir esto en el hogar.
-   - **IGLESIA**: Cómo aplicar esto en la comunidad de fe.
-   - **TRABAJO/ESTUDIO**: Cómo vivir esto en tu ámbito laboral.
-   - **TESTIMONIO**: Cómo mostrar esto a los no creyentes.
-3. **FORMATO ACCIONABLE**: Cada aplicación debe empezar con un verbo de acción en mayúsculas:
-   - "ORA cada mañana por..."
-   - "LEE este pasaje y reflexiona en..."
-   - "COMPARTE con tu familia..."
-   - "PRACTICA esto en tu trabajo..."
-   - "MEMORIZA este versículo..."
+ENFOQUE: CERO TEORÍA. Solo acciones específicas para HOY.
 
-### FUENTE (SERMÓN del capítulo)
-${fuenteSermonApp}
+ESTRUCTURA OBLIGATORIA (Debes generar exactamente este formato HTML):
 
-#### FORMATO DE SALIDA
-Devolvé SOLO un objeto JSON: {"tipo": "aplicaciones_practicas", "titulo": "Aplicaciones Prácticas: ${ctx}", "contenido_html": "<div class='aplicaciones-practicas'>[HTML con las aplicaciones organizadas por categorías]</div>"}. Castellano perfecto.`;
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7;">
+  <h2 style="text-align: center; color: #1a3a5c; border-bottom: 3px solid #d4ac0d; padding-bottom: 10px; margin-bottom: 30px;">📌 Aplicaciones Prácticas para Tu Vida</h2>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">🙏 Vida Personal y Devocional</h3>
+    
+    <div style="background: #fdfbf7; padding: 20px; border-radius: 8px; border-left: 4px solid #d4ac0d; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+      <h4 style="margin: 0 0 10px 0; color: #1a3a5c;">✅ [Título de la acción en imperativo, ej: ORA con perseverancia]</h4>
+      <p style="margin: 0 0 8px 0; font-size: 0.9em; color: #5d4037;"><strong>📖 Base:</strong> [Capítulo:Versículo]</p>
+      <p style="margin: 0 0 8px 0; font-size: 0.95em;"><strong>💡 Principio:</strong> [La verdad del capítulo en 1 sola frase].</p>
+      <p style="margin: 0; font-weight: bold; color: #1a3a5c;"><strong>🎯 Para HOY:</strong> [Acción concreta y específica. Ej: "Dedica 15 minutos hoy a orar en tu lugar secreto, no solo pidiendo, sino escuchando."]</p>
+    </div>
+    [Repite este bloque de "div" 2 veces más para esta categoría]
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">👨‍👩‍👧‍👦 Familia y Hogar</h3>
+    [Genera 2 bloques "div" como el anterior, adaptados a la familia]
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">⛪ Iglesia y Comunidad</h3>
+    [Genera 2 bloques "div" como el anterior, adaptados a la iglesia]
+  </div>
+</div>
+
+REGLAS CRÍTICAS:
+1. El "Para HOY" debe ser una acción que se pueda hacer en las próximas 24 horas.
+2. Sé breve. El "Principio" es 1 frase. El "Para HOY" es 1 o 2 frases máximo.
+3. Usa el HTML exacto proporcionado arriba para que se vea como tarjetas limpias y organizadas.
+
+FUENTE: ${materiales.sermon_html ? materiales.sermon_html.substring(0, 2000) : ''}
+
+FORMATO JSON: {"tipo": "aplicaciones_practicas", "titulo": "Aplicaciones Prácticas: ${ctx}", "contenido_html": "[HTML de tarjetas]"}`;
     }
-
+      
     case "quiz":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON puro, SIN markdown. Estructura: {"tipo": "quiz", "titulo": "Título atractivo", "preguntas": [{"pregunta": "Texto de la pregunta", "opciones": [{"texto": "Opción A", "correcta": false}, {"texto": "Opción B", "correcta": true}]}]}. 5 a 7 preguntas. Solo una opción correcta por pregunta.`;
 
