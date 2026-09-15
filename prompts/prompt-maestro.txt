@@ -417,6 +417,16 @@ LISTA DE VERIFICACIÓN DE CALIDAD
 [ ] ¿El contenido del apéndice es informativo, verificable y relevante?
 
 ══════════════════════════════════════════════════
+⚠️ REGLA FINAL CRÍTICA: NO OMITIR EL CIERRE ⚠️
+══════════════════════════════════════════════════
+Antes de terminar tu respuesta, DEBES asegurarte de incluir OBLIGATORIAMENTE estas 3 secciones al final del HTML, después del contenedor-blog:
+1. <div class="caja-meditar" id="meditar">...</div>
+2. <div class="caja-doctrinas">...</div>
+3. <div id="apendice">...</div> (con al menos 2 secciones internas y sus respectivos "Volver al índice").
+
+Si no incluyes el <div id="apendice"> al final, tu respuesta será rechazada por el sistema. ¡NO LO OLVIDES!
+
+══════════════════════════════════════════════════
 PROHIBICIONES ABSOLUTAS
 ══════════════════════════════════════════════════
 
