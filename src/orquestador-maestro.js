@@ -34,12 +34,19 @@ const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 
 const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colosenses", "1-tesalonicenses", "2-tesalonicenses", "1-timoteo", "2-timoteo", "tito", "filemon", "hebreos", "santiago", "1-pedro", "2-pedro", "1-juan", "2-juan", "3-juan", "judas", "apocalipsis"];
 
-// ============================================================
-// FUNCIÓN PARA LLAMAR A LA IA (CON DEBUG MEJORADO)
-// ============================================================
+const MAX_TOKENS_POR_TIPO = {
+  sermon: 16000,
+  bosquejo: 4000,
+  quiz: 4000,
+  glosario: 4000,
+  palabras_clave: 3000,
+  contexto_arqueologico: 6000,
+  aplicaciones_practicas: 6000,
+};
+
 async function llamarIA(prompt, tipoRecurso) {
   console.log(`   🔍 [${tipoRecurso}] Enviando prompt a la IA... (longitud: ${prompt.length} chars)`);
-  
+
   const response = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -50,27 +57,32 @@ async function llamarIA(prompt, tipoRecurso) {
       model: process.env.LLM_MODEL || "deepseek-chat",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 8000
+      max_tokens: MAX_TOKENS_POR_TIPO[tipoRecurso] || 8000
     })
   });
 
-  console.log(`    [${tipoRecurso}] Status HTTP: ${response.status}`);
-  
+  console.log(`   → [${tipoRecurso}] Status HTTP: ${response.status}`);
+
   const data = await response.json();
-  
+
   if (!response.ok) {
     console.error(`   ❌ [${tipoRecurso}] Error de API:`, data.error?.message || response.statusText);
     throw new Error(`Error IA: ${data.error?.message || response.statusText}`);
   }
-  
+
+  const finishReason = data.choices[0]?.finish_reason;
+  if (finishReason === "length") {
+    console.error(`   ⚠️ [${tipoRecurso}] LA RESPUESTA FUE TRUNCADA por max_tokens. Sube el límite para este tipo.`);
+  }
+
   const contenido = data.choices[0]?.message?.content;
   console.log(`   🔍 [${tipoRecurso}] Respuesta recibida (primeros 200 chars):`, contenido?.substring(0, 200));
-  
+
   if (!contenido || contenido.trim() === "") {
     throw new Error("La IA devolvió una respuesta vacía");
   }
-  
-  return contenido;
+
+  return { contenido, truncado: finishReason === "length" };
 }
 
 function parsearRango(rangoStr) {
