@@ -96,7 +96,25 @@ function parsearRango(rangoStr) {
       capitulos.add(Number(parte));
     }
   }
-  return Array.from(capitulos).sort((a, b) => a - b);
+    return Array.from(capitulos).sort((a, b) => a - b);
+}
+
+function extraerJSONDeRespuesta(textoCrudo) {
+  if (!textoCrudo) return null;
+
+  let limpio = textoCrudo.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+  const inicio = limpio.indexOf("{");
+  const fin = limpio.lastIndexOf("}");
+  if (inicio === -1 || fin === -1 || fin < inicio) return null;
+
+  const candidato = limpio.slice(inicio, fin + 1);
+
+  try {
+    return JSON.parse(candidato);
+  } catch {
+    return null;
+  }
 }
 
 async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
