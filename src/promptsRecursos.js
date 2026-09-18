@@ -177,7 +177,35 @@ REGLAS CRÍTICAS:
 FUENTE: ${materiales.sermon_html ? materiales.sermon_html.substring(0, 2000) : ''}
 
 FORMATO JSON: {"tipo": "aplicaciones_practicas", "titulo": "Aplicaciones Prácticas: ${ctx}", "contenido_html": "[HTML de tarjetas]"}`;
-    }
+    }   
+
+        case "citas_autoridades": {
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar CITAS DE AUTORIDADES (Teólogos y Libros de referencia) para ${ctx}.
+
+#### REGLAS CRÍTICAS:
+1. SOLO usa autores y obras REALES y VERIFICABLES (ej: Juan Calvino, Matthew Henry, Charles Spurgeon, John MacArthur, R.C. Sproul, Francis Schaeffer, A.W. Tozer, Jonathan Edwards).
+2. NO inventes citas ni títulos de libros.
+3. NO uses referencias bíblicas como "título de libro".
+4. Genera entre 4 y 6 citas en total, mezclando teólogos clásicos y comentaristas modernos.
+5. Cada cita debe estar DIRECTAMENTE relacionada con el tema del capítulo.
+
+#### ESTRUCTURA HTML OBLIGATORIA (usa estilos inline):
+
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7;">
+  <h2 style="text-align: center; color: #1a3a5c; border-bottom: 3px solid #d4ac0d; padding-bottom: 10px; margin-bottom: 25px;"> Citas de Autoridades</h2>
+  
+  <div style="background: #fdfbf7; padding: 20px; border-radius: 8px; border-left: 4px solid #8b6914; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <p style="font-style: italic; margin: 0 0 10px 0; color: #5d4037;">"[Cita textual del autor o libro]"</p>
+    <p style="margin: 0; font-size: 0.9em; color: #1a3a5c;"><strong>— [Nombre del Autor]</strong>, <em>[Nombre de la Obra/Libro]</em></p>
+  </div>
+  
+  [Repite el bloque "div" anterior para cada cita, entre 4 y 6 veces en total]
+</div>
+
+#### FORMATO DE SALIDA
+Devolvé SOLO un objeto JSON: {"tipo": "citas_autoridades", "titulo": "Citas de Autoridades: ${ctx}", "contenido_html": "[HTML con las citas]"}. Castellano perfecto.`;
+    }  
       
     case "quiz":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON puro, SIN markdown. Estructura: {"tipo": "quiz", "titulo": "Título atractivo", "preguntas": [{"pregunta": "Texto de la pregunta", "opciones": [{"texto": "Opción A", "correcta": false}, {"texto": "Opción B", "correcta": true}]}]}. 5 a 7 preguntas. Solo una opción correcta por pregunta.`;
