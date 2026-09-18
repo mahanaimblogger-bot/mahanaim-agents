@@ -22,7 +22,8 @@ const RECURSOS_IA = [
   "glosario",                  // Términos técnicos
   "palabras_clave",            // Hebreo/Griego
   "contexto_arqueologico",     // Histórico
-  "aplicaciones_practicas"     // NUEVO: Acciones concretas
+  "citas_autoridades",         // NUEVO: Teólogos y libros
+  "aplicaciones_practicas"     // Acciones concretas
 ];
 
 const FUENTES_CADENA = {
