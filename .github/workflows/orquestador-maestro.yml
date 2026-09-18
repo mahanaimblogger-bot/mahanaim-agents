@@ -43,9 +43,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "🔍 Verificando que las variables lleguen al script..."
-          echo "SUPABASE_URL está configurada: $([[ -n '$SUPABASE_URL' ]] && echo 'SÍ' || echo 'NO')"
-          echo "SUPABASE_ANON_KEY está configurada: $([[ -n '$SUPABASE_ANON_KEY' ]] && echo 'SÍ (longitud: ${#SUPABASE_ANON_KEY})' || echo 'NO')"
-          
+          echo "SUPABASE_URL está configurada: $([ -n "$SUPABASE_URL" ] && echo "SÍ" || echo "NO")"
+          echo "SUPABASE_SERVICE_ROLE_KEY está configurada: $([ -n "$SUPABASE_SERVICE_ROLE_KEY" ] && echo "SÍ (longitud: ${#SUPABASE_SERVICE_ROLE_KEY})" || echo "NO")"
+          echo "DEEPSEEK_API_KEY está configurada: $([ -n "$DEEPSEEK_API_KEY" ] && echo "SÍ (longitud: ${#DEEPSEEK_API_KEY})" || echo "NO")"
+
           node src/orquestador-maestro.js \
             --libro="${{ github.event.inputs.libro }}" \
             --rango="${{ github.event.inputs.rango }}" \
