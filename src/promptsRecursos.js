@@ -104,36 +104,69 @@ REGLA: Máximo 3 párrafos seguidos sin una caja de color o separador.
 FORMATO JSON: {"tipo": "sermon", "titulo": "...", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño rico y cajas de colores]"}`;
     }
       
-    case "bosquejo": {
+        case "bosquejo": {
       const fuenteSermon = recortarFuente(materiales.sermon_html);
       return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: Generar el BOSQUEJO HOMILÉTICO EXACTO del sermón para ${ctx}.
+### TAREA: Generar el BOSQUEJO HOMILÉTICO del sermón para ${ctx} con diseño "Línea de Tiempo Vertical".
 
-#### REGLA DE ARMONÍA (obligatoria)
-Este bosquejo se genera DESDE el SERMÓN ya existente de este mismo capítulo. Debe reflejar fielmente el mismo mensaje, estructura y llamado del sermón. NO inventes un tema ni puntos que el sermón no trate.
+#### REGLA DE ARMONÍA
+Este bosquejo se genera DESDE el SERMÓN ya existente. Debe reflejar fielmente el mismo mensaje, estructura y llamado del sermón. NO inventes temas ni puntos que el sermón no trate.
 
-#### CARACTERÍSTICAS OBLIGATORIAS:
-1. **SOLO PUNTOS Y SUBPUNTOS**: NO desarrolles el contenido. Solo lista la estructura esquemática con referencias bíblicas.
-2. **FORMATO ESQUEMÁTICO CLARO**:
-   - TÍTULO DEL SERMÓN
-   - TEXTO BASE
-   - INTRODUCCIÓN (solo mencionar el gancho, sin desarrollar)
-   - PUNTO I: [Título del punto]
-     * Subpunto A: [Cita bíblica de apoyo]
-     * Subpunto B: [Cita bíblica de apoyo]
-   - PUNTO II: [Título del punto]
-     * Subpunto A: [Cita bíblica]
-     * Subpunto B: [Cita bíblica]
-   - PUNTO III: [Título del punto]
-     * Subpunto A: [Cita bíblica]
-     * Subpunto B: [Cita bíblica]
-   - CONCLUSIÓN (solo mencionar el llamado, sin desarrollar)
+#### CARACTERÍSTICAS:
+- SOLO PUNTOS Y SUBPUNTOS: NO desarrolles el contenido.
+- FORMATO ESQUEMÁTICO CLARO con referencias bíblicas.
+
+#### DISEÑO HTML OBLIGATORIO - ESTILO "LÍNEA DE TIEMPO VERTICAL":
+
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7; max-width: 800px; margin: 0 auto;">
+
+  <div style="background: #fdfbf7; padding: 30px; border-radius: 12px; border: 2px dashed #d4ac0d; text-align: center; margin-bottom: 40px;">
+    <p style="color: #8b6914; font-style: italic; margin: 0;">Bosquejo Homilético</p>
+    <h1 style="color: #1a3a5c; font-size: 2em; margin: 10px 0; font-style: italic;">[TÍTULO DEL SERMÓN]</h1>
+    <p style="color: #8b6914; font-weight: bold; letter-spacing: 2px;">[TEXTO BASE]</p>
+  </div>
+
+  <div style="position: relative; padding-left: 60px;">
+    <div style="position: absolute; left: 30px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #d4ac0d, #8b6914, #d4ac0d);"></div>
+
+    <div style="position: relative; margin-bottom: 40px;">
+      <div style="position: absolute; left: -45px; top: 0; width: 30px; height: 30px; background: #d4ac0d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; box-shadow: 0 2px 8px rgba(212, 172, 13, 0.4);">I</div>
+      <div style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #d4ac0d;">[TÍTULO DEL PUNTO I]</div>
+      
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;">
+        <span style="color: #d4ac0d; font-weight: bold; margin-right: 8px;">A.</span>
+        <span style="color: #3e2723;">[Subpunto A]</span>
+        <div style="display: inline-block; background: #fef9e7; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; color: #8b6914; font-style: italic; margin-top: 5px; border: 1px solid #d4c4a8;">[Referencia bíblica]</div>
+      </div>
+      
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <span style="color: #d4ac0d; font-weight: bold; margin-right: 8px;">B.</span>
+        <span style="color: #3e2723;">[Subpunto B]</span>
+        <div style="display: inline-block; background: #fef9e7; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; color: #8b6914; font-style: italic; margin-top: 5px; border: 1px solid #d4c4a8;">[Referencia bíblica]</div>
+      </div>
+    </div>
+
+    [REPITE LA ESTRUCTURA DEL NODO PARA CADA PUNTO II, III, IV...]
+
+    <div style="position: relative; margin-bottom: 40px;">
+      <div style="position: absolute; left: -50px; top: 0; width: 40px; height: 40px; background: #1a3a5c; color: #d4ac0d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; border: 3px solid #d4ac0d; box-shadow: 0 2px 8px rgba(26, 58, 92, 0.4);"></div>
+      <div style="color: #d4ac0d; font-size: 1.4em; font-weight: bold; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #1a3a5c;">CONCLUSIÓN Y LLAMADO</div>
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d;">
+        <span style="color: #3e2723;">[Punto clave 1 del llamado]</span>
+      </div>
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d;">
+        <span style="color: #3e2723;">[Punto clave 2 del llamado]</span>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 ### FUENTE (SERMÓN del capítulo)
 ${fuenteSermon}
 
 #### FORMATO DE SALIDA
-Devolvé SOLO un objeto JSON: {"tipo": "bosquejo", "titulo": "Bosquejo: <tema del sermón>", "texto_base": "${ctx}", "contenido_html": "<div class='bosquejo-sermon'>[HTML con la estructura esquemática]</div>"}. Castellano perfecto.`;
+Devolvé SOLO un objeto JSON: {"tipo": "bosquejo", "titulo": "Bosquejo: [tema del sermón]", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño Línea de Tiempo Vertical]"}. Castellano perfecto.`;
     }
 
         case "aplicaciones_practicas": {
