@@ -36,7 +36,7 @@ const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colosenses", "1-tesalonicenses", "2-tesalonicenses", "1-timoteo", "2-timoteo", "tito", "filemon", "hebreos", "santiago", "1-pedro", "2-pedro", "1-juan", "2-juan", "3-juan", "judas", "apocalipsis"];
 
 const MAX_TOKENS_POR_TIPO = {
-  sermon: 16000,
+  sermon: 24000,
   bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000 para el nuevo diseño
   quiz: 4000,
   glosario: 4000,
