@@ -37,11 +37,12 @@ const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-co
 
 const MAX_TOKENS_POR_TIPO = {
   sermon: 16000,
-  bosquejo: 4000,
+  bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000
   quiz: 4000,
   glosario: 4000,
   palabras_clave: 3000,
   contexto_arqueologico: 6000,
+  citas_autoridades: 6000,      // <-- Agregado para el nuevo recurso
   aplicaciones_practicas: 6000,
 };
 
