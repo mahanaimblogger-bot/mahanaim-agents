@@ -1,59 +1,269 @@
-name: Orquestador Maestro (Lote)
-on:
-  workflow_dispatch:
-    inputs:
-      libro:
-        description: "Libro (ej: genesis)"
-        required: true
-      rango:    
-        description: "Rango de capítulos (ej: 1-10 o 1,3,5)"
-        required: true
-        default: "1-3"
+import "dotenv/config";
+import { generarEstudio } from "./generarEstudio.js";
+import { generarPromptsCapitulo } from "../scripts/generate-prompts.js";
+import { 
+  supabase, 
+  obtenerBookIdPorSlug, 
+  obtenerOCrearChapterId, 
+  obtenerTextoCapituloCompleto, 
+  obtenerRecurso, 
+  guardarRecursoComoBorrador 
+} from "./supabaseClient.js";
+import { generarPromptRecurso } from "./promptsRecursos.js";
+import { formatearRecurso } from "./formateadores.js";
 
-jobs:
-  procesar-lote:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clonar el repo
-        uses: actions/checkout@v4
-        
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          
-      - name: Instalar dependencias
-        run: npm install
-        
-      - name: Ejecutar Orquestador Maestro
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          LLM_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          LLM_BASE_URL: "https://api.deepseek.com/v1/chat/completions"
-          LLM_MODEL: "deepseek-chat"
-        run: |
-          node src/orquestador-maestro.js --libro=${{ github.event.inputs.libro }} --rango=${{ github.event.inputs.rango }}
-          
-      - name: Subir Prompts como Artefacto
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: prompts-${{ github.event.inputs.libro }}-${{ github.event.inputs.rango }}
-          path: prompts_output/
-          retention-days: 30
+// ============================================================
+// CONFIGURACIÓN DE RECURSOS
+// ============================================================
+const RECURSOS_IA = [
+  "sermon",                    // Homilético completo (palabra por palabra)
+  "bosquejo",                  // Del sermón (solo puntos y subpuntos)
+  "quiz",                      // Interactivo
+  "glosario",                  // Términos técnicos
+  "palabras_clave",            // Hebreo/Griego
+  "contexto_arqueologico",     // Histórico
+  "citas_autoridades",         // Teólogos y libros
+  "aplicaciones_practicas"     // Acciones concretas
+];
 
-      - name: Notificar éxito en Telegram
-        if: success()
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="🏁 Lote completado%0A Libro: ${{ github.event.inputs.libro }}%0A🔢 Rango: ${{ github.event.inputs.rango }}%0A Descarga los prompts desde los Artifacts."
-            
-      - name: Notificar fallo en Telegram
-        if: failure()
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="❌ Error en el Orquestador Maestro%0A📖 Libro: ${{ github.event.inputs.libro }}%0A🔢 Rango: ${{ github.event.inputs.rango }}%0A🔗 Ver detalles: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+const FUENTES_CADENA = {
+  sermon: ["estudio"],
+  bosquejo: ["sermon"],
+  aplicaciones_practicas: ["sermon"]
+};
+const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
+
+const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colosenses", "1-tesalonicenses", "2-tesalonicenses", "1-timoteo", "2-timoteo", "tito", "filemon", "hebreos", "santiago", "1-pedro", "2-pedro", "1-juan", "2-juan", "3-juan", "judas", "apocalipsis"];
+
+const MAX_TOKENS_POR_TIPO = {
+  sermon: 16000,
+  bosquejo: 8000,               // AUMENTADO de 4000 a 8000
+  quiz: 4000,
+  glosario: 4000,
+  palabras_clave: 3000,
+  contexto_arqueologico: 6000,
+  citas_autoridades: 6000,      // Agregado para el nuevo recurso
+  aplicaciones_practicas: 6000,
+};
+
+async function llamarIA(prompt, tipoRecurso) {
+  console.log(`   🔍 [${tipoRecurso}] Enviando prompt a la IA... (longitud: ${prompt.length} chars)`);
+
+  const response = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.LLM_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: process.env.LLM_MODEL || "deepseek-chat",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.3,
+      max_tokens: MAX_TOKENS_POR_TIPO[tipoRecurso] || 8000
+    })
+  });
+
+  console.log(`   → [${tipoRecurso}] Status HTTP: ${response.status}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(`   ❌ [${tipoRecurso}] Error de API:`, data.error?.message || response.statusText);
+    throw new Error(`Error IA: ${data.error?.message || response.statusText}`);
+  }
+
+  const finishReason = data.choices[0]?.finish_reason;
+  if (finishReason === "length") {
+    console.error(`   ⚠️ [${tipoRecurso}] LA RESPUESTA FUE TRUNCADA por max_tokens. Sube el límite para este tipo.`);
+  }
+
+  const contenido = data.choices[0]?.message?.content;
+  console.log(`   🔍 [${tipoRecurso}] Respuesta recibida (primeros 200 chars):`, contenido?.substring(0, 200));
+
+  if (!contenido || contenido.trim() === "") {
+    throw new Error("La IA devolvió una respuesta vacía");
+  }
+
+  return { contenido, truncado: finishReason === "length" };
+}
+
+function parsearRango(rangoStr) {
+  const capitulos = new Set();
+  const partes = rangoStr.split(',');
+  for (const parte of partes) {
+    if (parte.includes('-')) {
+      const [inicio, fin] = parte.split('-').map(Number);
+      for (let i = inicio; i <= fin; i++) capitulos.add(i);
+    } else {
+      capitulos.add(Number(parte));
+    }
+  }
+  return Array.from(capitulos).sort((a, b) => a - b);
+}
+
+function extraerJSONDeRespuesta(textoCrudo) {
+  if (!textoCrudo) return null;
+
+  let limpio = textoCrudo.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+  const inicio = limpio.indexOf("{");
+  const fin = limpio.lastIndexOf("}");
+  if (inicio === -1 || fin === -1 || fin < inicio) return null;
+
+  const candidato = limpio.slice(inicio, fin + 1);
+
+  try {
+    return JSON.parse(candidato);
+  } catch {
+    return null;
+  }
+}
+
+async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
+  console.log(`\n   🤖 [Paso 2/3] Generando recursos de IA para ${libro} ${capituloNum}...`);
+  
+  const recursosIATotales = [...RECURSOS_IA];
+
+  const { data: recursosDB } = await supabase.from("resources").select("tipo").eq("chapter_id", chapterId);
+  const tiposExistentes = recursosDB ? recursosDB.map(r => r.tipo) : [];
+  const faltantesIA = recursosIATotales.filter(tipo => !tiposExistentes.includes(tipo));
+  
+  if (faltantesIA.length === 0) {
+    console.log(`   ✅ Todos los recursos de IA ya existen para ${libro} ${capituloNum}.`);
+    return;
+  }
+
+  console.log(`   📋 Recursos a generar: ${faltantesIA.join(", ")}`);
+
+  const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
+  const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
+  const fueraCadena = faltantesIA.filter(t => !TIPOS_CADENA.has(t));
+  const ordenCadena = ["sermon", "bosquejo", "aplicaciones_practicas"].filter(t => enCadena.includes(t));
+  const colaGeneracion = [...ordenCadena, ...fueraCadena];
+
+  const cacheFuentes = {};
+  async function leerFuentePara(tipoFuente) {
+    if (tipoFuente in cacheFuentes) return cacheFuentes[tipoFuente];
+    const rec = await obtenerRecurso(chapterId, tipoFuente);
+    cacheFuentes[tipoFuente] = rec || null;
+    return rec;
+  }
+
+  for (const tipo of colaGeneracion) {
+    try {
+      const materiales = {};
+      const fuentesTipo = FUENTES_CADENA[tipo] || [];
+      const ausentes = [];
+      const hallados = {};
+      
+      for (const fTipo of fuentesTipo) {
+        const src = await leerFuentePara(fTipo);
+        if (src) hallados[fTipo] = src.contenido_html || "";
+        else ausentes.push(fTipo);
+      }
+      
+      if (ausentes.length > 0) {
+        console.log(`   ⛔ Omitido "${tipo}" (falta fuente: ${ausentes.join(", ")})`);
+        continue;
+      }
+      
+      if (hallados.estudio) materiales.estudio_html = hallados.estudio;
+      if (hallados.sermon) materiales.sermon_html = hallados.sermon;
+
+      const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
+      
+      console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
+      
+      const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
+
+      const datos = extraerJSONDeRespuesta(respuestaCruda);
+
+      if (!datos) {
+        console.error(`   ❌ [${tipo}] No se pudo extraer JSON válido.${truncado ? " (Causa probable: respuesta truncada por max_tokens)" : ""}`);
+        console.error(`   📄 Primeros 300 chars de la respuesta cruda:`, respuestaCruda.substring(0, 300));
+        continue;
+      }
+
+      const htmlFinal = formatearRecurso(tipo, datos);
+      
+      await guardarRecursoComoBorrador({
+        chapterId,
+        tipo: datos.tipo || tipo,
+        titulo: datos.titulo || `Recurso de ${tipo}`,
+        slug: `${libro}-${capituloNum}-${tipo}`,
+        contenidoHtml: htmlFinal,
+      });
+      console.log(`   ✅ ${tipo} guardado.`);
+      await new Promise(r => setTimeout(r, 2000));
+    } catch (err) {
+      console.error(`    Error generando ${tipo}:`, err.message);
+    }
+  }
+}
+
+// ============================================================
+// FUNCIÓN PRINCIPAL (MAESTRA)
+// ============================================================
+async function main() {
+  const args = {};
+  for (const arg of process.argv.slice(2)) {
+    const [clave, valor] = arg.replace(/^--/, "").split("=");
+    args[clave] = valor;
+  }
+
+  if (!args.libro || !args.rango) {
+    console.log("Uso: node src/orquestador-maestro.js --libro=genesis --rango=1-10 [--indicaciones=\"Texto aquí\"]");
+    process.exit(1);
+  }
+
+  const { libro, rango, indicaciones } = args;
+  
+  // Lógica para manejar las indicaciones especiales
+  const indicacionManual = (indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
+  
+  const capitulos = parsearRango(rango);
+  console.log(`\n🚀 INICIANDO ORQUESTADOR MAESTRO`);
+  console.log(`📖 Libro: ${libro}`);
+  console.log(`📚 Capítulos a procesar: ${capitulos.join(", ")}`);
+  if (indicacionManual) {
+    console.log(`📝 Indicaciones especiales: ${indicacionManual.substring(0, 100)}${indicacionManual.length > 100 ? '...' : ''}`);
+  }
+  console.log(`════════════════════════════════════════════\n`);
+
+  const libroInfo = await obtenerBookIdPorSlug(libro);
+
+  for (const capituloNum of capitulos) {
+    console.log(`\n🔄 ══════ PROCESANDO CAPÍTULO ${capituloNum} ══════`);
+    try {
+      const chapterId = await obtenerOCrearChapterId(libroInfo.id, capituloNum);
+
+      // PASO 1: Generar Estudio (con Oro Metálico y publicación automática)
+      console.log(`\n   📝 [Paso 1/3] Generando estudio...`);
+      await generarEstudio({
+        libro,
+        capitulo: capituloNum,
+        video: "SIN VIDEO",
+        imagen: "SIN IMAGEN",
+        minimoPalabras: 3500,
+        forzar: false,
+        indicacionManual: indicacionManual, // <-- AHORA SÍ USA LA VARIABLE
+      });
+
+      // PASO 2: Generar Recursos de IA
+      await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
+
+      // PASO 3: Generar Prompts Multimedia (Artefactos)
+      console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
+      await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
+
+      console.log(`\n   🎉 ¡Capítulo ${capituloNum} completado exitosamente!`);
+    } catch (error) {
+      console.error(`\n   💥 ERROR CRÍTICO en capítulo ${capituloNum}:`, error.message);
+    }
+  }
+
+  console.log(`\n\n🏁 ══════ LOTE FINALIZADO ══════`);
+  console.log(`📁 Todos los prompts están en: prompts_output/${libro.toLowerCase()}/`);
+}
+
+main().catch(console.error);
