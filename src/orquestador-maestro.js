@@ -37,7 +37,7 @@ const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-co
 
 const MAX_TOKENS_POR_TIPO = {
   sermon: 16000,
-  bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000
+  bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000 para el nuevo diseño
   quiz: 4000,
   glosario: 4000,
   palabras_clave: 3000,
@@ -98,7 +98,7 @@ function parsearRango(rangoStr) {
       capitulos.add(Number(parte));
     }
   }
-    return Array.from(capitulos).sort((a, b) => a - b);
+  return Array.from(capitulos).sort((a, b) => a - b);
 }
 
 function extraerJSONDeRespuesta(textoCrudo) {
@@ -172,10 +172,9 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
 
       const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
       
-      // 🕵️ DEBUG: Ver el prompt que se envía
       console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
       
-            const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
+      const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
 
       const datos = extraerJSONDeRespuesta(respuestaCruda);
 
@@ -213,15 +212,22 @@ async function main() {
   }
 
   if (!args.libro || !args.rango) {
-    console.log("Uso: node src/orquestador-maestro.js --libro=genesis --rango=1-10");
+    console.log("Uso: node src/orquestador-maestro.js --libro=genesis --rango=1-10 [--indicaciones=\"Texto aquí\"]");
     process.exit(1);
   }
 
-  const { libro, rango } = args;
+  const { libro, rango, indicaciones } = args;
+  
+  // Lógica para manejar las indicaciones especiales
+  const indicacionManual = (indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
+  
   const capitulos = parsearRango(rango);
   console.log(`\n🚀 INICIANDO ORQUESTADOR MAESTRO`);
   console.log(`📖 Libro: ${libro}`);
   console.log(`📚 Capítulos a procesar: ${capitulos.join(", ")}`);
+  if (indicacionManual) {
+    console.log(`📝 Indicaciones especiales: ${indicacionManual.substring(0, 100)}${indicacionManual.length > 100 ? '...' : ''}`);
+  }
   console.log(`════════════════════════════════════════════\n`);
 
   const libroInfo = await obtenerBookIdPorSlug(libro);
@@ -240,13 +246,13 @@ async function main() {
         imagen: "SIN IMAGEN",
         minimoPalabras: 3500,
         forzar: false,
-        indicacionManual: null,
+        indicacionManual: indicacionManual, // <-- AHORA SÍ USA LA VARIABLE
       });
 
-      // PASO 2: Generar 16 Recursos de IA
+      // PASO 2: Generar 8 Recursos de IA
       await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
 
-      // PASO 3: Generar 8 Archivos de Prompts (Solo local)
+      // PASO 3: Generar Prompts Multimedia (Artefactos)
       console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
       await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
 
