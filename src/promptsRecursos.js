@@ -249,8 +249,76 @@ Devolvé SOLO un objeto JSON: {"tipo": "citas_autoridades", "titulo": "Citas de 
     case "palabras_clave":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "palabras_clave", "titulo": "Estudio de Palabras Clave: ${ctx}", "terminos": [{"termino_original": "Hebreo/Griego", "transliteracion": "Transliteración", "strong": "Número Strong", "significado": "Significado", "contexto": "Contexto en el capítulo"}]}. Entre 3 y 5 términos.`;
 
-    case "contexto_arqueologico":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener secciones: Contexto Histórico, Contexto Arqueológico (datos REALES), Implicaciones para la Interpretación. ${clasesCSS}`;
+       case "contexto_arqueologico": {
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar el CONTEXTO HISTÓRICO-ARQUEOLÓGICO para ${ctx} con diseño "Ficha de Museo".
+
+#### CARACTERÍSTICAS OBLIGATORIAS:
+1. SOLO datos REALES y VERIFICABLES. NO inventes hallazgos arqueológicos.
+2. Si no hay datos arqueológicos específicos del capítulo, usa datos del período histórico general.
+3. Estructura en 3 secciones: Contexto Histórico, Hallazgos Arqueológicos, Implicaciones para la Interpretación.
+
+#### DISEÑO HTML OBLIGATORIO - ESTILO "FICHA DE MUSEO":
+
+<div style="font-family: 'Segoe UI', Tahoma, sans-serif; color: #2c2c2c; line-height: 1.7; max-width: 850px; margin: 0 auto;">
+
+  <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 25px; text-align: center; border-top: 5px solid #d4ac0d;">
+    <p style="color: #757575; margin: 0; font-size: 0.9em; text-transform: uppercase; letter-spacing: 2px;">Contexto Histórico-Arqueológico</p>
+    <h1 style="color: #1a3a5c; font-size: 2em; margin: 10px 0; font-family: Georgia, serif;">${ctx}</h1>
+    <div style="display: inline-block; background: #1a3a5c; color: #d4ac0d; padding: 10px 25px; border-radius: 6px; font-weight: bold; letter-spacing: 2px; margin-top: 10px;">[ÉPOCA] · [LUGAR]</div>
+  </div>
+
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">⏳</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Contexto Histórico</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Desarrollo del contexto histórico del capítulo]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Más desarrollo histórico]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Referencia:</strong> [Fuente histórica verificable]
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 2px; background: linear-gradient(to right, transparent, #d4ac0d, transparent); margin: 25px 0;"></div>
+
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">🏺</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Hallazgos Arqueológicos</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Desarrollo de hallazgos arqueológicos REALES]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Más hallazgos verificados]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Hallazgo clave:</strong> [Dato arqueológico específico con fuente]
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 2px; background: linear-gradient(to right, transparent, #d4ac0d, transparent); margin: 25px 0;"></div>
+
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">💡</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Implicaciones para la Interpretación</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Cómo el contexto histórico y arqueológico ilumina la interpretación del texto]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Aplicación hermenéutica]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Aplicación hermenéutica:</strong> [Conclusión interpretativa]
+      </div>
+    </div>
+  </div>
+
+</div>
+
+#### FORMATO DE SALIDA
+Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML con diseño Ficha de Museo]"}. Castellano perfecto.`;
+    }
 
     default:
       return `Genera un recurso de tipo ${tipo} para ${ctx}. Devuelve un JSON válido con "tipo", "titulo" y "contenido_html" o la estructura específica del recurso.`;
