@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del repositorio
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -46,7 +46,7 @@ jobs:
             --indicaciones="${{ github.event.inputs.indicaciones }}"
 
       - name: Subir artefactos (Prompts generados)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: prompts-generados-${{ github.event.inputs.libro }}
