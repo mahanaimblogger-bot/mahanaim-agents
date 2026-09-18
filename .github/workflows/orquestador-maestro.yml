@@ -27,7 +27,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Instalar dependencias
         run: npm install
@@ -39,6 +39,7 @@ jobs:
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "🔍 Verificando que las variables lleguen al script..."
           echo "SUPABASE_URL está configurada: $([[ -n '$SUPABASE_URL' ]] && echo 'SÍ' || echo 'NO')"
