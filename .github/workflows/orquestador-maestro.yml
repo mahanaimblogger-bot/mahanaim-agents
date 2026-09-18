@@ -40,6 +40,10 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          echo "🔍 Verificando que las variables lleguen al script..."
+          echo "SUPABASE_URL está configurada: $([[ -n '$SUPABASE_URL' ]] && echo 'SÍ' || echo 'NO')"
+          echo "SUPABASE_ANON_KEY está configurada: $([[ -n '$SUPABASE_ANON_KEY' ]] && echo 'SÍ (longitud: ${#SUPABASE_ANON_KEY})' || echo 'NO')"
+          
           node src/orquestador-maestro.js \
             --libro="${{ github.event.inputs.libro }}" \
             --rango="${{ github.event.inputs.rango }}" \
