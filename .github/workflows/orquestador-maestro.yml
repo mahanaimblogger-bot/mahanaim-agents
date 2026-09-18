@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          
+
       - name: Instalar dependencias
         run: npm install
 
@@ -37,7 +37,7 @@ jobs:
           LLM_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           DEEPSEEK_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
-                    LLM_BASE_URL: https://api.deepseek.com/v1/chat/completions
+          LLM_BASE_URL: 'https://api.deepseek.com/v1/chat/completions'
           LLM_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
