@@ -433,7 +433,8 @@ export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
 async function generarArtefactosVideo(libro, capitulo, textoCapitulo) {
   console.log(`\n    [Paso 3.1] Generando artefactos para Video Automático...`);
   
-  const dir = `prompts_output/${libro.toLowerCase()}/capitulo_${capitulo}`;
+  // CORRECCIÓN: Guardar en la misma carpeta raíz que los otros archivos
+  const dir = `prompts_output/${libro.toLowerCase()}`;
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   const ctx = `${libro} capítulo ${capitulo}`;
@@ -457,8 +458,9 @@ TEXTO DE REFERENCIA: ${textoCapitulo.substring(0, 2000)}
     });
     const dataImg = await resImg.json();
     let contenidoImg = dataImg.choices[0]?.message?.content || "[]";
-    // Limpieza básica para asegurar JSON
     contenidoImg = contenidoImg.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+    
+    // GUARDAR EN LA CARPETA RAÍZ
     fs.writeFileSync(`${dir}/prompts_imagenes_video.json`, contenidoImg, 'utf8');
     console.log(`   ✅ prompts_imagenes_video.json guardado.`);
   } catch (e) { console.error("   ⚠️ Error generando prompts de imagen:", e.message); }
@@ -485,9 +487,11 @@ TEXTO DE REFERENCIA: ${textoCapitulo.substring(0, 3000)}
     const dataSSML = await resSSML.json();
     let contenidoSSML = dataSSML.choices[0]?.message?.content || "";
     contenidoSSML = contenidoSSML.replace(/```xml\s*/gi, "").replace(/```\s*/g, "").trim();
+    
+    // GUARDAR EN LA CARPETA RAÍZ
     fs.writeFileSync(`${dir}/guion_video_tts.ssml`, contenidoSSML, 'utf8');
     console.log(`   ✅ guion_video_tts.ssml guardado.`);
-  } catch (e) { console.error("   ️ Error generando guion SSML:", e.message); }
+  } catch (e) { console.error("   ⚠️ Error generando guion SSML:", e.message); }
 }
   
 }
