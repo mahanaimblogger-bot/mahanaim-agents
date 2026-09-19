@@ -421,4 +421,68 @@ export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
     console.error(`   ❌ Error fatal en el workflow de prompts:`, error.message);
     return false;
   }
+  // ============================================================
+// NUEVOS ARTEFACTOS PARA PIPELINE DE VIDEO (Azure + Replicate)
+// ============================================================
+
+async function generarArtefactosVideo(libro, capitulo, textoCapitulo) {
+  console.log(`\n    [Paso 3.1] Generando artefactos para Video Automático...`);
+  
+  const dir = `prompts_output/${libro.toLowerCase()}/capitulo_${capitulo}`;
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+  const ctx = `${libro} capítulo ${capitulo}`;
+
+  // --- 1. PROMPTS DE IMÁGENES (Para Replicate/DALL-E) ---
+  const promptImagenes = `
+Eres un director de arte cinematográfico. Genera un array JSON con exactamente 12 prompts detallados para IA de generación de imágenes (como Midjourney o DALL-E 3) para ilustrar un video documental sobre: ${ctx}.
+REGLAS:
+1. Estilo: Fotorrealista, cinematográfico, iluminación dramática, relación de aspecto 16:9 (--ar 16:9).
+2. Temática: Escenas bíblicas históricas, paisajes del antiguo oriente, texturas de pergamino, luz divina.
+3. NO incluir texto en las imágenes.
+4. Formato de salida: SOLO un array JSON de strings. Ejemplo: ["Prompt 1...", "Prompt 2..."]
+TEXTO DE REFERENCIA: ${textoCapitulo.substring(0, 2000)}
+`;
+
+  try {
+    const resImg = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${process.env.LLM_API_KEY}` },
+      body: JSON.stringify({ model: process.env.LLM_MODEL || "deepseek-chat", messages: [{ role: "user", content: promptImagenes }], temperature: 0.7 })
+    });
+    const dataImg = await resImg.json();
+    let contenidoImg = dataImg.choices[0]?.message?.content || "[]";
+    // Limpieza básica para asegurar JSON
+    contenidoImg = contenidoImg.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+    fs.writeFileSync(`${dir}/prompts_imagenes_video.json`, contenidoImg, 'utf8');
+    console.log(`   ✅ prompts_imagenes_video.json guardado.`);
+  } catch (e) { console.error("   ⚠️ Error generando prompts de imagen:", e.message); }
+
+  // --- 2. GUION SSML (Para Azure TTS) ---
+  const promptSSML = `
+Eres un guionista de documentales bíblicos y experto en Azure TTS. Genera un guion narrativo de aproximadamente 1000 palabras (para un video de 7 minutos) sobre: ${ctx}.
+REGLAS CRÍTICAS:
+1. Debes devolver SOLO el código XML SSML válido, empezando con <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="es-ES"> y terminando con </speak>.
+2. Usa una voz neuronal masculina, tono solemne y pastoral.
+3. Usa <break time="800ms"/> entre párrafos y <break time="1.5s"/> para pausas dramáticas.
+4. Usa <emphasis level="moderate"> para palabras clave teológicas.
+5. Usa <prosody rate="slow"> para los versículos bíblicos citados.
+6. Estructura: Introducción impactante -> Desarrollo narrativo del capítulo -> Aplicación espiritual -> Oración final.
+TEXTO DE REFERENCIA: ${textoCapitulo.substring(0, 3000)}
+`;
+
+  try {
+    const resSSML = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${process.env.LLM_API_KEY}` },
+      body: JSON.stringify({ model: process.env.LLM_MODEL || "deepseek-chat", messages: [{ role: "user", content: promptSSML }], temperature: 0.5, max_tokens: 4000 })
+    });
+    const dataSSML = await resSSML.json();
+    let contenidoSSML = dataSSML.choices[0]?.message?.content || "";
+    contenidoSSML = contenidoSSML.replace(/```xml\s*/gi, "").replace(/```\s*/g, "").trim();
+    fs.writeFileSync(`${dir}/guion_video_tts.ssml`, contenidoSSML, 'utf8');
+    console.log(`   ✅ guion_video_tts.ssml guardado.`);
+  } catch (e) { console.error("   ️ Error generando guion SSML:", e.message); }
+}
+  
 }
