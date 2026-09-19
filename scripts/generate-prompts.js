@@ -433,8 +433,11 @@ export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
 async function generarArtefactosVideo(libro, capitulo, textoCapitulo) {
   console.log(`\n    [Paso 3.1] Generando artefactos para Video Automático...`);
   
-  // CORRECCIÓN: Guardar en la misma carpeta raíz que los otros archivos
-  const dir = `prompts_output/${libro.toLowerCase()}`;
+  // Guardar en la EXACTA misma carpeta que los otros 8 archivos del capítulo
+  function quitarTildes(texto) {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  const dir = path.join('prompts_output', quitarTildes(libro.toLowerCase()), `Capitulo_${capitulo}`);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   const ctx = `${libro} capítulo ${capitulo}`;
