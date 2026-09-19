@@ -284,6 +284,7 @@ async function generateWithAI(promptData) {
       ],
       response_format: { type: "json_object" },
       temperature: 0.8,
+      max_tokens: 8000,
     });
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
@@ -296,7 +297,11 @@ async function saveFilesLocally(results, plainTextSource, bookName, chapterNum, 
   console.log(`   💾 Generando archivos de texto para descargar...`);
   
   // 📁 CREAR CARPETA ORGANIZADA: prompts_output/{libro}/Capitulo_{numero}/
-  const outputDir = path.join('prompts_output', bookName.toLowerCase(), `Capitulo_${chapterNum}`);
+  function quitarTildes(texto) {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+const outputDir = path.join('prompts_output', quitarTildes(bookName.toLowerCase()), `Capitulo_${chapterNum}`);
   mkdirSync(outputDir, { recursive: true });
 
   for (const result of results) {
