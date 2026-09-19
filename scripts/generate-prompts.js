@@ -415,6 +415,10 @@ export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
     }
 
     await saveFilesLocally(results, plainTextSource, chapterInfo.bookName, chapterInfo.chapterNumber, context.estudioTitulo);
+    // NUEVO: Generar artefactos para Video Automático (Azure + Replicate)
+    // Extraemos el texto del estudio si existe
+    const textoEstudio = context.estudioHtml ? context.estudioHtml.replace(/<[^>]*>/g, ' ').substring(0, 3000) : '';
+    await generarArtefactosVideo(chapterInfo.bookName, chapterInfo.chapterNumber, textoEstudio);
     console.log(`   ✨ ¡Prompts listos para ${bookSlug} ${chapterNumber}!`);
     return true;
 
