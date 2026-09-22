@@ -16,25 +16,39 @@ import { formatearRecurso } from "./formateadores.js";
 // CONFIGURACIÓN DE RECURSOS
 // ============================================================
 const RECURSOS_IA = [
-  "quiz", "glosario", "guia_estudio", "bosquejo", "sermon", "paralelos",
-  "palabras_clave", "infografia", "citas_teologos", "citas_libros",
-  "contexto_arqueologico", "diagrama_estructura", "cronologia", "devocional", "profecias",
+  "sermon",                    // Homilético completo (palabra por palabra)
+  "bosquejo",                  // Del sermón (solo puntos y subpuntos)
+  "quiz",                      // Interactivo
+  "glosario",                  // Términos técnicos
+  "palabras_clave",            // Hebreo/Griego
+  "contexto_arqueologico",     // Histórico
+  "citas_autoridades",         // NUEVO: Teólogos y libros
+  "aplicaciones_practicas"     // Acciones concretas
 ];
 
 const FUENTES_CADENA = {
   sermon: ["estudio"],
   bosquejo: ["sermon"],
+  aplicaciones_practicas: ["sermon"]
 };
 const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 
 const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colosenses", "1-tesalonicenses", "2-tesalonicenses", "1-timoteo", "2-timoteo", "tito", "filemon", "hebreos", "santiago", "1-pedro", "2-pedro", "1-juan", "2-juan", "3-juan", "judas", "apocalipsis"];
 
-// ============================================================
-// FUNCIÓN PARA LLAMAR A LA IA (CON DEBUG MEJORADO)
-// ============================================================
+const MAX_TOKENS_POR_TIPO = {
+  sermon: 24000,
+  bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000 para el nuevo diseño
+  quiz: 4000,
+  glosario: 4000,
+  palabras_clave: 3000,
+  contexto_arqueologico: 6000,
+  citas_autoridades: 6000,      // <-- Agregado para el nuevo recurso
+  aplicaciones_practicas: 6000,
+};
+
 async function llamarIA(prompt, tipoRecurso) {
   console.log(`   🔍 [${tipoRecurso}] Enviando prompt a la IA... (longitud: ${prompt.length} chars)`);
-  
+
   const response = await fetch(process.env.LLM_BASE_URL || "https://api.deepseek.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -45,27 +59,32 @@ async function llamarIA(prompt, tipoRecurso) {
       model: process.env.LLM_MODEL || "deepseek-chat",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 8000
+      max_tokens: MAX_TOKENS_POR_TIPO[tipoRecurso] || 8000
     })
   });
 
-  console.log(`    [${tipoRecurso}] Status HTTP: ${response.status}`);
-  
+  console.log(`   → [${tipoRecurso}] Status HTTP: ${response.status}`);
+
   const data = await response.json();
-  
+
   if (!response.ok) {
     console.error(`   ❌ [${tipoRecurso}] Error de API:`, data.error?.message || response.statusText);
     throw new Error(`Error IA: ${data.error?.message || response.statusText}`);
   }
-  
+
+  const finishReason = data.choices[0]?.finish_reason;
+  if (finishReason === "length") {
+    console.error(`   ⚠️ [${tipoRecurso}] LA RESPUESTA FUE TRUNCADA por max_tokens. Sube el límite para este tipo.`);
+  }
+
   const contenido = data.choices[0]?.message?.content;
   console.log(`   🔍 [${tipoRecurso}] Respuesta recibida (primeros 200 chars):`, contenido?.substring(0, 200));
-  
+
   if (!contenido || contenido.trim() === "") {
     throw new Error("La IA devolvió una respuesta vacía");
   }
-  
-  return contenido;
+
+  return { contenido, truncado: finishReason === "length" };
 }
 
 function parsearRango(rangoStr) {
@@ -82,13 +101,28 @@ function parsearRango(rangoStr) {
   return Array.from(capitulos).sort((a, b) => a - b);
 }
 
+function extraerJSONDeRespuesta(textoCrudo) {
+  if (!textoCrudo) return null;
+
+  let limpio = textoCrudo.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+  const inicio = limpio.indexOf("{");
+  const fin = limpio.lastIndexOf("}");
+  if (inicio === -1 || fin === -1 || fin < inicio) return null;
+
+  const candidato = limpio.slice(inicio, fin + 1);
+
+  try {
+    return JSON.parse(candidato);
+  } catch {
+    return null;
+  }
+}
+
 async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
   console.log(`\n   🤖 [Paso 2/3] Generando recursos de IA para ${libro} ${capituloNum}...`);
   
-  const esNT = librosNT.includes(libro.toLowerCase());
-  const recursosIATotales = esNT 
-    ? [...RECURSOS_IA, "conexion_at"] 
-    : [...RECURSOS_IA, "conexion_nt"];
+  const recursosIATotales = [...RECURSOS_IA];
 
   const { data: recursosDB } = await supabase.from("resources").select("tipo").eq("chapter_id", chapterId);
   const tiposExistentes = recursosDB ? recursosDB.map(r => r.tipo) : [];
@@ -104,7 +138,7 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
   const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
   const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
   const fueraCadena = faltantesIA.filter(t => !TIPOS_CADENA.has(t));
-  const ordenCadena = ["sermon", "bosquejo"].filter(t => enCadena.includes(t));
+  const ordenCadena = ["sermon", "bosquejo", "aplicaciones_practicas"].filter(t => enCadena.includes(t));
   const colaGeneracion = [...ordenCadena, ...fueraCadena];
 
   const cacheFuentes = {};
@@ -138,22 +172,20 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
 
       const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
       
-      // 🕵️ DEBUG: Ver el prompt que se envía
       console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
       
-      const respuestaCruda = await llamarIA(prompt, tipo);
-      
-      const jsonLimpio = respuestaCruda.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-      
-      let datos;
-      try { 
-        datos = JSON.parse(jsonLimpio); 
-      } catch (err) {
-        console.log(`   ⚠️ [${tipo}] No es JSON válido. Guardando como texto plano.`);
-        datos = { tipo, titulo: `Recurso de ${tipo}`, contenido_html: respuestaCruda }; 
+      const { contenido: respuestaCruda, truncado } = await llamarIA(prompt, tipo);
+
+      const datos = extraerJSONDeRespuesta(respuestaCruda);
+
+      if (!datos) {
+        console.error(`   ❌ [${tipo}] No se pudo extraer JSON válido.${truncado ? " (Causa probable: respuesta truncada por max_tokens)" : ""}`);
+        console.error(`   📄 Primeros 300 chars de la respuesta cruda:`, respuestaCruda.substring(0, 300));
+        continue;
       }
 
       const htmlFinal = formatearRecurso(tipo, datos);
+      
       await guardarRecursoComoBorrador({
         chapterId,
         tipo: datos.tipo || tipo,
@@ -180,15 +212,22 @@ async function main() {
   }
 
   if (!args.libro || !args.rango) {
-    console.log("Uso: node src/orquestador-maestro.js --libro=genesis --rango=1-10");
+    console.log("Uso: node src/orquestador-maestro.js --libro=genesis --rango=1-10 [--indicaciones=\"Texto aquí\"]");
     process.exit(1);
   }
 
-  const { libro, rango } = args;
+  const { libro, rango, indicaciones } = args;
+  
+  // Lógica para manejar las indicaciones especiales
+  const indicacionManual = (indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
+  
   const capitulos = parsearRango(rango);
   console.log(`\n🚀 INICIANDO ORQUESTADOR MAESTRO`);
   console.log(`📖 Libro: ${libro}`);
   console.log(`📚 Capítulos a procesar: ${capitulos.join(", ")}`);
+  if (indicacionManual) {
+    console.log(`📝 Indicaciones especiales: ${indicacionManual.substring(0, 100)}${indicacionManual.length > 100 ? '...' : ''}`);
+  }
   console.log(`════════════════════════════════════════════\n`);
 
   const libroInfo = await obtenerBookIdPorSlug(libro);
@@ -207,13 +246,13 @@ async function main() {
         imagen: "SIN IMAGEN",
         minimoPalabras: 3500,
         forzar: false,
-        indicacionManual: null,
+        indicacionManual: indicacionManual, // <-- AHORA SÍ USA LA VARIABLE
       });
 
-      // PASO 2: Generar 16 Recursos de IA
+      // PASO 2: Generar 8 Recursos de IA
       await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
 
-      // PASO 3: Generar 8 Archivos de Prompts (Solo local)
+      // PASO 3: Generar Prompts Multimedia (Artefactos)
       console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
       await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
 

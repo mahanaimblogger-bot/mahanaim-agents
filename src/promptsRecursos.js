@@ -1,5 +1,5 @@
-﻿/**
- * Genera el prompt específico para cada tipo de recurso.
+/**
+ * Genera el prompt específico para cada tipo de recurso optimizado.
  * Incluye la inyección del texto bíblico para evitar alucinaciones.
  */
 export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", materiales = {}) {
@@ -7,16 +7,7 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", 
   const reglaOrtografia = "**⛔ REGLA ABSOLUTA DE ORTOGRAFÍA Y FORMATO ⛔**\nEl texto DEBE estar en ESPAÑOL PERFECTO. Revisa tildes, puntuación y nombres propios. No inventes citas ni datos. Si usas comillas dobles dentro del JSON, escápalas con \\\".\n\n";
 
   const basePrompt = `Genera contenido para ${ctx}. \n\nTEXTO BÍBLICO DE REFERENCIA (RVR1960) PARA CITAS EXACTAS:\n${textoCapitulo}\n\n`;
-  const clasesCSS = "Usa las clases HTML: 'contenedor-blog', 'titulo-entrada', 'subtitulo', 'caja-meditar', 'tabla-comparativa'.";
-
-  // ============================================================
-  // AYUDAS PARA LA CADENA HOMILÉTICA (estudio -> sermón -> bosquejo -> podcast)
-  // Cada pieza se NUTRE de la pieza fuente del mismo capítulo y NO debe
-  // contradecirla ni inventar fuera de ella.
-  // materiales = { estudio_html, sermon_html }
-  // ============================================================
-  const estudioHtml = (materiales && materiales.estudio_html) || null;
-  const sermonHtml = (materiales && materiales.sermon_html) || null;
+  const clasesCSS = "Usa las clases HTML: 'contenedor-blog', 'titulo-entrada', 'subtitulo', 'caja-meditar', 'tabla-comparativa', 'caja-linguistica'.";
 
   // Recorte defensivo de una fuente HTML larga para no inflar el prompt.
   function recortarFuente(html, max = 26000) {
@@ -39,177 +30,295 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", 
 `;
 
   switch (tipo) {
+
+        case "sermon": {
+      const fuenteEstudio = recortarFuente(materiales.estudio_html);
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar un SERMÓN HOMILÉTICO COMPLETO (mínimo 3,000 palabras) para ${ctx}.
+
+#### REGLA DE ARMONÍA
+Desarrolla el TEMA del estudio. No inventes temas distintos.
+
+#### DISEÑO HTML OBLIGATORIO (ESTILO RICO Y VISUAL):
+NO generes párrafos largos de texto plano. DEBES usar esta estructura HTML con estilos en línea para garantizar el diseño:
+
+<div style="background: #fdfbf7; padding: 40px 30px; border-radius: 12px; border: 1px solid #e8dcc8; font-family: Georgia, serif; color: #3e2723; line-height: 1.8;">
+  
+  <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px dashed #d4ac0d; padding-bottom: 20px;">
+    <p style="color: #8b6914; font-style: italic; font-size: 1.1em; margin: 0;">Sermón Expositivo</p>
+    <h1 style="color: #1a3a5c; font-size: 2.2em; margin: 10px 0;">[TÍTULO IMPACTANTE]</h1>
+    <p style="color: #5d4037; font-weight: bold; letter-spacing: 1px;">TEXTO BASE: [Libro Capítulo:Versículos]</p>
+  </div>
+
+  <h2 style="color: #1a3a5c; border-left: 4px solid #d4ac0d; padding-left: 15px; margin-top: 30px;">Introducción</h2>
+  <p>[Párrafo de gancho conversacional]</p>
+  
+  <div style="background: linear-gradient(135deg, #2c0a0a, #4a1010); color: #f0e6d0; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid #d4ac0d;">
+    <strong style="color: #d4ac0d; display: block; margin-bottom: 10px;">💡 Ilustración:</strong>
+    [Historia o analogía visual breve]
+  </div>
+
+  <div style="margin: 30px 0; border-top: 1px solid #d4c4a8; border-bottom: 1px solid #d4c4a8; padding: 15px 0; text-align: center; color: #d4ac0d; font-size: 1.5em; letter-spacing: 10px;">❦ ❦</div>
+
+  <h2 style="color: #1a3a5c; border-left: 4px solid #d4ac0d; padding-left: 15px; margin-top: 30px;">I. [TÍTULO DEL PRIMER PUNTO]</h2>
+  
+  <div style="background: #fef9e7; border-left: 4px solid #b7950b; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #5d4037;">
+    <strong style="color: #1a3a5c; font-style: normal; display: block; margin-bottom: 5px;">📖 [Referencia Bíblica]</strong>
+    "[Texto bíblico citado]"
+  </div>
+
+  <p>[Exposición del punto]</p>
+
+  <div style="background: #f4ecf7; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8e44ad;">
+    <strong style="color: #6c3483; display: block; margin-bottom: 5px;">📜 Nota Teológica:</strong>
+    [Explicación breve de término hebreo/griego o doctrina]
+  </div>
+
+  <div style="background: #e8f8f5; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #1abc9c;">
+    <strong style="color: #117a65; display: block; margin-bottom: 5px;">✅ Aplicación:</strong>
+    [Acción concreta para la vida]
+  </div>
+
+  [REPITE LA ESTRUCTURA DE PUNTOS CON SUS CAJAS DE COLORES]
+
+  <div style="background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: white; padding: 30px; border-radius: 12px; margin-top: 40px; text-align: center; border: 2px solid #d4ac0d;">
+    <h2 style="color: #d4ac0d; margin-top: 0;">Conclusión y Llamado</h2>
+    <p>[Recapitulación breve]</p>
+    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left;">
+      <strong>1.</strong> [Verdad 1]<br>
+      <strong>2.</strong> [Verdad 2]<br>
+      <strong>3.</strong> [Verdad 3]
+    </div>
+    <div style="background: #fdfbf7; color: #3e2723; padding: 20px; border-radius: 8px; margin-top: 20px; font-style: italic;">
+      <strong style="display: block; margin-bottom: 10px; color: #8b6914;">🙏 Oración Final:</strong>
+      "[Oración completa escrita]"
+    </div>
+  </div>
+
+</div>
+
+REGLA: Máximo 3 párrafos seguidos sin una caja de color o separador.
+
+### FUENTE: ${fuenteEstudio}
+
+FORMATO JSON: {"tipo": "sermon", "titulo": "...", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño rico y cajas de colores]"}`;
+    }
+      
+        case "bosquejo": {
+      const fuenteSermon = recortarFuente(materiales.sermon_html);
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar el BOSQUEJO HOMILÉTICO del sermón para ${ctx} con diseño "Línea de Tiempo Vertical".
+
+#### REGLA DE ARMONÍA
+Este bosquejo se genera DESDE el SERMÓN ya existente. Debe reflejar fielmente el mismo mensaje, estructura y llamado del sermón. NO inventes temas ni puntos que el sermón no trate.
+
+#### CARACTERÍSTICAS:
+- SOLO PUNTOS Y SUBPUNTOS: NO desarrolles el contenido.
+- FORMATO ESQUEMÁTICO CLARO con referencias bíblicas.
+
+#### DISEÑO HTML OBLIGATORIO - ESTILO "LÍNEA DE TIEMPO VERTICAL":
+
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7; max-width: 800px; margin: 0 auto;">
+
+  <div style="background: #fdfbf7; padding: 30px; border-radius: 12px; border: 2px dashed #d4ac0d; text-align: center; margin-bottom: 40px;">
+    <p style="color: #8b6914; font-style: italic; margin: 0;">Bosquejo Homilético</p>
+    <h1 style="color: #1a3a5c; font-size: 2em; margin: 10px 0; font-style: italic;">[TÍTULO DEL SERMÓN]</h1>
+    <p style="color: #8b6914; font-weight: bold; letter-spacing: 2px;">[TEXTO BASE]</p>
+  </div>
+
+  <div style="position: relative; padding-left: 60px;">
+    <div style="position: absolute; left: 30px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #d4ac0d, #8b6914, #d4ac0d);"></div>
+
+    <div style="position: relative; margin-bottom: 40px;">
+      <div style="position: absolute; left: -45px; top: 0; width: 30px; height: 30px; background: #d4ac0d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; box-shadow: 0 2px 8px rgba(212, 172, 13, 0.4);">I</div>
+      <div style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #d4ac0d;">[TÍTULO DEL PUNTO I]</div>
+      
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;">
+        <span style="color: #d4ac0d; font-weight: bold; margin-right: 8px;">A.</span>
+        <span style="color: #3e2723;">[Subpunto A]</span>
+        <div style="display: inline-block; background: #fef9e7; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; color: #8b6914; font-style: italic; margin-top: 5px; border: 1px solid #d4c4a8;">[Referencia bíblica]</div>
+      </div>
+      
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <span style="color: #d4ac0d; font-weight: bold; margin-right: 8px;">B.</span>
+        <span style="color: #3e2723;">[Subpunto B]</span>
+        <div style="display: inline-block; background: #fef9e7; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; color: #8b6914; font-style: italic; margin-top: 5px; border: 1px solid #d4c4a8;">[Referencia bíblica]</div>
+      </div>
+    </div>
+
+    [REPITE LA ESTRUCTURA DEL NODO PARA CADA PUNTO II, III, IV...]
+
+    <div style="position: relative; margin-bottom: 40px;">
+      <div style="position: absolute; left: -50px; top: 0; width: 40px; height: 40px; background: #1a3a5c; color: #d4ac0d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; border: 3px solid #d4ac0d; box-shadow: 0 2px 8px rgba(26, 58, 92, 0.4);"></div>
+      <div style="color: #d4ac0d; font-size: 1.4em; font-weight: bold; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #1a3a5c;">CONCLUSIÓN Y LLAMADO</div>
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d;">
+        <span style="color: #3e2723;">[Punto clave 1 del llamado]</span>
+      </div>
+      <div style="margin: 12px 0; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #d4ac0d;">
+        <span style="color: #3e2723;">[Punto clave 2 del llamado]</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+### FUENTE (SERMÓN del capítulo)
+${fuenteSermon}
+
+#### FORMATO DE SALIDA
+Devolvé SOLO un objeto JSON: {"tipo": "bosquejo", "titulo": "Bosquejo: [tema del sermón]", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño Línea de Tiempo Vertical]"}. Castellano perfecto.`;
+    }
+
+        case "aplicaciones_practicas": {
+      return `Genera APLICACIONES PRÁCTICAS, CONCRETAS Y RESUMIDAS para ${ctx}.
+
+ENFOQUE: CERO TEORÍA. Solo acciones específicas para HOY.
+
+ESTRUCTURA OBLIGATORIA (Debes generar exactamente este formato HTML):
+
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7;">
+  <h2 style="text-align: center; color: #1a3a5c; border-bottom: 3px solid #d4ac0d; padding-bottom: 10px; margin-bottom: 30px;">📌 Aplicaciones Prácticas para Tu Vida</h2>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">🙏 Vida Personal y Devocional</h3>
+    
+    <div style="background: #fdfbf7; padding: 20px; border-radius: 8px; border-left: 4px solid #d4ac0d; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+      <h4 style="margin: 0 0 10px 0; color: #1a3a5c;">✅ [Título de la acción en imperativo, ej: ORA con perseverancia]</h4>
+      <p style="margin: 0 0 8px 0; font-size: 0.9em; color: #5d4037;"><strong>📖 Base:</strong> [Capítulo:Versículo]</p>
+      <p style="margin: 0 0 8px 0; font-size: 0.95em;"><strong>💡 Principio:</strong> [La verdad del capítulo en 1 sola frase].</p>
+      <p style="margin: 0; font-weight: bold; color: #1a3a5c;"><strong>🎯 Para HOY:</strong> [Acción concreta y específica. Ej: "Dedica 15 minutos hoy a orar en tu lugar secreto, no solo pidiendo, sino escuchando."]</p>
+    </div>
+    [Repite este bloque de "div" 2 veces más para esta categoría]
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">👨‍👩‍👧‍👦 Familia y Hogar</h3>
+    [Genera 2 bloques "div" como el anterior, adaptados a la familia]
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3 style="color: #8b6914; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">⛪ Iglesia y Comunidad</h3>
+    [Genera 2 bloques "div" como el anterior, adaptados a la iglesia]
+  </div>
+</div>
+
+REGLAS CRÍTICAS:
+1. El "Para HOY" debe ser una acción que se pueda hacer en las próximas 24 horas.
+2. Sé breve. El "Principio" es 1 frase. El "Para HOY" es 1 o 2 frases máximo.
+3. Usa el HTML exacto proporcionado arriba para que se vea como tarjetas limpias y organizadas.
+
+FUENTE: ${materiales.sermon_html ? materiales.sermon_html.substring(0, 2000) : ''}
+
+FORMATO JSON: {"tipo": "aplicaciones_practicas", "titulo": "Aplicaciones Prácticas: ${ctx}", "contenido_html": "[HTML de tarjetas]"}`;
+    }   
+
+        case "citas_autoridades": {
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar CITAS DE AUTORIDADES (Teólogos y Libros de referencia) para ${ctx}.
+
+#### REGLAS CRÍTICAS:
+1. SOLO usa autores y obras REALES y VERIFICABLES (ej: Juan Calvino, Matthew Henry, Charles Spurgeon, John MacArthur, R.C. Sproul, Francis Schaeffer, A.W. Tozer, Jonathan Edwards).
+2. NO inventes citas ni títulos de libros.
+3. NO uses referencias bíblicas como "título de libro".
+4. Genera entre 4 y 6 citas en total, mezclando teólogos clásicos y comentaristas modernos.
+5. Cada cita debe estar DIRECTAMENTE relacionada con el tema del capítulo.
+
+#### ESTRUCTURA HTML OBLIGATORIA (usa estilos inline):
+
+<div style="font-family: Georgia, serif; color: #3e2723; line-height: 1.7;">
+  <h2 style="text-align: center; color: #1a3a5c; border-bottom: 3px solid #d4ac0d; padding-bottom: 10px; margin-bottom: 25px;"> Citas de Autoridades</h2>
+  
+  <div style="background: #fdfbf7; padding: 20px; border-radius: 8px; border-left: 4px solid #8b6914; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <p style="font-style: italic; margin: 0 0 10px 0; color: #5d4037;">"[Cita textual del autor o libro]"</p>
+    <p style="margin: 0; font-size: 0.9em; color: #1a3a5c;"><strong>— [Nombre del Autor]</strong>, <em>[Nombre de la Obra/Libro]</em></p>
+  </div>
+  
+  [Repite el bloque "div" anterior para cada cita, entre 4 y 6 veces en total]
+</div>
+
+#### FORMATO DE SALIDA
+Devolvé SOLO un objeto JSON: {"tipo": "citas_autoridades", "titulo": "Citas de Autoridades: ${ctx}", "contenido_html": "[HTML con las citas]"}. Castellano perfecto.`;
+    }  
+      
     case "quiz":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON puro, SIN markdown. Estructura: {"tipo": "quiz", "titulo": "Título atractivo", "preguntas": [{"pregunta": "Texto de la pregunta", "opciones": [{"texto": "Opción A", "correcta": false}, {"texto": "Opción B", "correcta": true}]}]}. 5 a 7 preguntas. Solo una opción correcta por pregunta.`;
 
     case "glosario":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "glosario", "titulo": "Glosario: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener al menos 5 términos. Usa la clase "caja-linguistica" para cada término, con un span clase "palabra-original" para el término en hebreo/griego. Incluir significado y contexto bíblico.`;
 
-    case "guia_estudio":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "guia_estudio", "titulo": "Guía de Estudio y Reflexión: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe incluir: 1) Preguntas de comprensión del texto, 2) Preguntas de reflexión personal aplicativa, 3) Búsqueda bíblica (pasajes relacionados), 4) Conexión con Cristo, 5) Aplicación práctica concreta. ${clasesCSS}`;
-
-    case "bosquejo":
-      if (!sermonHtml) {
-        throw new Error(`Falta el recurso fuente para bosquejo: no se encontró el SERMÓN de ${ctx}.`);
-      }
-      const fuenteSermon = recortarFuente(sermonHtml);
-      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: Generar un BOSQUEJO HOMILÉTICO para ${ctx}.
-
-#### REGLA DE ARMONÍA (obligatoria)
-Este bosquejo se genera DESDE el SERMÓN ya existente de este mismo capítulo (su texto se entrega como fuente). Debe reflejar fielmente el mismo mensaje/tema, estructura y llamado del sermón; NO inventes un tema ni puntos que el sermón no trate. Guarda coherencia doctrinal con el estudio/sermón del capítulo.
-
-#### ESTRUCTURA (destilación del sermón)
-1) Título del sermón (el mismo del sermón fuente o uno equivalente).
-2) Tema / Mensaje central (tesis en UNA frase, tomada del sermón).
-3) Pasaje base (referencia del capítulo).
-4) Bosquejo de 3 puntos principales con subpuntos, extraídos de la estructura del sermón fuente.
-5) Ilustración sugerida.
-6) Conclusión y Aplicación/Llamado (tal como cierra el sermón fuente).
-
-### FUENTE (SERMÓN del capítulo)
-${fuenteSermon}
-
-#### FORMATO DE SALIDA
-Devolvé SOLO un objeto JSON: {"tipo": "bosquejo", "titulo": "Bosquejo Homilético: ${ctx} — <tema>", "contenido_html": "[HTML COMPLETO del bosquejo]"}. Usa ${clasesCSS}. Castellano perfecto.
-`;
-
-    case "sermon":
-      if (!estudioHtml) {
-        throw new Error(`Falta el recurso fuente para sermon: no se encontró el ESTUDIO de ${ctx}.`);
-      }
-      const fuenteEstudio = recortarFuente(estudioHtml);
-      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: Generar un SERMÓN (predicación expositivo-concional) para ${ctx}.
-
-#### REGLA DE ARMONÍA (obligatoria)
-Este sermón se genera DESDE el ESTUDIO ya existente de este mismo capítulo (su contenido/idea/doctrinas/mensaje se entrega como fuente). Debe:
-- Desarrollar el TEMA / MENSAJE CENTRAL del capítulo tal como emerge del estudio. No inventes un tema distinto ni contradigas el estudio.
-- Ser MÁS conciso y predicable que el estudio (no un tratado académico): orientado a la congregación.
-- Seguir NORMAS DE HOMILÉTICA: 1) Idea o tesis homilética (el mensaje central) en UNA frase; 2) Introducción que captura; 3) Desarrollo expositivo en puntos claros que avanzan el texto, con ilustraciones e implicaciones prácticas; 4) Conclusión; 5) Llamado/apelación final.
-
-### FUENTE (ESTUDIO del capítulo)
-${fuenteEstudio}
-
-#### FORMATO DE SALIDA
-Devolvé SOLO un objeto JSON: {"tipo": "sermon", "titulo": "Sermón: ${ctx} — <mensaje central en pocas palabras>", "contenido_html": "[HTML COMPLETO del sermón]"}. Usa ${clasesCSS}. Castellano perfecto.
-`;
-
-    case "podcast_guion":
-      if (!estudioHtml || !sermonHtml) {
-        const faltan = [];
-        if (!estudioHtml) faltan.push("ESTUDIO");
-        if (!sermonHtml) faltan.push("SERMÓN");
-        throw new Error(`Falta el recurso fuente para podcast_guion de ${ctx}: no se encontró ${faltan.join(" y ")}.`);
-      }
-      const fuenteEstudioPod = recortarFuente(estudioHtml);
-      const fuenteSermonPod = recortarFuente(sermonHtml);
-      return basePrompt + PERFIL_DOCTRINAL + `
-### TAREA: escribir el GUION COMPLETO de un PODCAST DE AUDIO de DOS VOCES (diálogo), en texto plano para ${ctx}.
-
-#### NATURALEZA: PODCAST CONVERSACIONAL A DOS VOCES
-- Es una conversación entre DOS personas que dialogan sobre el capítulo, NO un monólogo.
-- Genera naturalidad: preguntas cruzadas, descubrimientos mutuos y comentarios breves que se responden.
-- Entre ambos recorren el capítulo: cada uno aporta datos, aclara dudas del otro y llegan a la aplicación.
-- Mantén el hilo: el mensaje central del sermón y el recorrido del estudio, pero en charla amena.
-- Respeta el perfil doctrinal y las fuentes; no contradigas ni inventes fuera de ellas.
-
-#### REGLAS CRÍTICAS DE SALIDA
-- El archivo final será un .txt que se pasará a un conversor de texto a voz (TTS).
-- NUNCA devuelvas JSON, HTML, markdown, ni encierres nada entre comillas de código.
-- Devolvé SOLO el guion literal, listo para pegar en el conversor, en ESPAÑOL PERFECTO.
-- Se arma DESDE el ESTUDIO y el SERMÓN del capítulo (provistos como fuentes).
-
-#### FORMATO DEL ARCHIVO TXT (usa estos marcadores SIEMPRE)
-#FORMATO=mahanaim-tts:v1
-#IDIOMA=es-ES
-#EPISODIO=Podcast de <libro> <capítulo> — <título atractivo>
-#VOZ_PRINCIPAL=Narrador
-
-[INTRO] (tono enérgico)
-LOCUTOR=Narrador
-...saludo y presentación de ambos conductores...
-LOCUTOR=Locutor
-...gancho que capta al oyente...
-[EXPECTATIVA]
-...pregunta que promete lo que van a descubrir...
-
-[CUERPO] (tono de charla cálida)
-LOCUTOR=Narrador
-...primer tema planteado en voz conversacional...
-LOCUTOR=Locutor
-...reacción, pregunta o aporte en conversación...
-[PAUSA 1s]
-LOCUTOR=Narrador
-...continúan alternando y profundizan otra sección...
-[ENFASIS] ...frase que uno enfatiza y el otro subraya...
-
-[CIERRE] (tono sereno y de llamado)
-LOCUTOR=Narrador
-...resumen breve y aplicación/llamado final...
-LOCUTOR=Locutor
-...cierre cálido, despedida e invitación al siguiente episodio...
-
-#### REGLAS DE DIÁLOGO Y MARCAS
-- Usa SIEMPRE la etiqueta LOCUTOR= ANTES de cada parlamento para indicar quién habla:
-  * LOCUTOR=Narrador          -> Voz principal (conductor fijo).
-  * LOCUTOR=Locutor (o Voz2, Invitado/a, Narradora) -> Segunda voz.
-- Ningún parlamento sin su LOCUTOR= previo. Alterna voces varias veces a lo largo del guion.
-- Coloca [PAUSA 1s], [PAUSA 2s] o [PAUSA 3s] en su propia línea donde haya silencio real.
-- [ENFASIS] va en su propia línea o al inicio de la frase a enfatizar.
-- (tono ...) en su propia línea al inicio de cada bloque, ej.: (tono enérgico | suave | serio | misterioso | cercano).
-- [EXPECTATIVA] en su propia línea tras una pregunta que debe subir en entonación.
-- Secciones [INTRO] | [CUERPO] | [CIERRE] y líneas # de metadatos no se leen en voz alta.
-- Frases cortas y orales. Sin listas ni citas académicas largas: dialogar y leer en voz alta natural.
-
-#### DURACIÓN OBJETIVO
-Para un capítulo de estudio, apunta a entre 8 y 14 minutos leídos en voz alta (aprox. 1200-1600 palabras), repartidas entre ambas voces.
-
-### FUENTES a usar
-#### ESTUDIO del capítulo:
-${fuenteEstudioPod}
-#### SERMÓN del capítulo:
-${fuenteSermonPod}
-
-#### SALIDA
-Imprimí el guion SOLO (sin NINGUNA línea extra, sin explicaciones).
-`;
-
-    case "paralelos":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "paralelos", "titulo": "Paralelos Bíblicos: ${ctx}", "paralelos": [{"referencia": "Libro Cap:Ver", "texto_cita": "Texto exacto RVR1960", "explicacion": "Conexión teológica clara"}]}. Máximo 6 paralelos.`;
-
     case "palabras_clave":
       return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "palabras_clave", "titulo": "Estudio de Palabras Clave: ${ctx}", "terminos": [{"termino_original": "Hebreo/Griego", "transliteracion": "Transliteración", "strong": "Número Strong", "significado": "Significado", "contexto": "Contexto en el capítulo"}]}. Entre 3 y 5 términos.`;
 
-    case "infografia":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "infografia", "titulo": "Infografía Doctrinal: ${ctx}", "doctrinas": [{"doctrina": "Nombre formal de la doctrina", "fundamento": "Versículos del capítulo", "desarrollo": "Explicación teológica con referencias cruzadas"}]}. 3 a 5 doctrinas formales según la Teología Sistemática.`;
+       case "contexto_arqueologico": {
+      return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
+### TAREA: Generar el CONTEXTO HISTÓRICO-ARQUEOLÓGICO para ${ctx} con diseño "Ficha de Museo".
 
-    case "citas_teologos":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_teologos", "titulo": "Citas de Teólogos: ${ctx}", "citas": [{"autor": "Nombre real", "obra": "Obra real", "cita": "Cita textual pertinente"}]}. 3 a 5 citas. SOLO autores y obras REALES y VERIFICABLES.`;
+#### CARACTERÍSTICAS OBLIGATORIAS:
+1. SOLO datos REALES y VERIFICABLES. NO inventes hallazgos arqueológicos.
+2. Si no hay datos arqueológicos específicos del capítulo, usa datos del período histórico general.
+3. Estructura en 3 secciones: Contexto Histórico, Hallazgos Arqueológicos, Implicaciones para la Interpretación.
 
-    case "citas_libros":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "citas_libros", "titulo": "Citas de Libros: ${ctx}", "citas": [{"autor": "Nombre del autor", "titulo_libro": "Título del libro", "cita": "Cita textual del libro"}]}. 3 a 5 citas de libros REALES y VERIFICABLES de comentarios bíblicos, teológicos o devocionales reconocidos (p. ej. Juan Calvino, Matthew Henry, Charles Spurgeon, C.S. Lewis, A.W. Tozer). NO uses referencias bíblicas como título_libro.`;
+#### DISEÑO HTML OBLIGATORIO - ESTILO "FICHA DE MUSEO":
 
-    case "contexto_arqueologico":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener secciones: Contexto Histórico, Contexto Arqueológico (datos REALES), Implicaciones para la Interpretación. ${clasesCSS}`;
+<div style="font-family: 'Segoe UI', Tahoma, sans-serif; color: #2c2c2c; line-height: 1.7; max-width: 850px; margin: 0 auto;">
 
-    case "diagrama_estructura":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "diagrama_estructura", "titulo": "Diagrama de Estructura Literaria: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe mostrar el tipo de estructura (ej: quiasmo) y un diagrama textual en una etiqueta <pre>. Incluye el significado teológico de la estructura.`;
+  <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 25px; text-align: center; border-top: 5px solid #d4ac0d;">
+    <p style="color: #757575; margin: 0; font-size: 0.9em; text-transform: uppercase; letter-spacing: 2px;">Contexto Histórico-Arqueológico</p>
+    <h1 style="color: #1a3a5c; font-size: 2em; margin: 10px 0; font-family: Georgia, serif;">${ctx}</h1>
+    <div style="display: inline-block; background: #1a3a5c; color: #d4ac0d; padding: 10px 25px; border-radius: 6px; font-weight: bold; letter-spacing: 2px; margin-top: 10px;">[ÉPOCA] · [LUGAR]</div>
+  </div>
 
-    case "cronologia":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "cronologia", "titulo": "Cronología del capítulo ${capitulo}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe ser una tabla con clase "tabla-comparativa" listando los eventos en orden cronológico con su referencia bíblica exacta. El título DEBE ser exactamente "Cronología del capítulo ${capitulo}".`;
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">⏳</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Contexto Histórico</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Desarrollo del contexto histórico del capítulo]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Más desarrollo histórico]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Referencia:</strong> [Fuente histórica verificable]
+      </div>
+    </div>
+  </div>
 
-    case "conexion_at":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "conexion_at", "titulo": "Conexión con el A.T.: ${ctx}", "conexiones": [{"referencia_at": "Ref AT real", "texto_cita": "Cita textual RVR1960", "explicacion": "Cómo se relaciona con este pasaje del NT"}]}. 3 a 5 conexiones REALES.`;
+  <div style="height: 2px; background: linear-gradient(to right, transparent, #d4ac0d, transparent); margin: 25px 0;"></div>
 
-    case "conexion_nt":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "conexion_nt", "titulo": "Conexión con el N.T.: ${ctx}", "conexiones": [{"referencia_nt": "Ref NT real", "texto_cita": "Cita textual RVR1960", "explicacion": "Cómo este pasaje del AT se cumple o conecta en el NT"}]}. 3 a 5 conexiones REALES.`;
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">🏺</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Hallazgos Arqueológicos</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Desarrollo de hallazgos arqueológicos REALES]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Más hallazgos verificados]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Hallazgo clave:</strong> [Dato arqueológico específico con fuente]
+      </div>
+    </div>
+  </div>
 
-    case "profecias":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "profecias", "titulo": "Profecías en ${ctx}", "profecias": [{"profecia": "Descripción", "referencia_profecia": "Ref bíblica", "estado": "Cumplida/Parcial/Por cumplir", "referencia_cumplimiento": "Ref cumplimiento", "explicacion": "Explicación teológica profunda"}]}. Mínimo 2 profecías REALES.`;
+  <div style="height: 2px; background: linear-gradient(to right, transparent, #d4ac0d, transparent); margin: 25px 0;"></div>
 
-    case "devocional":
-      return reglaOrtografia + basePrompt + `Devolvé SOLO un objeto JSON: {"tipo": "devocional", "titulo": "Devocional: ${ctx}", "contenido_html": "[HTML COMPLETO]"}. El HTML debe tener: Versículo principal (clase "cita-versiculo"), Contexto, Reflexión profunda (3-4 párrafos), Aplicación Personal, Para Meditar (clase "caja-meditar"), Oración Sugerida.`;
+  <div style="background: white; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #f9f9f9, #f0f0f0); padding: 20px 25px; border-bottom: 2px solid #d4ac0d; display: flex; align-items: center; gap: 15px;">
+      <div style="font-size: 2.5em;">💡</div>
+      <h2 style="color: #1a3a5c; font-size: 1.4em; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Implicaciones para la Interpretación</h2>
+    </div>
+    <div style="padding: 25px;">
+      <p style="margin-bottom: 15px; color: #3e2723;">[Cómo el contexto histórico y arqueológico ilumina la interpretación del texto]</p>
+      <p style="margin-bottom: 15px; color: #3e2723;">[Aplicación hermenéutica]</p>
+      <div style="font-size: 0.85em; color: #757575; font-style: italic; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <strong style="color: #1a3a5c; font-style: normal;">Aplicación hermenéutica:</strong> [Conclusión interpretativa]
+      </div>
+    </div>
+  </div>
+
+</div>
+
+#### FORMATO DE SALIDA
+Devolvé SOLO un objeto JSON: {"tipo": "contexto_arqueologico", "titulo": "Contexto Histórico-Arqueológico: ${ctx}", "contenido_html": "[HTML con diseño Ficha de Museo]"}. Castellano perfecto.`;
+    }
 
     default:
       return `Genera un recurso de tipo ${tipo} para ${ctx}. Devuelve un JSON válido con "tipo", "titulo" y "contenido_html" o la estructura específica del recurso.`;

@@ -1,0 +1,32 @@
+name: Generar Base de Ilustraciones
+
+on:
+  workflow_dispatch: # Se ejecuta manualmente desde la pestaña Actions
+
+jobs:
+  construir-ilustraciones:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar script de ilustraciones
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+        run: node scripts/construir-base-ilustraciones.js
+
+      - name: Subir archivo JSON generado
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-ilustraciones-generada
+          path: ilustraciones.json
