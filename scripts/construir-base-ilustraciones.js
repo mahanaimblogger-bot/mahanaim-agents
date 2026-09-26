@@ -2,20 +2,26 @@ import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 
-// Esta es la forma segura de importar paquetes antiguos en Node.js moderno (ESM)
+// 1. ARREGLO INFALIBLE PARA PDF-PARSE EN NODE.JS MODERNO
 const require = createRequire(import.meta.url);
-const pdfParseModule = require('pdf-parse');
-const pdfParse = pdfParseModule.default || pdfParseModule;
+const pdfParseLib = require('pdf-parse');
+const pdfParse = typeof pdfParseLib === 'function' 
+  ? pdfParseLib 
+  : (pdfParseLib.default || pdfParseLib.pdfParse || (() => { throw new Error("No se pudo cargar pdf-parse"); }));
+
 // ============================================================
-// CONFIGURACIÓN
+// 2. CONFIGURACIÓN (Nombres exactos y limpios)
 // ============================================================
 const INPUT_DIR = './recursos_base';
 const OUTPUT_FILE = './ilustraciones.json';
-const LLM_API_KEY = process.env.DEEPSEEK_API_KEY || process.env.LLM_API_KEY;
-const LLM_BASE_URL = process.env.LLM_BASE_URL || 'https://api.deepseek.com/v1';
+
+// Si no tienes BASE_URL en secrets, usará la de DeepSeek por defecto automáticamente.
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const BASE_URL = process.env.BASE_URL || 'https://api.deepseek.com/v1';
+const MODEL = process.env.MODEL || 'deepseek-chat';
 
 // ============================================================
-// FUNCIONES PRINCIPALES
+// 3. FUNCIONES PRINCIPALES
 // ============================================================
 
 async function extraerTextoDeArchivo(rutaArchivo) {
@@ -92,15 +98,15 @@ FORMATO DE SALIDA:
 
 RESPONDE SOLO CON EL JSON:`;
 
-    try {
-    const response = await fetch(`${LLM_BASE_URL}/chat/completions`, {
+  try {
+    const response = await fetch(`${BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${LLM_API_KEY}`
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: MODEL,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.3,
         max_tokens: 4000
@@ -109,7 +115,6 @@ RESPONDE SOLO CON EL JSON:`;
 
     const data = await response.json();
     
-    // NUEVO: Mostrar el error real si la API falla
     if (!response.ok) {
       console.error(`❌ Error de API (${response.status}):`, data);
       return [];
@@ -122,7 +127,6 @@ RESPONDE SOLO CON EL JSON:`;
       return JSON.parse(jsonLimpio);
     } catch (e) {
       console.error(`⚠️ Error parseando JSON en bloque ${numeroBloque}:`, e.message);
-      console.error(`Contenido crudo recibido:`, contenido);
       return [];
     }
   } catch (error) {
@@ -152,7 +156,7 @@ async function procesarArchivo(rutaArchivo) {
 }
 
 // ============================================================
-// FUNCIÓN PRINCIPAL
+// 4. FUNCIÓN PRINCIPAL
 // ============================================================
 
 async function main() {
