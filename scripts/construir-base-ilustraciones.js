@@ -4,7 +4,8 @@ import { createRequire } from 'module';
 
 // Esta es la forma segura de importar paquetes antiguos en Node.js moderno (ESM)
 const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
+const pdfParseModule = require('pdf-parse');
+const pdfParse = pdfParseModule.default || pdfParseModule;
 // ============================================================
 // CONFIGURACIÓN
 // ============================================================
