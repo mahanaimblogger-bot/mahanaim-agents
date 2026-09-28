@@ -155,7 +155,7 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
   const textoCapitulo = await obtenerTextoCapituloCompleto(libroInfo.id, capituloNum);
   const enCadena = faltantesIA.filter(t => TIPOS_CADENA.has(t));
   const fueraCadena = faltantesIA.filter(t => !TIPOS_CADENA.has(t));
-  const ordenCadena = ["sermon", "bosquejo", "aplicaciones_practicas"].filter(t => enCadena.includes(t));
+  const ordenCadena = ["sermon", "bosquejo", "aplicaciones_practicas", "ilustraciones"].filter(t => enCadena.includes(t));
   const colaGeneracion = [...ordenCadena, ...fueraCadena];
 
   const cacheFuentes = {};
