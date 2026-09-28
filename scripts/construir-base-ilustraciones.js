@@ -44,9 +44,9 @@ function detectarFuente(nombreArchivo) {
   const nombre = nombreArchivo.toLowerCase();
   if (nombre.includes('spurgeon')) return 'Spurgeon';
   if (nombre.includes('moody')) return 'Moody';
-  return 'Desconocida';
+  if (nombre.includes('500-ilustraciones')) return 'Colección de Sermones';
+  return 'Clásicos Cristianos'; // Mejor que "Desconocida"
 }
-
 function dividirEnBloques(texto, tamanoBloque = 3000) {
   const bloques = [];
   let inicio = 0;
