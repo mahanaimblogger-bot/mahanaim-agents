@@ -1,4 +1,5 @@
 import "dotenv/config";
+import fs from 'fs'; // <-- NUEVO: Para leer el JSON
 import { generarEstudio } from "./generarEstudio.js";
 import { generarPromptsCapitulo } from "../scripts/generate-prompts.js";
 import { 
@@ -13,23 +14,38 @@ import { generarPromptRecurso } from "./promptsRecursos.js";
 import { formatearRecurso } from "./formateadores.js";
 
 // ============================================================
+// CARGA DE LA BASE DE DATOS DE ILUSTRACIONES
+// ============================================================
+let BASE_ILUSTRACIONES = [];
+try {
+  // Asegúrate de que ilustraciones.json esté en la raíz del proyecto
+  const rawData = fs.readFileSync('./ilustraciones.json', 'utf8');
+  BASE_ILUSTRACIONES = JSON.parse(rawData).ilustraciones || [];
+  console.log(`✅ Base de ilustraciones cargada: ${BASE_ILUSTRACIONES.length} ilustraciones disponibles.`);
+} catch (e) {
+  console.warn("⚠️ No se pudo cargar ilustraciones.json. Asegúrate de que esté en la raíz del proyecto.");
+}
+
+// ============================================================
 // CONFIGURACIÓN DE RECURSOS
 // ============================================================
 const RECURSOS_IA = [
-  "sermon",                    // Homilético completo (palabra por palabra)
-  "bosquejo",                  // Del sermón (solo puntos y subpuntos)
-  "quiz",                      // Interactivo
-  "glosario",                  // Términos técnicos
-  "palabras_clave",            // Hebreo/Griego
-  "contexto_arqueologico",     // Histórico
-  "citas_autoridades",         // NUEVO: Teólogos y libros
-  "aplicaciones_practicas"     // Acciones concretas
+  "sermon",                    
+  "bosquejo",                  
+  "quiz",                      
+  "glosario",                  
+  "palabras_clave",            
+  "contexto_arqueologico",     
+  "citas_autoridades",         
+  "aplicaciones_practicas",
+  "ilustraciones"              // <-- NUEVO
 ];
 
 const FUENTES_CADENA = {
   sermon: ["estudio"],
   bosquejo: ["sermon"],
-  aplicaciones_practicas: ["sermon"]
+  aplicaciones_practicas: ["sermon"],
+  ilustraciones: ["estudio"]   // <-- NUEVO
 };
 const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 
@@ -37,13 +53,14 @@ const librosNT = ["mateo", "marcos", "lucas", "juan", "hechos", "romanos", "1-co
 
 const MAX_TOKENS_POR_TIPO = {
   sermon: 24000,
-  bosquejo: 8000,               // <-- AUMENTADO de 4000 a 8000 para el nuevo diseño
+  bosquejo: 8000,               
   quiz: 4000,
   glosario: 4000,
   palabras_clave: 3000,
   contexto_arqueologico: 6000,
-  citas_autoridades: 6000,      // <-- Agregado para el nuevo recurso
+  citas_autoridades: 6000,      
   aplicaciones_practicas: 6000,
+  ilustraciones: 6000           // <-- NUEVO
 };
 
 async function llamarIA(prompt, tipoRecurso) {
@@ -170,7 +187,8 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       if (hallados.estudio) materiales.estudio_html = hallados.estudio;
       if (hallados.sermon) materiales.sermon_html = hallados.sermon;
 
-      const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales);
+      // <-- CAMBIO AQUÍ: Se pasa BASE_ILUSTRACIONES como último argumento
+      const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales, BASE_ILUSTRACIONES);
       
       console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
       
@@ -218,7 +236,6 @@ async function main() {
 
   const { libro, rango, indicaciones } = args;
   
-  // Lógica para manejar las indicaciones especiales
   const indicacionManual = (indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
   
   const capitulos = parsearRango(rango);
@@ -237,7 +254,6 @@ async function main() {
     try {
       const chapterId = await obtenerOCrearChapterId(libroInfo.id, capituloNum);
 
-      // PASO 1: Generar Estudio (con Oro Metálico y publicación automática)
       console.log(`\n   📝 [Paso 1/3] Generando estudio...`);
       await generarEstudio({
         libro,
@@ -246,13 +262,11 @@ async function main() {
         imagen: "SIN IMAGEN",
         minimoPalabras: 3500,
         forzar: false,
-        indicacionManual: indicacionManual, // <-- AHORA SÍ USA LA VARIABLE
+        indicacionManual: indicacionManual,
       });
 
-      // PASO 2: Generar 8 Recursos de IA
       await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
 
-      // PASO 3: Generar Prompts Multimedia (Artefactos)
       console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
       await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
 
