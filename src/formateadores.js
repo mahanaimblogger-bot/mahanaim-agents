@@ -514,6 +514,30 @@ export function formatearRecurso(tipo, datos) {
     case "cronologia":
       return formatCronologiaCards(datos);
 
+        if (tipo === 'ilustraciones') {
+    let html = `<div class="recurso-ilustraciones" style="margin-top: 2rem;">\n`;
+    html += `<h3 style="color: #8b0000; border-bottom: 2px solid #d4af37; padding-bottom: 0.5rem; font-family: Georgia, serif;">🎨 Ilustraciones Homiléticas</h3>\n`;
+    
+    if (!datos.ilustraciones || datos.ilustraciones.length === 0) {
+      html += `<p style="font-style: italic; color: #666;"><em>No se encontraron ilustraciones específicas en la base de datos para este pasaje.</em></p>`;
+    } else {
+      for (const ilus of datos.ilustraciones) {
+        html += `<div class="ilustracion-item" style="margin-bottom: 2rem; padding: 1.5rem; background: #fdfbf7; border-left: 4px solid #d4af37; border-radius: 4px; font-family: Georgia, serif;">\n`;
+        html += `<h4 style="color: #1a3a5c; margin-top: 0;">💡 ${ilus.titulo_ilustracion} <small style="color: #666; font-weight: normal; font-size: 0.8em;">(Fuente: ${ilus.fuente})</small></h4>\n`;
+        html += `<p style="font-style: italic; color: #5d4037; line-height: 1.6; background: #fff; padding: 15px; border-radius: 4px; border: 1px solid #e8dcc8;">"${ilus.contenido_ilustracion}"</p>\n`;
+        
+        html += `<h5 style="color: #8b0000; margin-bottom: 0.5rem; margin-top: 1rem; font-size: 1em;">✝️ Conexión Homilética:</h5>\n`;
+        html += `<p style="line-height: 1.6; color: #3e2723;">${ilus.conexion_homiletica}</p>\n`;
+        
+        html += `<h5 style="color: #2e8b57; margin-bottom: 0.5rem; margin-top: 1rem; font-size: 1em;">🚀 Aplicación Práctica:</h5>\n`;
+        html += `<p style="line-height: 1.6; color: #3e2723;">${ilus.aplicacion_practica}</p>\n`;
+        html += `</div>\n`;
+      }
+    }
+    html += `</div>`;
+    return html;
+  }
+
     default:
       return `<div style="${ESTILOS.contenedor}"><pre style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word;">${escapeHtml(JSON.stringify(datos, null, 2))}</pre></div>`;
   }
