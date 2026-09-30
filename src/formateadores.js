@@ -1,215 +1,540 @@
 /**
- * Formateadores de recursos a HTML con diseño Mahanaim
+ * Módulo de formateo para convertir JSON de IA en HTML estilizado.
+ * Sistema de Diseño Unificado Mahanaim (Estética Infografía Doctrinal).
  */
-export function formatearRecurso(tipo, datos) {
-  if (!datos) return '<p>Error: No hay datos para mostrar</p>';
 
-  // ============================================================
-  // RECURSO #9: ILUSTRACIONES HOMILÉTICAS (DISEÑO PREMIUM)
-  // ============================================================
-  if (tipo === 'ilustraciones') {
-    let html = `
-<div class="recurso-ilustraciones" style="
-  font-family: 'Georgia', 'Times New Roman', serif;
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 20px;
-">
+export function escapeHtml(str) {
+  if (!str) return "";
+  return str      
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export function limpiarHtml(html) {
+  if (!html) return "";
   
-  <div style="
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
-  ">
-    <div style="font-size: 3em; margin-bottom: 10px;"></div>
-    <h2 style="
-      margin: 0;
-      font-size: 2em;
-      font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    ">Ilustraciones Homiléticas</h2>
-    <p style="margin: 10px 0 0 0; opacity: 0.9; font-style: italic;">
-      ${datos.titulo || ''}
-    </p>
-  </div>
+  if (html.trim().startsWith('{')) {
+    const match = html.match(/"contenido_html"\s*:\s*"([\s\S]*)"/);
+    if (match && match[1]) {
+      html = match[1];
+    } else {
+      const htmlStart = html.match(/<(div|h1|h2|p)[\s>]/i);
+      if (htmlStart && htmlStart.index !== undefined) {
+        html = html.substring(htmlStart.index);
+      }
+    }
+  }
+  
+  let htmlLimpio = html
+    .replace(/```json|```/g, "")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\\n/g, '\n')
+    .replace(/^["']|["']$/g, '')
+    .trim();
 
-  ${!datos.ilustraciones || datos.ilustraciones.length === 0 ? `
-    <div style="
-      background: #f8f9fa;
-      padding: 30px;
-      border-radius: 8px;
-      text-align: center;
-      color: #6c757d;
-      font-style: italic;
-      border-left: 4px solid #dee2e6;
-    ">
-      <p style="margin: 0; font-size: 1.1em;">No se encontraron ilustraciones específicas en la base de datos para este pasaje.</p>
-    </div>
-  ` : ''}
-
-  ${datos.ilustraciones ? datos.ilustraciones.map((ilus, index) => `
-    <div class="ilustracion-item" style="
-      background: white;
-      margin-bottom: 40px;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-      border: 1px solid #e9ecef;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    " onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 20px rgba(0,0,0,0.08)'">
-      
-      <!-- Header de la ilustración -->
-      <div style="
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        padding: 25px 30px;
-        position: relative;
-      ">
-        <div style="
-          position: absolute;
-          top: 20px;
-          right: 30px;
-          background: rgba(255,255,255,0.2);
-          padding: 5px 15px;
-          border-radius: 20px;
-          font-size: 0.85em;
-          font-weight: 600;
-          backdrop-filter: blur(10px);
-        ">
-          💡 Ilustración ${index + 1}
-        </div>
-        <h3 style="
-          margin: 0 60px 0 0;
-          font-size: 1.6em;
-          font-weight: 700;
-          line-height: 1.3;
-        ">${ilus.titulo_ilustracion || 'Ilustración'}</h3>
-        ${ilus.fuente && ilus.fuente !== 'Desconocida' ? `
-          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 0.95em;">
-            📚 Fuente: <strong>${ilus.fuente}</strong>
-          </p>
-        ` : ''}
-      </div>
-
-      <!-- Contenido de la ilustración -->
-      <div style="padding: 30px;">
-        <div style="
-          background: linear-gradient(to right, #fff9e6, #fff);
-          border-left: 5px solid #f5576c;
-          padding: 25px;
-          border-radius: 0 8px 8px 0;
-          margin-bottom: 25px;
-          font-style: italic;
-          line-height: 1.8;
-          color: #495057;
-          position: relative;
-        ">
-          <div style="
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            background: #f5576c;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-          ">"</div>
-          <p style="margin: 10px 0 0 0; font-size: 1.05em;">${ilus.contenido_ilustracion || ''}</p>
-          <div style="
-            position: absolute;
-            bottom: -10px;
-            right: 10px;
-            background: #f5576c;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-          ">"</div>
-        </div>
-
-        <!-- Conexión Homilética -->
-        <div style="
-          background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-          padding: 25px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          border: 2px solid #ff9a76;
-        ">
-          <h4 style="
-            margin: 0 0 15px 0;
-            color: #d63031;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-          ">
-            <span style="font-size: 1.3em;">✝️</span>
-            Conexión Homilética
-          </h4>
-          <p style="margin: 0; line-height: 1.8; color: #2d3436; font-size: 1.05em;">
-            ${ilus.conexion_homiletica || ''}
-          </p>
-        </div>
-
-        <!-- Aplicación Práctica -->
-        <div style="
-          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-          padding: 25px;
-          border-radius: 8px;
-          border: 2px solid #00b894;
-        ">
-          <h4 style="
-            margin: 0 0 15px 0;
-            color: #00b894;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-          ">
-            <span style="font-size: 1.3em;">🚀</span>
-            Aplicación Práctica
-          </h4>
-          <p style="margin: 0; line-height: 1.8; color: #2d3436; font-size: 1.05em;">
-            ${ilus.aplicacion_practica || ''}
-          </p>
-        </div>
-      </div>
-    </div>
-  `).join('') : ''}
-
-  <!-- Footer -->
-  <div style="
-    text-align: center;
-    padding: 30px;
-    color: #6c757d;
-    font-style: italic;
-    border-top: 2px dashed #dee2e6;
-    margin-top: 40px;
-  ">
-    <p style="margin: 0;">Ilustraciones extraídas de nuestra base de datos homilética</p>
-  </div>
-</div>`;
-
-    return html;
+  if (!htmlLimpio.includes('max-width') && !htmlLimpio.startsWith('<div style="')) {
+    htmlLimpio = `<div style="font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word; overflow-x: auto;">${htmlLimpio}</div>`;
   }
 
-  // ============================================================
-  // LOS DEMÁS RECURSOS (sermon, bosquejo, etc.) se mantienen igual
-  // ============================================================
+  return htmlLimpio;
+}
+
+const ESTILOS = {
+  contenedor: "font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word;",
+  titulo: "color: #1a5276; border-bottom: 2px solid #d4ac0d; padding-bottom: 8px; margin-bottom: 20px;",
+  tablaHeader: "background: #1a3a5c; color: #d4ac0d; padding: 10px 12px; text-align: left; font-weight: bold; font-size: 0.9em; border: 1px solid #3e5a7a; white-space: normal; word-wrap: break-word;",
+  tablaCelda: "padding: 10px 12px; border: 1px solid #d4c4a8; vertical-align: top; font-size: 0.9em; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; max-width: 300px;",
+  tablaContenedor: "overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px;",
+  card: "background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 100%; box-sizing: border-box;",
+  cardTitulo: "color: #1a3a5c; border-bottom: 1px dashed #d4ac0d; padding-bottom: 6px; margin-bottom: 10px; font-size: 1.1em;",
+  btn: "background: #1a3a5c; color: #d4ac0d; border: 2px solid #d4ac0d; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Georgia', serif;"
+};
+
+// ============================================================
+// NUEVO: Formateador de Ilustraciones Homiléticas (Estilo Mahanaim)
+// ============================================================
+export function formatIlustracionesHomileticas(datos) {
+  const ilustraciones = datos.ilustraciones || [];
+  if (ilustraciones.length === 0) {
+    return `<div style="${ESTILOS.contenedor}"><p>No se encontraron ilustraciones específicas en la base de datos para este pasaje.</p></div>`;
+  }
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">🎨 ${escapeHtml(datos.titulo || "Ilustraciones Homiléticas")}</h1>`;
+
+  ilustraciones.forEach((ilus, index) => {
+    html += `<div style="${ESTILOS.card}">`;
+    
+    // Encabezado de la tarjeta
+    html += `<h3 style="${ESTILOS.cardTitulo} display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">`;
+    html += `<span>💡 ${escapeHtml(ilus.titulo_ilustracion || "Ilustración")}</span>`;
+    if (ilus.fuente && ilus.fuente !== "Desconocida" && ilus.fuente !== "Colección de Sermones") {
+      html += `<span style="font-size: 0.8em; background: #1a3a5c; color: #d4ac0d; padding: 4px 10px; border-radius: 12px; font-weight: normal; white-space: nowrap;">📚 ${escapeHtml(ilus.fuente)}</span>`;
+    }
+    html += `</h3>`;
+
+    // Texto LITERAL de la ilustración (Estilo cita destacada Mahanaim)
+    html += `<div style="background: #fdfbf7; border-left: 4px solid #d4ac0d; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #3e2723; line-height: 1.6; word-wrap: break-word;">`;
+    html += `<p style="margin: 0;">"${escapeHtml(ilus.contenido_ilustracion || "")}"</p>`;
+    html += `</div>`;
+
+    // Conexión Homilética
+    html += `<h4 style="color: #1a5276; margin: 20px 0 10px 0; font-size: 1.05em; border-bottom: 1px dashed #d4ac0d; padding-bottom: 4px;">✝️ Conexión Homilética</h4>`;
+    html += `<p style="color: #3e2723; line-height: 1.6; margin-bottom: 16px; word-wrap: break-word;">${ilus.conexion_homiletica || ""}</p>`;
+
+    // Aplicación Práctica
+    html += `<h4 style="color: #2d6a4f; margin: 20px 0 10px 0; font-size: 1.05em; border-bottom: 1px dashed #2d6a4f; padding-bottom: 4px;">🚀 Aplicación Práctica</h4>`;
+    html += `<p style="color: #3e2723; line-height: 1.6; margin: 0; word-wrap: break-word;">${ilus.aplicacion_practica || ""}</p>`;
+    
+    html += `</div>`; // Cierre de card
+  });
+
+  html += `</div>`; // Cierre de contenedor
+  return html;
+}
+
+export function formatQuizInteractivo(json) {
+  const preguntas = json.preguntas || [];
+  if (preguntas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se generaron preguntas.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Cuestionario Bíblico")}</h1>`;
+  html += `<p style="text-align: center; font-style: italic; color: #757575; margin-bottom: 24px;">Responde las siguientes preguntas seleccionando la opción correcta.</p>`;
+
+  preguntas.forEach((p, i) => {
+    const preguntaTexto = p.pregunta || "Pregunta sin texto";
+    html += `<div class="quiz-pregunta-card" style="${ESTILOS.card}" data-pregunta-num="${i + 1}">`;
+    html += `<p style="font-weight: bold; color: #1a5276; margin-bottom: 12px; font-size: 1.05em; word-wrap: break-word;">${i + 1}. ${escapeHtml(preguntaTexto)}</p>`;
+    html += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+    const opciones = p.opciones || [];
+    opciones.forEach((op, j) => {
+      const opcionTexto = op.texto || op.text || "Opción sin texto";
+      const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
+      html += `<label class="quiz-opcion-label" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; cursor: pointer; transition: all 0.2s; word-wrap: break-word;">`;
+      html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" style="accent-color: #d4ac0d; width: 16px; height: 16px; flex-shrink: 0;">`;
+      html += `<span style="color: #3e2723; word-wrap: break-word;">${escapeHtml(opcionTexto)}</span>`;
+      html += `</label>`;
+    });
+
+    html += `</div><p class="quiz-feedback-individual" style="font-size: 0.9em; margin-top: 12px; font-weight: bold;"></p></div>`;
+  });
+
+  html += `<div style="text-align: center; margin-top: 24px;">`;
+  html += `<button class="quiz-verificar" style="${ESTILOS.btn}">Verificar respuestas</button>`;
+  html += `</div>`;
+  html += `<div class="quiz-resultado" style="text-align: center; font-weight: bold; font-size: 1.2em; margin-top: 20px;"></div>`;
+
+  html += `<script>
+    (function() {
+      const btn = document.querySelector('.quiz-verificar');
+      const resultado = document.querySelector('.quiz-resultado');
+      if (!btn || !resultado) return;
+      btn.addEventListener('click', function() {
+        let correctas = 0;
+        const preguntasCards = document.querySelectorAll('.quiz-pregunta-card');
+        preguntasCards.forEach((card) => {
+          const seleccionada = card.querySelector('input[type="radio"]:checked');
+          const feedback = card.querySelector('.quiz-feedback-individual');
+          const labels = card.querySelectorAll('.quiz-opcion-label');
+          labels.forEach((label) => { label.style.backgroundColor = ''; label.style.borderColor = '#e8e8e8'; });
+          const esCorrectaRespuesta = seleccionada && seleccionada.getAttribute('data-correcta') === 'true';
+          if (esCorrectaRespuesta) {
+            correctas++;
+            if (feedback) { feedback.textContent = '✅ Correcto'; feedback.style.color = '#2d6a4f'; }
+            if (seleccionada) { seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd'; seleccionada.closest('.quiz-opcion-label').style.borderColor = '#2d6a4f'; }
+          } else {
+            if (feedback) { feedback.textContent = seleccionada ? '❌ Incorrecto' : '️ Sin responder'; feedback.style.color = '#c0392b'; }
+            if (seleccionada) { seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#fbdcdc'; seleccionada.closest('.quiz-opcion-label').style.borderColor = '#c0392b'; }
+            const correctaLabel = card.querySelector('input[data-correcta="true"]');
+            if (correctaLabel) { correctaLabel.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd'; correctaLabel.closest('.quiz-opcion-label').style.borderColor = '#2d6a4f'; }
+          }
+        });
+        const total = preguntasCards.length;
+        const porcentaje = Math.round((correctas / total) * 100);
+        let mensaje = porcentaje === 100 ? '🎉 ¡Excelente! Has comprendido muy bien este pasaje.' : porcentaje >= 80 ? '🙌 Muy bien. Revisa las preguntas que fallaste.' : porcentaje >= 50 ? ' Buen intento. Te recomiendo volver a leer el capítulo.' : '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma.';
+        resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span style="font-size: 0.8em; font-weight: normal; margin-top: 8px; display: block;">' + mensaje + '</span>';
+        resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
+      });
+    })();
+  </script>`;
+  html += `</div>`;
+  return html;
+}
+
+export function formatTablaGenerica(json, tipoLabel, columnas) {
+  const items = json[columnas.dataKey] || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron datos.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || tipoLabel)}</h1>`;
+  html += `<div style="${ESTILOS.tablaContenedor}"><table style="width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; font-size: 0.9em; color: #3e2723; table-layout: auto;">`;
+  html += `<thead><tr>`;
+  columnas.headers.forEach(h => {
+    html += `<th style="${ESTILOS.tablaHeader}">${h}</th>`;
+  });
+  html += `</tr></thead><tbody>`;
   
-  // ... (aquí va el resto de tu código de formateadores existente)
+  items.forEach((item, index) => {
+    const bgColor = index % 2 === 0 ? '#ffffff' : '#fdfbf7';
+    html += `<tr style="background-color: ${bgColor};">`;
+    columnas.keys.forEach(k => {
+      const val = item[k] || "—";
+      let style = ESTILOS.tablaCelda;
+      if (k.includes('referencia') || k.includes('estado')) style += ' font-weight: bold; color: #1a5276;';
+      if (k.includes('texto')) style += ' font-style: italic;';
+      html += `<td style="${style}">${escapeHtml(val)}</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  return html;
+}
+
+export function formatInfografiaDoctrinal(json) {
+  const items = json.doctrinas || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron doctrinas.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Infografía Doctrinal")}</h1>`;
+  html += `<div id="mah-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
+
+  items.forEach((item, index) => {
+    const doctrina  = escapeHtml(item.doctrina  || "Doctrina");
+    const fundamento = escapeHtml(item.fundamento || "");
+    const desarrollo = escapeHtml(item.desarrollo || "");
+
+    html += `<div id="mah-card-${index}" style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:24px;text-align:center;">`;
+    html += `<div style="font-size:2.5em;margin-bottom:12px;"></div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 12px 0;font-size:1.2em;font-weight:bold;font-family:Georgia,serif;">${doctrina}</h3>`;
+    html += `<div style="background:#fdfbf7;padding:12px;border-radius:6px;border-left:4px solid #d4ac0d;font-style:italic;color:#3e2723;font-size:0.95em;font-weight:500;">${fundamento}</div>`;
+    html += `<button id="mah-btn-${index}" style="color:#1a5276;margin-top:16px;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;" aria-expanded="false">👆 Toca para ver el desarrollo</button>`;
+    html += `</div>`;
+    html += `<div id="mah-dev-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<h4 style="color:#d4ac0d;margin:0 0 12px 0;font-size:1em;font-weight:bold;font-family:Georgia,serif;border-bottom:1px solid rgba(212,172,13,0.3);padding-bottom:8px;">Desarrollo Teológico</h4>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;text-align:justify;font-family:Georgia,serif;">${desarrollo}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function() {
+    const total = ${items.length};
+    let openIndex = -1;
+    let currentMode = null;
+    function cerrar(i) {
+      const btn = document.getElementById('mah-btn-' + i);
+      const dev = document.getElementById('mah-dev-' + i);
+      if (!btn || !dev) return;
+      dev.style.display = 'none';
+      btn.textContent = '👆 Toca para ver el desarrollo';
+      btn.setAttribute('aria-expanded', 'false');
+      openIndex = -1;
+    }
+    function abrir(i) {
+      const btn = document.getElementById('mah-btn-' + i);
+      const dev = document.getElementById('mah-dev-' + i);
+      if (!btn || !dev) return;
+      dev.style.display = 'block';
+      btn.textContent = '🔼 Toca para ocultar';
+      btn.setAttribute('aria-expanded', 'true');
+      openIndex = i;
+    }
+    function inicializarListeners() {
+      for (let i = 0; i < total; i++) {
+        const btn = document.getElementById('mah-btn-' + i);
+        if (!btn || btn.dataset.mahInit) continue;
+        btn.dataset.mahInit = '1';
+        btn.addEventListener('click', function() {
+          const idx = parseInt(this.id.replace('mah-btn-', ''));
+          if (openIndex === idx) { cerrar(idx); } else { if (openIndex !== -1) cerrar(openIndex); abrir(idx); }
+        });
+      }
+    }
+    function aplicarModo(isMobile) {
+      const modo = isMobile ? 'mobile' : 'desktop';
+      if (currentMode === modo) return;
+      currentMode = modo;
+      for (let i = 0; i < total; i++) {
+        const btn = document.getElementById('mah-btn-' + i);
+        const dev = document.getElementById('mah-dev-' + i);
+        if (!btn || !dev) continue;
+        if (isMobile) {
+          btn.style.display = 'block';
+          dev.style.display = 'none';
+          btn.textContent = '👆 Toca para ver el desarrollo';
+          btn.setAttribute('aria-expanded', 'false');
+          openIndex = -1;
+        } else {
+          dev.style.display = 'block';
+          btn.style.display = 'none';
+          btn.setAttribute('aria-expanded', 'true');
+          openIndex = -1;
+        }
+      }
+    }
+    let resizeTimer;
+    function onResize() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() { aplicarModo(window.innerWidth <= 768); }, 150);
+    }
+    inicializarListeners();
+    aplicarModo(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+  })();
+  </script></div>`;
+  return html;
+}
+
+export function formatParalelosCards(json) {
+  const items = json.paralelos || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron paralelos.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Paralelos Bíblicos")}</h1>`;
+  html += `<div id="par-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const referencia = escapeHtml(item.referencia || "");
+    const texto = escapeHtml(item.texto_cita || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;"></div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 12px 0;font-size:1.1em;font-weight:bold;font-family:Georgia,serif;">${referencia}</h3>`;
+    html += `<p style="font-style:italic;color:#3e2723;margin:0 0 12px 0;line-height:1.5;">"${texto}"</p>`;
+    html += `<button id="par-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;"> Ver conexión</button>`;
+    html += `</div>`;
+    html += `<div id="par-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<h4 style="color:#d4ac0d;margin:0 0 12px 0;font-size:1em;font-weight:bold;font-family:Georgia,serif;">Conexión Teológica</h4>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver conexión';b.setAttribute('aria-expanded','false');o=-1;}
+  function a(i){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';b.setAttribute('aria-expanded','true');o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('par-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('par-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('par-btn-'+i),e=document.getElementById('par-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';b.textContent='👆 Ver conexión';o=-1;}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatProfeciasCards(json) {
+  const items = json.profecias || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron profecías.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Profecías")}</h1>`;
+  html += `<div id="prof-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const profecia = escapeHtml(item.profecia || "");
+    const refProf = escapeHtml(item.referencia_profecia || "");
+    const estado = escapeHtml(item.estado || "");
+    const refCumpl = escapeHtml(item.referencia_cumplimiento || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+    const colorEstado = estado.includes('Cumplida') ? '#2d6a4f' : estado.includes('Parcial') ? '#b7950b' : '#c0392b';
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">🔮</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 8px 0;font-size:1.05em;font-weight:bold;font-family:Georgia,serif;">${profecia}</h3>`;
+    html += `<p style="color:#1a5276;margin:0 0 6px 0;font-size:0.9em;font-weight:600;">📍 ${refProf}</p>`;
+    html += `<span style="display:inline-block;background:${colorEstado};color:#fff;padding:4px 10px;border-radius:12px;font-size:0.8em;font-weight:600;margin-bottom:12px;">${estado}</span>`;
+    html += `<button id="prof-btn-${index}" style="color:#1a5276;margin-top:12px;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver cumplimiento</button>`;
+    html += `</div>`;
+    html += `<div id="prof-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<p style="color:#d4ac0d;margin:0 0 8px 0;font-size:0.9em;"><strong>Cumplimiento:</strong> ${refCumpl}</p>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent=' Ver cumplimiento';o=-1;}
+  function a(i){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('prof-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('prof-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('prof-btn-'+i),e=document.getElementById('prof-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatConexionesCards(json, tipo) {
+  const items = json.conexiones || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron conexiones.</p></div>`;
   
-  return '<p>Recurso no disponible</p>';
+  const titulo = tipo === 'conexion_at' ? 'Conexión con el Antiguo Testamento' : 'Conexión con el Nuevo Testamento';
+  const emoji = tipo === 'conexion_at' ? '📜' : '✝️';
+  const refKey = tipo === 'conexion_at' ? 'referencia_at' : 'referencia_nt';
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || titulo)}</h1>`;
+  html += `<div id="con-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const referencia = escapeHtml(item[refKey] || "");
+    const texto = escapeHtml(item.texto_cita || "");
+    const explicacion = escapeHtml(item.explicacion || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">${emoji}</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 12px 0;font-size:1.1em;font-weight:bold;font-family:Georgia,serif;">${referencia}</h3>`;
+    html += `<p style="font-style:italic;color:#3e2723;margin:0 0 12px 0;line-height:1.5;">"${texto}"</p>`;
+    html += `<button id="con-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver explicación</button>`;
+    html += `</div>`;
+    html += `<div id="con-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<h4 style="color:#d4ac0d;margin:0 0 12px 0;font-size:1em;font-weight:bold;font-family:Georgia,serif;">Conexión</h4>`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${explicacion}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver explicación';o=-1;}
+  function a(i){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent='🔼 Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('con-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('con-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('con-btn-'+i),e=document.getElementById('con-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatCronologiaCards(json) {
+  const items = json.cronologia || [];
+  if (items.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No hay eventos cronológicos.</p></div>`;
+
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Cronología del Capítulo")}</h1>`;
+  html += `<div id="cron-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;">`;
+
+  items.forEach((item, index) => {
+    const evento = escapeHtml(item.evento || "");
+    const referencia = escapeHtml(item.referencia || "");
+    const detalles = escapeHtml(item.detalles || "");
+
+    html += `<div style="background:#ffffff;border:2px solid #d4c4a8;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+    html += `<div style="padding:20px;">`;
+    html += `<div style="font-size:1.8em;margin-bottom:8px;">⏱️</div>`;
+    html += `<h3 style="color:#1a5276;margin:0 0 8px 0;font-size:1.05em;font-weight:bold;font-family:Georgia,serif;">${evento}</h3>`;
+    html += `<p style="color:#1a5276;margin:0 0 12px 0;font-size:0.9em;font-weight:600;">📍 ${referencia}</p>`;
+    html += `<button id="cron-btn-${index}" style="color:#1a5276;font-size:0.85em;font-weight:600;cursor:pointer;background:none;border:none;font-family:Georgia,serif;display:none;">👆 Ver detalles</button>`;
+    html += `</div>`;
+    html += `<div id="cron-exp-${index}" style="background:#1a3a5c;padding:20px;border-top:3px solid #d4ac0d;display:none;">`;
+    html += `<p style="color:#ffffff;line-height:1.6;font-size:0.95em;margin:0;">${detalles}</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += `<script>
+  (function(){const t=${items.length};let o=-1,m=null;
+  function c(i){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)return;e.style.display='none';b.textContent='👆 Ver detalles';o=-1;}
+  function a(i){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)return;e.style.display='block';b.textContent=' Ocultar';o=i;}
+  function init(){for(let i=0;i<t;i++){const b=document.getElementById('cron-btn-'+i);if(!b||b.dataset.mahInit)continue;b.dataset.mahInit='1';b.addEventListener('click',function(){const idx=parseInt(this.id.replace('cron-btn-',''));if(o===idx)c(idx);else{if(o!==-1)c(o);a(idx);}});}}
+  function mode(mob){const md=mob?'mobile':'desktop';if(m===md)return;m=md;for(let i=0;i<t;i++){const b=document.getElementById('cron-btn-'+i),e=document.getElementById('cron-exp-'+i);if(!b||!e)continue;if(mob){b.style.display='block';e.style.display='none';}else{e.style.display='block';b.style.display='none';o=-1;}}}
+  let rt;function onR(){clearTimeout(rt);rt=setTimeout(()=>mode(window.innerWidth<=768),150);}
+  init();mode(window.innerWidth<=768);window.addEventListener('resize',onR);})();
+  </script></div>`;
+  return html;
+}
+
+export function formatCitasHtml(json, tipoLabel) {
+  const citas = json.citas || [];
+  if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || tipoLabel)}</h1>`;
+  citas.forEach((c) => {
+    html += `<div style="${ESTILOS.card}">`;
+    html += `<h4 style="${ESTILOS.cardTitulo}"><strong>${escapeHtml(c.autor || "")}</strong>${c.obra ? ` — <em style="color: #757575;">${escapeHtml(c.obra)}</em>` : ""}${c.titulo_libro ? ` — <em style="color: #757575;">${escapeHtml(c.titulo_libro)}</em>` : ""}</h4>`;
+    html += `<p style="font-style: italic; color: #3e2723; line-height: 1.6; border-left: 3px solid #d4ac0d; padding-left: 12px; margin: 0; word-wrap: break-word;">"${escapeHtml(c.cita)}"</p>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+export function formatPalabrasClaveHtml(json) {
+  const terminos = json.terminos || [];
+  if (terminos.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se generaron términos.</p></div>`;
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || "Estudio de Palabras Clave")}</h1>`;
+  terminos.forEach((t) => {
+    html += `<div style="${ESTILOS.card}">`;
+    html += `<h4 style="${ESTILOS.cardTitulo}">`;
+    html += `<span style="font-size: 1.2em; color: #1a3a5c; word-wrap: break-word;">${escapeHtml(t.termino_original)}</span> — <span style="font-style: italic;">${escapeHtml(t.transliteracion)}</span>`;
+    if (t.strong && t.strong !== "No disponible") {
+      html += `<span style="float: right; font-size: 0.75em; background: #1a3a5c; color: #d4ac0d; padding: 2px 8px; border-radius: 12px;">Strong ${escapeHtml(t.strong)}</span>`;
+    }
+    html += `</h4>`;
+    html += `<p style="margin-bottom: 8px; word-wrap: break-word;"><strong style="color: #1a5276;">Significado:</strong> ${escapeHtml(t.significado)}</p>`;
+    html += `<p style="margin: 0; word-wrap: break-word;"><strong style="color: #1a5276;">Contexto:</strong> ${escapeHtml(t.contexto)}</p>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// FUNCIÓN PRINCIPAL DE ENRUTAMIENTO
+// ============================================================
+export function formatearRecurso(tipo, datos) {
+  if (!datos) return "<p>Error: No se recibieron datos.</p>";
+
+  if (datos.contenido_html) {
+    return limpiarHtml(datos.contenido_html);
+  }
+
+  switch (tipo) {
+    case "ilustraciones":
+      return formatIlustracionesHomileticas(datos);
+      
+    case "quiz":
+      return formatQuizInteractivo(datos);
+    
+    case "paralelos":
+      return formatParalelosCards(datos);
+
+    case "palabras_clave":
+    case "glosario":
+      return formatPalabrasClaveHtml(datos);
+
+    case "infografia":
+      return formatInfografiaDoctrinal(datos);
+
+    case "profecias":
+      return formatProfeciasCards(datos);
+
+    case "citas_teologos":
+    case "citas_libros":
+    case "citas_autoridades":
+      return formatCitasHtml(datos, datos.titulo || "Citas");
+
+    case "conexion_at":
+    case "conexion_nt":
+      return formatConexionesCards(datos, tipo);
+
+    case "cronologia":
+      return formatCronologiaCards(datos);
+
+    default:
+      return `<div style="${ESTILOS.contenedor}"><pre style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word;">${escapeHtml(JSON.stringify(datos, null, 2))}</pre></div>`;
+  }
 }
