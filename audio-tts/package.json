@@ -1,0 +1,13 @@
+{
+  "name": "audio-tts-mahanaim",
+  "version": "1.0.0",
+  "description": "Genera audio narrado con Google Cloud TTS y extrae timestamps de sincronización para el video",
+  "type": "module",
+  "main": "generar-audio.js",
+  "scripts": {
+    "generar": "node generar-audio.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
