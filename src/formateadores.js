@@ -16,6 +16,7 @@ export function escapeHtml(str) {
 export function limpiarHtml(html) {
   if (!html) return "";
   
+  // 1. Si es un JSON mal formado que contiene HTML, extraerlo
   if (html.trim().startsWith('{')) {
     const match = html.match(/"contenido_html"\s*:\s*"([\s\S]*)"/);
     if (match && match[1]) {
@@ -28,6 +29,7 @@ export function limpiarHtml(html) {
     }
   }
   
+  // 2. Limpieza básica de artefactos de markdown y escapes
   let htmlLimpio = html
     .replace(/```json|```/g, "")
     .replace(/&quot;/g, '"')
@@ -38,7 +40,11 @@ export function limpiarHtml(html) {
     .replace(/^["']|["']$/g, '')
     .trim();
 
-  if (!htmlLimpio.includes('max-width') && !htmlLimpio.startsWith('<div style="')) {
+  // 3. CLAVE: SOLO envolver si NO parece un documento HTML estructurado completo generado por la IA.
+  // Un diseño de IA (como bosquejo o contexto) ya empieza con <div style="... y tiene max-width o font-family.
+  const esEstructurado = htmlLimpio.startsWith('<div') && (htmlLimpio.includes('max-width') || htmlLimpio.includes('font-family'));
+  
+  if (!esEstructurado) {
     htmlLimpio = `<div style="font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word; overflow-x: auto;">${htmlLimpio}</div>`;
   }
 
@@ -46,56 +52,94 @@ export function limpiarHtml(html) {
 }
 
 const ESTILOS = {
-  contenedor: "font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 20px; border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word;",
-  titulo: "color: #1a5276; border-bottom: 2px solid #d4ac0d; padding-bottom: 8px; margin-bottom: 20px;",
+  contenedor: "font-family: 'Georgia', serif; color: #3e2723; background: #fdfbf7; padding: 24px; border-radius: 12px; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word;",
+  titulo: "color: #1a5276; border-bottom: 2px solid #d4ac0d; padding-bottom: 10px; margin-bottom: 24px; text-align: center; font-size: 1.5em;",
   tablaHeader: "background: #1a3a5c; color: #d4ac0d; padding: 10px 12px; text-align: left; font-weight: bold; font-size: 0.9em; border: 1px solid #3e5a7a; white-space: normal; word-wrap: break-word;",
   tablaCelda: "padding: 10px 12px; border: 1px solid #d4c4a8; vertical-align: top; font-size: 0.9em; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; max-width: 300px;",
-  tablaContenedor: "overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px;",
-  card: "background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 100%; box-sizing: border-box;",
-  cardTitulo: "color: #1a3a5c; border-bottom: 1px dashed #d4ac0d; padding-bottom: 6px; margin-bottom: 10px; font-size: 1.1em;",
+  tablaContenedor: "overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; border-radius: 8px;",
+  card: "background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 100%; box-sizing: border-box;",
+  cardTitulo: "color: #1a3a5c; border-bottom: 1px dashed #d4ac0d; padding-bottom: 8px; margin-bottom: 12px; font-size: 1.1em; font-weight: bold;",
   btn: "background: #1a3a5c; color: #d4ac0d; border: 2px solid #d4ac0d; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Georgia', serif;"
 };
 
 // ============================================================
-// NUEVO: Formateador de Ilustraciones Homiléticas (Estilo Mahanaim)
+// ILUSTRACIONES HOMILÉTICAS (DISEÑO PREMIUM MAHANAIM)
 // ============================================================
 export function formatIlustracionesHomileticas(datos) {
   const ilustraciones = datos.ilustraciones || [];
   if (ilustraciones.length === 0) {
-    return `<div style="${ESTILOS.contenedor}"><p>No se encontraron ilustraciones específicas en la base de datos para este pasaje.</p></div>`;
+    return `<div style="${ESTILOS.contenedor}"><p style="text-align:center; color:#757575; font-style:italic;">No se encontraron ilustraciones específicas en la base de datos para este pasaje.</p></div>`;
   }
 
   let html = `<div style="${ESTILOS.contenedor}">`;
   html += `<h1 style="${ESTILOS.titulo}">🎨 ${escapeHtml(datos.titulo || "Ilustraciones Homiléticas")}</h1>`;
 
   ilustraciones.forEach((ilus, index) => {
-    html += `<div style="${ESTILOS.card}">`;
+    html += `<div style="${ESTILOS.card} border-left: 5px solid #d4ac0d; margin-bottom: 24px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">`;
     
     // Encabezado de la tarjeta
-    html += `<h3 style="${ESTILOS.cardTitulo} display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">`;
-    html += `<span>💡 ${escapeHtml(ilus.titulo_ilustracion || "Ilustración")}</span>`;
-    if (ilus.fuente && ilus.fuente !== "Desconocida" && ilus.fuente !== "Colección de Sermones") {
-      html += `<span style="font-size: 0.8em; background: #1a3a5c; color: #d4ac0d; padding: 4px 10px; border-radius: 12px; font-weight: normal; white-space: nowrap;">📚 ${escapeHtml(ilus.fuente)}</span>`;
+    html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">`;
+    html += `<h3 style="color: #1a5276; margin: 0; font-size: 1.2em; font-weight: bold;">💡 ${escapeHtml(ilus.titulo_ilustracion || "Ilustración")}</h3>`;
+    if (ilus.fuente && ilus.fuente !== "Desconocida") {
+      html += `<span style="background: #1a3a5c; color: #d4ac0d; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; letter-spacing: 0.5px;">📚 ${escapeHtml(ilus.fuente)}</span>`;
     }
-    html += `</h3>`;
+    html += `</div>`;
 
-    // Texto LITERAL de la ilustración (Estilo cita destacada Mahanaim)
-    html += `<div style="background: #fdfbf7; border-left: 4px solid #d4ac0d; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #3e2723; line-height: 1.6; word-wrap: break-word;">`;
-    html += `<p style="margin: 0;">"${escapeHtml(ilus.contenido_ilustracion || "")}"</p>`;
+    // Texto LITERAL de la ilustración (Estilo Cita Premium)
+    html += `<div style="background: #ffffff; border-left: 4px solid #d4ac0d; padding: 20px; margin: 16px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">`;
+    html += `<p style="margin: 0; font-style: italic; color: #3e2723; line-height: 1.7; font-size: 1.05em; font-family: Georgia, serif;">"${escapeHtml(ilus.contenido_ilustracion || "")}"</p>`;
     html += `</div>`;
 
     // Conexión Homilética
-    html += `<h4 style="color: #1a5276; margin: 20px 0 10px 0; font-size: 1.05em; border-bottom: 1px dashed #d4ac0d; padding-bottom: 4px;">✝️ Conexión Homilética</h4>`;
-    html += `<p style="color: #3e2723; line-height: 1.6; margin-bottom: 16px; word-wrap: break-word;">${ilus.conexion_homiletica || ""}</p>`;
+    html += `<div style="background: #eaf2f8; border: 1px solid #d4e6f1; border-radius: 8px; padding: 16px; margin-top: 16px;">`;
+    html += `<h4 style="color: #1a5276; margin: 0 0 10px 0; font-size: 1em; display: flex; align-items: center; gap: 8px; font-weight: bold;">✝️ <span>Conexión Homilética</span></h4>`;
+    html += `<p style="color: #2c3e50; line-height: 1.6; margin: 0; font-size: 0.95em;">${ilus.conexion_homiletica || ""}</p>`;
+    html += `</div>`;
 
     // Aplicación Práctica
-    html += `<h4 style="color: #2d6a4f; margin: 20px 0 10px 0; font-size: 1.05em; border-bottom: 1px dashed #2d6a4f; padding-bottom: 4px;">🚀 Aplicación Práctica</h4>`;
-    html += `<p style="color: #3e2723; line-height: 1.6; margin: 0; word-wrap: break-word;">${ilus.aplicacion_practica || ""}</p>`;
+    html += `<div style="background: #e9f7ef; border: 1px solid #d5f5e3; border-radius: 8px; padding: 16px; margin-top: 16px;">`;
+    html += `<h4 style="color: #2d6a4f; margin: 0 0 10px 0; font-size: 1em; display: flex; align-items: center; gap: 8px; font-weight: bold;">🚀 <span>Aplicación Práctica</span></h4>`;
+    html += `<p style="color: #2c3e50; line-height: 1.6; margin: 0; font-size: 0.95em;">${ilus.aplicacion_practica || ""}</p>`;
+    html += `</div>`;
     
-    html += `</div>`; // Cierre de card
+    html += `</div>`; // Cierre card
   });
 
-  html += `</div>`; // Cierre de contenedor
+  html += `</div>`; // Cierre contenedor
+  return html;
+}
+
+// ============================================================
+// CITAS DE AUTORIDADES (DISEÑO PREMIUM MAHANAIM)
+// ============================================================
+export function formatCitasHtml(json, tipoLabel) {
+  const citas = json.citas || [];
+  if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p style="text-align:center; color:#757575;">No se encontraron citas.</p></div>`;
+  
+  let html = `<div style="${ESTILOS.contenedor}">`;
+  html += `<h1 style="${ESTILOS.titulo}">📜 ${escapeHtml(json.titulo || tipoLabel)}</h1>`;
+  
+  html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">`;
+  
+  citas.forEach((c) => {
+    html += `<div style="background: #ffffff; border: 1px solid #d4c4a8; border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; overflow: hidden;">`;
+    // Comilla decorativa de fondo
+    html += `<div style="position: absolute; top: -10px; right: 10px; font-size: 4em; color: #f0e6d0; font-family: Georgia, serif; line-height: 1; z-index: 0;">"</div>`;
+    
+    html += `<div style="position: relative; z-index: 1;">`;
+    html += `<p style="font-style: italic; color: #3e2723; line-height: 1.7; margin: 0 0 16px 0; font-size: 1.05em; border-left: 3px solid #d4ac0d; padding-left: 16px;">"${escapeHtml(c.cita || c.contenido || "")}"</p>`;
+    
+    html += `<div style="text-align: right; border-top: 1px dashed #d4c4a8; padding-top: 12px; margin-top: 12px;">`;
+    html += `<p style="margin: 0; color: #1a5276; font-weight: bold; font-size: 0.95em;">— ${escapeHtml(c.autor || "Autor desconocido")}</p>`;
+    if (c.obra || c.titulo_libro) {
+      html += `<p style="margin: 4px 0 0 0; color: #757575; font-size: 0.85em; font-style: italic;">${escapeHtml(c.obra || c.titulo_libro)}</p>`;
+    }
+    html += `</div>`;
+    html += `</div>`; // z-index 1
+    html += `</div>`; // card
+  });
+  
+  html += `</div></div>`; // grid y contenedor
   return html;
 }
 
@@ -456,21 +500,6 @@ export function formatCronologiaCards(json) {
   return html;
 }
 
-export function formatCitasHtml(json, tipoLabel) {
-  const citas = json.citas || [];
-  if (citas.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se encontraron citas.</p></div>`;
-  let html = `<div style="${ESTILOS.contenedor}">`;
-  html += `<h1 style="${ESTILOS.titulo}">${escapeHtml(json.titulo || tipoLabel)}</h1>`;
-  citas.forEach((c) => {
-    html += `<div style="${ESTILOS.card}">`;
-    html += `<h4 style="${ESTILOS.cardTitulo}"><strong>${escapeHtml(c.autor || "")}</strong>${c.obra ? ` — <em style="color: #757575;">${escapeHtml(c.obra)}</em>` : ""}${c.titulo_libro ? ` — <em style="color: #757575;">${escapeHtml(c.titulo_libro)}</em>` : ""}</h4>`;
-    html += `<p style="font-style: italic; color: #3e2723; line-height: 1.6; border-left: 3px solid #d4ac0d; padding-left: 12px; margin: 0; word-wrap: break-word;">"${escapeHtml(c.cita)}"</p>`;
-    html += `</div>`;
-  });
-  html += `</div>`;
-  return html;
-}
-
 export function formatPalabrasClaveHtml(json) {
   const terminos = json.terminos || [];
   if (terminos.length === 0) return `<div style="${ESTILOS.contenedor}"><p>No se generaron términos.</p></div>`;
@@ -498,10 +527,12 @@ export function formatPalabrasClaveHtml(json) {
 export function formatearRecurso(tipo, datos) {
   if (!datos) return "<p>Error: No se recibieron datos.</p>";
 
+  // Si la IA ya generó contenido_html, usamos limpiarHtml (que ahora respeta los diseños estructurados)
   if (datos.contenido_html) {
     return limpiarHtml(datos.contenido_html);
   }
 
+  // Si no, usamos los formateadores específicos de Mahanaim
   switch (tipo) {
     case "ilustraciones":
       return formatIlustracionesHomileticas(datos);
