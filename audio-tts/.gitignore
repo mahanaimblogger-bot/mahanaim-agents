@@ -1,2 +1,19 @@
-   echo node_modules/ > audio-tts/.gitignore
-   echo .env >> audio-tts/.gitignore
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+.env.local
+
+# Archivos de audio generados
+*.mp3
+*.wav
+
+# Timestamps generados por TTS
+*_timestamps.json
+
+# Contador local (migrado a Supabase)
+contador-caracteres.json
+
+# Logs
+*.log

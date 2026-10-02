@@ -1,0 +1,13 @@
+{
+  "name": "mahanaim-video",
+  "version": "1.0.0",
+  "description": "Ensamblaje de videos narrados con FFmpeg para Mahanaim",
+  "type": "module",
+  "scripts": {
+    "start": "node ensamblar-video.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "fluent-ffmpeg": "^2.1.3"
+  }
+}
