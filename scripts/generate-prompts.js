@@ -761,13 +761,17 @@ REGLAS DE ESTILO Y SSML
 6. Marcas de sincronización <mark name="imagen_N"/> (CRÍTICO):
    - Insertá EXACTAMENTE 12 marcas: <mark name="imagen_1"/>, <mark name="imagen_2"/>, ..., <mark name="imagen_12"/>.
    - Cada marca debe ir JUSTO ANTES de la frase donde cambia la escena visual.
-   - Distribución OBLIGATORIA (aprox. 40-50 segundos entre marcas):
+   - Distribución OBLIGATORIA (aprox. 60-70 segundos entre marcas):
      * imagen_1: al inicio absoluto del guion (antes del gancho).
      * imagen_2: al inicio del contexto narrativo (después del gancho).
-     * imagen_3 a imagen_9: en los puntos de cambio narrativo del desarrollo (uno cada 40-50 segundos, NO mecánicamente, sino donde cambia la escena).
-     * imagen_10: al inicio de la aplicación transformadora.
-     * imagen_11: en la mitad de la aplicación (para mantener variedad visual).
-     * imagen_12: al inicio de la conclusión impactante.
+     * imagen_3 a imagen_10: distribuidas uniformemente en el desarrollo y la aplicación (aprox. cada 60-70 segundos, NO mecánicamente, sino donde cambia la escena).
+     * imagen_11: en el inicio de la conclusión impactante.
+     * imagen_12: en la MITAD de la conclusión (por ejemplo, antes de la oración final).
+   - REGLAS CRÍTICAS DE DISTRIBUCIÓN:
+     * NINGUNA imagen debe durar más de 90 segundos.
+     * NINGUNA imagen debe durar menos de 30 segundos (excepto imagen_1 que puede ser más corta).
+     * La última imagen (imagen_12) NO debe empezar en el inicio de la conclusión. Debe empezar en la mitad de la conclusión, dejando solo 30-60 segundos hasta el final.
+     * Si el guion total dura ~12-13 minutos, cada una de las 12 imágenes debe durar en promedio ~60-70 segundos.
    - IMPORTANTE: las marcas deben coincidir con el contenido visual correspondiente de cada sección.
 
 7. Duración objetivo: 1400-1700 palabras (8-10 minutos de narración a velocidad media).

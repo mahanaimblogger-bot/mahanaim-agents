@@ -118,7 +118,7 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
 
     const vf = [
       `scale=1280:720`,
-      `zoompan=z='min(zoom+0.0008,1.25)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
+      `zoompan=z='1+0.00012*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
       `format=yuv420p`,
     ].join(",");
 
