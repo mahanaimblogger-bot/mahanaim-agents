@@ -4,6 +4,22 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
+// ── Detectar FFmpeg portable ──────────────────────────────────────
+// Si existe FFmpeg en tools/ffmpeg/, usarlo. Si no, usar el del sistema.
+const ffmpegPortablePath = path.join(
+  process.cwd(),
+  "..",
+  "tools",
+  "ffmpeg",
+  "ffmpeg-9.0.2-essentials_build",
+  "bin",
+  "ffmpeg.exe",
+);
+if (fs.existsSync(ffmpegPortablePath)) {
+  ffmpeg.setFfmpegPath(ffmpegPortablePath);
+  console.log("🔧 Usando FFmpeg portable desde tools/");
+}
+
 // ── Argumentos ────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const bookName = args[0];
@@ -107,34 +123,31 @@ function getAudioDuration() {
 }
 
 // ── Generar un clip con Ken Burns ─────────────────────────────────
+
 function generarClipKenBurns(imagePath, duracion, outputPath) {
   return new Promise((resolve, reject) => {
-    // Ken Burns: zoom lento hacia adentro.
-    // - scale previo a 720p (liviano) para el zoompan
-    // - zoompan hace el zoom y devuelve 1080p
-    // - -t duracion va en OUTPUT options (correcto para imágenes en loop)
     const fps = 24;
-    const frames = Math.ceil(duracion * fps);
+    const frames = Math.round(duracion * fps);
+    const zoomFinal = 1.15;
+    const incremento = (zoomFinal - 1) / frames;
 
     const vf = [
-      `scale=1280:720`,
-      `zoompan=z='1+0.00012*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
+      `scale=8000:-1`,
+      `zoompan=z='1+${incremento}*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
       `format=yuv420p`,
     ].join(",");
 
     ffmpeg(imagePath)
-      .inputOptions(["-loop 1"])
       .videoFilters(vf)
       .outputOptions([
         "-c:v libx264",
         "-preset medium",
         "-crf 23",
-        "-tune stillimage",
         "-pix_fmt yuv420p",
         "-r 24",
-        `-t ${duracion}`,
+        `-frames:v ${frames}`,
       ])
-      .on("start", (cmd) =>
+      .on("start", () =>
         console.log(
           `   ▶️  Iniciando render del clip ${path.basename(outputPath)}`,
         ),

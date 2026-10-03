@@ -35,3 +35,5 @@ medir-estudio.js
 # Archivos sueltos creados por error
 /cd
 /ffmpeg
+# FFmpeg portable (no subir a GitHub)
+tools/

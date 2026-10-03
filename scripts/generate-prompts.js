@@ -318,7 +318,7 @@ async function generateWithAI(promptData) {
       ],
       response_format: { type: "json_object" },
       temperature: 0.8,
-      max_tokens: 8000,
+      max_tokens: 12000,
     });
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {

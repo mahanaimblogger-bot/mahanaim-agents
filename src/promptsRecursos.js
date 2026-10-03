@@ -110,7 +110,7 @@ Ejemplo INCORRECTO: <div class="card"> o <blockquote>
 FORMATO JSON: {"tipo": "sermon", "titulo": "...", "texto_base": "${ctx}", "contenido_html": "[HTML con diseño rico y cajas de colores]"}`;
     }
       
-    case "bosquejo": {
+        case "bosquejo": {
       const fuenteSermon = recortarFuente(materiales.sermon_html);
       return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
 ### TAREA: Generar el BOSQUEJO HOMILÉTICO del sermón para ${ctx} con diseño "Línea de Tiempo Vertical".
@@ -121,6 +121,15 @@ Este bosquejo se genera DESDE el SERMÓN ya existente. Debe reflejar fielmente e
 #### CARACTERÍSTICAS:
 - SOLO PUNTOS Y SUBPUNTOS: NO desarrolles el contenido.
 - FORMATO ESQUEMÁTICO CLARO con referencias bíblicas.
+
+#### ⛔ REGLA CRÍTICA DE EXTENSIÓN (OBLIGATORIA):
+- Es un ESQUEMA, no un desarrollo. MÁXIMO 1.500 palabras en total.
+- Cada punto principal: título corto (1 línea) + 2-3 subpuntos. NO más.
+- Cada subpunto: idea clave en 1 sola frase corta. NO párrafos.
+- Citas bíblicas: SOLO referencia (ej: "Lucas 6:20-23"). NO copies el texto bíblico completo.
+- NO repitas párrafos del sermón. Solo estructura y puntos clave.
+- Total de puntos principales: entre 3 y 5. NO más.
+- El objetivo es un esquema visual que se pueda ver en 1 sola página.
 
 #### DISEÑO HTML OBLIGATORIO - ESTILO "LÍNEA DE TIEMPO VERTICAL":
 

@@ -3,6 +3,22 @@ import fs from "fs";
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 import { createClient } from "@supabase/supabase-js";
+// ── Detectar FFmpeg portable ──────────────────────────────────────
+// Si existe FFmpeg en tools/ffmpeg/, usarlo. Si no, usar el del sistema.
+const ffmpegPortablePath = path.join(
+  process.cwd(),
+  "..",
+  "tools",
+  "ffmpeg",
+  "ffmpeg-9.0.2-essentials_build",
+  "bin",
+  "ffmpeg.exe",
+);
+if (fs.existsSync(ffmpegPortablePath)) {
+  ffmpeg.setFfmpegPath(ffmpegPortablePath);
+  console.log("🔧 Usando FFmpeg portable desde tools/");
+}
+
 
 // ============================================================
 // CONFIGURACIÓN
