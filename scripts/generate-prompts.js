@@ -581,7 +581,7 @@ ${estudioFinal}
     const promptImagenes = `
 Eres un director de arte cinematográfico e historiador bíblico con expertise en contextos culturales de todas las épocas (patriarcal, egipcia, israelita, babilónica, persa, greco-romana, apostólica, etc.).
 
-TAREA: Genera un array JSON con exactamente 12 prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas (Flux, Midjourney, DALL-E) que ilustrarán un video documental sobre: ${ctx}.
+TAREA: Genera un array JSON con entre 15 y 22 prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas (Flux, Midjourney, DALL-E) que ilustrarán un video documental sobre: ${ctx}. La cantidad debe coincidir con la cantidad de marcas <mark name="imagen_N"/> que le pediste al guion SSML (15-22 según densidad narrativa).
 
 PASO 1 — IDENTIFICAR CONTEXTO Y PERSONAJES (crítico):
 Antes de generar los prompts, analizá internamente:
@@ -655,7 +655,7 @@ SOLO un array JSON de 12 strings en INGLÉS. Sin texto adicional, sin explicacio
 ["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9", ...]
 
 CONTEXTO DEL CAPÍTULO (usalo para identificar personajes y coherencia, NO lo copies literal en los prompts):
-${textoCapitulo.substring(0, 6000)}
+${textoCapitulo.substring(0, 12000)}
 `;
 
     try {
@@ -697,7 +697,7 @@ ${textoCapitulo.substring(0, 6000)}
     const promptSSML = `
 Eres un guionista profesional de documentales bíblicos para YouTube, especializado en retención de audiencia y profundidad teológica. Escribís para el canal "Mahanaim", que se caracteriza por contenido exegético serio pero accesible, con narrativa envolvente.
 
-TAREA: Genera un guion narrativo completo para un video de 8 a 10 minutos sobre ${ctx}, en formato SSML válido para Google Cloud Text-to-Speech.
+TAREA: Genera un guion narrativo completo para un video de 18 a 22 minutos sobre ${ctx}, en formato SSML válido para Google Cloud Text-to-Speech.
 
 Tenés acceso al estudio bíblico y al sermón del capítulo al final de este prompt. Usá ambos como material de base. El estudio aporta exégesis profunda y datos arqueológicos/lingüísticos. El sermón aporta estructura narrativa, aplicaciones y tono pastoral. NO inventes datos que no estén en estas fuentes ni en conocimiento bíblico ampliamente aceptado.
 
@@ -756,25 +756,59 @@ REGLAS DE ESTILO Y SSML
 
 4. Usá <emphasis level="moderate"> para palabras clave teológicas o giros importantes.
 
-5. Usá <prosody rate="slow"> ÚNICAMENTE para citas textuales de la Escritura (entre comillas), anidada dentro del prosody general.
+5. NO uses <prosody rate="slow"> en ningún caso. La velocidad de lectura debe mantenerse constante (rate="medium") durante TODO el guion, incluidas las citas bíblicas. Para marcar solemnidad en las citas, usá únicamente pausas antes y después (<break time="1.5s"/>). La reducción de velocidad suena artificial en la narración continua.
 
 6. Marcas de sincronización <mark name="imagen_N"/> (CRÍTICO):
-   - Insertá EXACTAMENTE 12 marcas: <mark name="imagen_1"/>, <mark name="imagen_2"/>, ..., <mark name="imagen_12"/>.
+   - Insertá entre 15 y 22 marcas según la densidad narrativa del capítulo.
+   - Elegí la cantidad óptima: 15-17 para capítulos simples, 18-22 para capítulos densos con muchos cambios de escena.
    - Cada marca debe ir JUSTO ANTES de la frase donde cambia la escena visual.
-   - Distribución OBLIGATORIA (aprox. 60-70 segundos entre marcas):
-     * imagen_1: al inicio absoluto del guion (antes del gancho).
-     * imagen_2: al inicio del contexto narrativo (después del gancho).
-     * imagen_3 a imagen_10: distribuidas uniformemente en el desarrollo y la aplicación (aprox. cada 60-70 segundos, NO mecánicamente, sino donde cambia la escena).
-     * imagen_11: en el inicio de la conclusión impactante.
-     * imagen_12: en la MITAD de la conclusión (por ejemplo, antes de la oración final).
-   - REGLAS CRÍTICAS DE DISTRIBUCIÓN:
-     * NINGUNA imagen debe durar más de 90 segundos.
-     * NINGUNA imagen debe durar menos de 30 segundos (excepto imagen_1 que puede ser más corta).
-     * La última imagen (imagen_12) NO debe empezar en el inicio de la conclusión. Debe empezar en la mitad de la conclusión, dejando solo 30-60 segundos hasta el final.
-     * Si el guion total dura ~12-13 minutos, cada una de las 12 imágenes debe durar en promedio ~60-70 segundos.
-   - IMPORTANTE: las marcas deben coincidir con el contenido visual correspondiente de cada sección.
+      - REGLAS CRÍTICAS DE DISTRIBUCIÓN:
+     * Cada imagen debe durar entre 45 y 120 segundos (ni menos ni más).
+     * Con 3.200-3.800 palabras (18-22 min), si usás 20 imágenes cada una dura ~60-70 segundos.
+     * Distribuí las marcas equitativamente según los cambios narrativos reales (cambio de tema, personaje o sección).
+     * La primera marca (imagen_1) va al inicio absoluto (antes del gancho).
+     * La última marca (imagen_N) va donde empieza la conclusión, NO al principio de la aplicación.
+     * NINGUNA imagen debe durar más de 120 segundos.
+     * NINGUNA imagen debe durar menos de 45 segundos.
+   - IMPORTANTE: las marcas deben coincidir con los cambios narrativos reales.
 
-7. Duración objetivo: 1400-1700 palabras (8-10 minutos de narración a velocidad media).
+7. Duración objetivo: 3.200-3.800 palabras (18-22 minutos de narración a velocidad media). NO superes las 3.800 palabras. El guion completo con etiquetas SSML NO debe superar los 28.000 caracteres.
+
+
+═══════════════════════════════════════
+ESTRUCTURA DE RETENCIÓN NARRATIVA (CRÍTICO PARA 20 MIN)
+═══════════════════════════════════════
+
+Para mantener la atención durante 20 minutos, el guion DEBE incluir estos elementos:
+
+1. GANCHO INICIAL (30-45 segundos):
+   - Pregunta intrigante, dato sorprendente o contraste impactante.
+   - Promesa implícita de lo que el oyente va a descubrir.
+
+2. MICRO-CLIFFHANGERS cada 3-4 minutos:
+   - Insertá preguntas abiertas que se resuelven 2-3 minutos después.
+   - Cada cliffhanger genera "mini tensión" que el oyente quiere resolver.
+
+3. VARIEDAD DE RITMO:
+   - Alterná entre: narrativa, exégesis profunda, ilustración, aplicación.
+   - NO dejes más de 90 segundos de pura exégesis técnica sin una ilustración o aplicación.
+
+4. MOMENTOS DE REVELACIÓN ("ajás"):
+   - Al menos 3-4 momentos donde el oyente diga "no sabía eso".
+   - Cada uno debe apoyarse en una palabra del original, un dato arqueológico, o una conexión profética.
+
+5. PAUSAS DRAMÁTICAS:
+   - Usá <break time="1.5s"/> o <break time="2s"/> antes de puntos clave.
+   - El silencio prepara al oyente para lo importante.
+
+6. SECCIÓN DE APLICACIÓN EXPANDIDA (2-3 minutos):
+   - No seas genérico. Conectá con situaciones reales: ansiedad, soledad, decisiones difíciles.
+   - Cada aplicación debe nacer del texto, no ser un añadido moralista.
+
+7. CONCLUSIÓN QUE CIERRA EL CÍRCULO (1-1.5 minutos):
+   - Volvé al gancho inicial y respondelo con la verdad del capítulo.
+   - Frase final memorable y breve.
+   - Oración corta (3-4 líneas).
 
 8. Tono: reverente pero accesible. Profundo pero claro. Apasionado pero respetuoso.
 
@@ -799,7 +833,7 @@ Generá el guion SSML completo ahora. Recordá: SOLO el XML, sin explicaciones, 
             model: process.env.LLM_MODEL || "deepseek-chat",
             messages: [{ role: "user", content: promptSSML }],
             temperature: 0.5,
-            max_tokens: 10000,
+            max_tokens: 20000,
           }),
         },
       );
