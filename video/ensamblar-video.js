@@ -81,8 +81,19 @@ for (const [k, v] of Object.entries(marks)) {
   console.log(`   ${k}: ${v}s`);
 }
 
+// ── Detectar cantidad dinámica de marcas ──────────────────────────
+const NUM_IMAGENES = Object.keys(marks).filter((k) =>
+  k.startsWith("imagen_"),
+).length;
+
+if (NUM_IMAGENES === 0) {
+  console.error("❌ No se encontraron marcas 'imagen_N' en el JSON.");
+  process.exit(1);
+}
+
+console.log(`📊 Detectadas ${NUM_IMAGENES} imágenes dinámicamente.\n`);
+
 // ── Calcular duración de cada imagen ──────────────────────────────
-const NUM_IMAGENES = 12;
 const duraciones = [];
 
 for (let i = 1; i <= NUM_IMAGENES; i++) {
@@ -158,7 +169,7 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
   });
 }
 
-// ── Concatenar los 12 clips ───────────────────────────────────────
+// ── Concatenar los clips ───────────────────────────────────────
 function concatenarClips(clipPaths, outputPath) {
   return new Promise((resolve, reject) => {
     const listPath = path.join(outputDir, "clips_list.txt");
@@ -209,7 +220,7 @@ async function main() {
     }
     console.log();
 
-    // Paso 1: generar los 12 clips
+    // Paso 1: generar los clips
     const clipPaths = [];
     for (const d of duraciones) {
       const imageName = `imagen_${String(d.index).padStart(2, "0")}.png`;

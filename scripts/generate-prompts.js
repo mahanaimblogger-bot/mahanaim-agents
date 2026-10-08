@@ -455,6 +455,167 @@ ${jsonData.guion_podcast}
 // ============================================================
 // FUNCIÓN PRINCIPAL EXPORTADA (PARA SER USADA POR EL ORQUESTADOR)
 // ============================================================
+
+// ============================================================
+// FUNCIONES AUXILIARES PARA DETECCIÓN DE MOMENTOS NARRATIVOS
+// ============================================================
+
+/**
+ * Extrae segmentos del SSML cortando por <break>.
+ * Devuelve un array de strings (cada uno es un bloque de texto entre breaks).
+ * NO incluye las etiquetas <speak>, <prosody>, ni las etiquetas <break>.
+ */
+function extraerSegmentosPorBreak(ssml) {
+  if (!ssml || typeof ssml !== "string") return [];
+
+  // Quitar <speak> y <prosody> de apertura/cierre
+  let contenido = ssml
+    .replace(/<speak[^>]*>/gi, "")
+    .replace(/<\/speak>/gi, "")
+    .replace(/<prosody[^>]*>/gi, "")
+    .replace(/<\/prosody>/gi, "")
+    .trim();
+
+  // Cortar por <break time="..."/> (cualquier duración)
+  const partes = contenido.split(/<break\s+time="[^"]*"\s*\/?>/gi);
+
+  // Limpiar cada segmento
+  const segmentos = partes
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
+  return segmentos;
+}
+
+/**
+ * Llama a DeepSeek para refinar los segmentos brutos en 12-25 momentos narrativos.
+ * Devuelve un array de objetos { indice, texto_inicio, descripcion_visual }.
+ */
+async function detectarMomentosNarrativos(segmentos, ctx) {
+  if (!segmentos || segmentos.length === 0) return [];
+
+  // Unir los segmentos numerados para pasárselos a la IA
+  const segmentosNumerados = segmentos
+    .map((seg, i) => `[${i + 1}] ${seg}`)
+    .join("\n\n");
+
+  const prompt = `Eres un editor narrativo experto. Te paso los segmentos de un guion para un video bíblico sobre ${ctx}, cortados por pausas dramáticas.
+
+TAREA: Analizá los segmentos y agrupalos en 12-25 MOMENTOS NARRATIVOS. Un "momento narrativo" es un bloque donde se habla del mismo tema, personaje o sección. Cada momento puede contener 1 o varios segmentos consecutivos.
+
+REGLAS:
+1. Cada momento debe tener sentido narrativo propio.
+2. NO fragmentes en exceso (no hagas 40 momentos).
+3. NO fusiones en exceso (no hagas 5 momentos).
+4. La cantidad óptima es 15-22 momentos.
+5. El primer momento SIEMPRE es el gancho inicial.
+6. El último momento SIEMPRE es la conclusión.
+7. NINGÚN momento debe ser demasiado largo ni demasiado corto. Si un bloque de segmentos es muy extenso, dividilo en dos momentos. Si es muy corto, fusionálo con el siguiente.
+8. La cantidad IDEAL es 15-22 momentos. Si te salen más de 25, fusioná los más cortos. Si te salen menos de 12, dividí los más largos.
+
+SEGMENTOS:
+${segmentosNumerados}
+
+FORMATO DE SALIDA (JSON estricto):
+{
+  "momentos": [
+    {
+      "indice": 1,
+      "inicio_segmento": 1,
+      "fin_segmento": 2,
+      "texto_inicio": "primeras palabras exactas del momento (20-30 caracteres)",
+      "descripcion_visual": "descripción breve de qué mostrar visualmente (una línea, en español)"
+    },
+    ...
+  ]
+}
+
+Devolvé SOLO el JSON, sin markdown, sin explicaciones.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "deepseek-chat",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3,
+      max_tokens: 4000,
+    });
+
+    const parsed = JSON.parse(response.choices[0].message.content);
+
+    if (!parsed.momentos || !Array.isArray(parsed.momentos)) {
+      console.error("   ⚠️ La IA no devolvió momentos válidos.");
+      return [];
+    }
+
+    console.log(`   📊 Momentos narrativos detectados: ${parsed.momentos.length}`);
+    return parsed.momentos;
+  } catch (error) {
+    console.error("   ❌ Error detectando momentos narrativos:", error.message);
+    return [];
+  }
+}
+
+/**
+ * Inserta las marcas <mark name="imagen_N"/> en el SSML, antes de cada momento narrativo.
+ * Busca el texto exacto de inicio del momento y le inserta la marca antes.
+ */
+
+function insertarMarcasEnSSML(ssml, momentos) {
+  if (!ssml || !momentos || momentos.length === 0) return ssml;
+
+  // Ordenar los momentos por su índice (1, 2, 3, ...)
+  const momentosOrdenados = [...momentos].sort(
+    (a, b) => (a.indice || 0) - (b.indice || 0),
+  );
+
+  let ssmlConMarcas = ssml;
+  let posicionAnterior = 0;
+
+  for (let i = 0; i < momentosOrdenados.length; i++) {
+    const momento = momentosOrdenados[i];
+    const numImagen = i + 1;
+
+    // Buscar texto de inicio con diferentes longitudes (fallback progresivo)
+    const textosBuscar = [
+      (momento.texto_inicio || "").substring(0, 25),
+      (momento.texto_inicio || "").substring(0, 15),
+      (momento.texto_inicio || "").substring(0, 10),
+    ].filter((t) => t.length > 0);
+
+    let posicion = -1;
+
+    for (const texto of textosBuscar) {
+      const pos = ssmlConMarcas.indexOf(texto, posicionAnterior);
+      if (pos !== -1) {
+        posicion = pos;
+        break;
+      }
+    }
+
+    if (posicion === -1) {
+      console.error(
+        `   ⚠️ No se encontró el momento ${numImagen} en el SSML.`,
+      );
+      continue;
+    }
+
+    // Insertar la marca justo antes del texto encontrado
+    const marca = `<mark name="imagen_${numImagen}"/>`;
+    ssmlConMarcas =
+      ssmlConMarcas.slice(0, posicion) +
+      marca +
+      ssmlConMarcas.slice(posicion);
+
+    // Actualizar la posición anterior (para la próxima búsqueda)
+    posicionAnterior = posicion + marca.length;
+
+    console.log(`   ✓ Momento ${numImagen} insertado en posición ${posicion}`);
+  }
+
+  return ssmlConMarcas;
+}
+
 export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
   try {
     const chapterInfo = await fetchChapterResources(bookSlug, chapterNumber);
@@ -556,7 +717,7 @@ ${estudioFinal}
     return false;
   }
 
-  // NUEVOS ARTEFACTOS PARA PIPELINE DE VIDEO (Azure + Replicate)
+  // NUEVOS ARTEFACTOS PARA PIPELINE DE VIDEO (rediseñado)
   // ============================================================
 
   async function generarArtefactosVideo(libro, capitulo, textoCapitulo) {
@@ -577,123 +738,7 @@ ${estudioFinal}
 
     const ctx = `${libro} capítulo ${capitulo}`;
 
-    // --- 1. PROMPTS DE IMÁGENES (Para Replicate/DALL-E) ---
-    const promptImagenes = `
-Eres un director de arte cinematográfico e historiador bíblico con expertise en contextos culturales de todas las épocas (patriarcal, egipcia, israelita, babilónica, persa, greco-romana, apostólica, etc.).
-
-TAREA: Genera un array JSON con entre 15 y 22 prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas (Flux, Midjourney, DALL-E) que ilustrarán un video documental sobre: ${ctx}. La cantidad debe coincidir con la cantidad de marcas <mark name="imagen_N"/> que le pediste al guion SSML (15-22 según densidad narrativa).
-
-PASO 1 — IDENTIFICAR CONTEXTO Y PERSONAJES (crítico):
-Antes de generar los prompts, analizá internamente:
-
-A) CONTEXTO HISTÓRICO-CULTURAL:
-- Época aproximada (siglo, año a.C./d.C., período histórico)
-- Cultura y pueblo protagonista
-- Región geográfica
-- Estrato social y vestimenta típica
-
-B) PERSONAJES QUE APARECEN:
-Listá cada personaje humano que va a aparecer en las 12 imágenes. Para cada uno identificá:
-- Nombre propio (si lo tiene)
-- Género (hombre / mujer / niño / niña) — CRÍTICO
-- Edad aproximada
-- Rol en la narrativa (protagonista, secundario, multitud)
-
-PASO 2 — REGLAS UNIVERSALES PARA CADA PROMPT:
-
-A) COHERENCIA HISTÓRICA Y CULTURAL:
-- Cada prompt debe incluir al inicio un bloque de contexto de época específico a ESTE capítulo (ej: "Ancient Egypt, New Kingdom period, c. 1440 BC, enslaved Hebrew people").
-- Vestimenta, arquitectura, herramientas, armas (si las hay), mobiliario y entorno exactos a esa época y cultura.
-- PROHIBIDO: cualquier objeto moderno o fuera de época (armas de fuego, ropa contemporánea, casas de estilos posteriores, tecnología, relojes, gafas, vehículos).
-- Prohibido mezclar elementos de distintas culturas o siglos en la misma imagen.
-
-B) GÉNERO EXPLÍCITO EN PERSONAJES CON NOMBRE (crítico):
-- Cada vez que un personaje con nombre aparezca en un prompt, aclaralo explícitamente entre paréntesis junto al nombre. Ejemplos:
-  * "Rebekah (a woman with long dark hair, no masculine features)"
-  * "Abraham (a man with a long grey beard)"
-  * "the midwife (a woman)"
-  * "Isaac (a young man)" / "the infant (a baby boy)"
-- Esto es OBLIGATORIO para evitar que el modelo confunda el género.
-
-C) HUMANIDAD EXPLÍCITA (crítico):
-- Todos los personajes son seres humanos completos y normales.
-- Si un personaje tiene características rústicas o primitivas (piel de animal, pelo corporal, fuerza bruta, apariencia salvaje), aclaralo como rasgo HUMANO:
-  * "Esau (a fully human muscular man with thick red-brown human body hair — human hair, not fur, no horns, no claws, no animal features)"
-- Al final de cada prompt donde haya un personaje con estas características, agregá: "fully human anatomy only, no animal features, no horns, no fur, no claws".
-- Prohibido: cabezas flotantes, cuerpos cortados, miembros desconectados, composiciones ambiguas.
-
-D) POSE Y COMPOSICIÓN CLARA:
-- Poses explícitas: si alguien sostiene algo, decirlo. Si alguien está solo, decirlo. Si alguien está de pie o sentado, decirlo.
-- Figuras humanas completas o claramente visibles (busto solo si el prompt lo especifica).
-- Anatomía natural, proporciones correctas, manos y rostros bien formados.
-
-E) AUTO-SUFICIENCIA DEL PROMPT (crítico):
-- Cada uno de los 12 prompts debe poder entenderse por sí solo, sin referencias a "el estudio", "el capítulo", "la escena anterior", "el pasaje", etc.
-- Todo el contexto necesario (época, cultura, quién es quién, qué está pasando) debe estar descrito DENTRO del mismo string del prompt.
-
-F) ESTILO VISUAL:
-- Fotorrealismo hiperrealista, estilo documental cinematográfico.
-- Iluminación dramática y naturalista (35mm, shallow depth of field).
-- NO caricatura, NO CGI genérico, NO ilustración estilizada, NO "pintura devocional del s.XIX".
-- Paleta de colores coherente con la escena.
-- Relación de aspecto 16:9 al final de cada prompt (--ar 16:9).
-
-G) PROHIBICIONES GENERALES:
-- NO incluir texto, letras, símbolos legibles, ni marcas de agua en las imágenes.
-- NO rostros reconocibles de personas reales modernas.
-- NO cruces ni símbolos cristianos anacrónicos a la época del pasaje.
-
-PASO 3 — ESTRUCTURA DE CADA PROMPT:
-Cada uno de los 12 prompts debe seguir este orden:
-[bloque de época y cultura] + [personaje/s con género y humanidad explícitos] + [descripción de la escena y la acción] + [entorno y arquitectura] + [iluminación y atmósfera] + [estilo fotográfico] + [restricciones negativas breves] + --ar 16:9
-
-PASO 4 — COBERTURA NARRATIVA:
-Los 12 prompts deben cubrir la secuencia narrativa del capítulo en orden: apertura, desarrollo, momentos clave, clímax, cierre. Deben poder concatenarse como storyboard del video.
-
-FORMATO DE SALIDA (obligatorio):
-SOLO un array JSON de 12 strings en INGLÉS. Sin texto adicional, sin explicaciones, sin markdown. Ejemplo:
-["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9", ...]
-
-CONTEXTO DEL CAPÍTULO (usalo para identificar personajes y coherencia, NO lo copies literal en los prompts):
-${textoCapitulo.substring(0, 12000)}
-`;
-
-    try {
-      const resImg = await fetch(
-        process.env.LLM_BASE_URL ||
-          "https://api.deepseek.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.LLM_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: process.env.LLM_MODEL || "deepseek-chat",
-            messages: [{ role: "user", content: promptImagenes }],
-            temperature: 0.7,
-          }),
-        },
-      );
-      const dataImg = await resImg.json();
-      let contenidoImg = dataImg.choices[0]?.message?.content || "[]";
-      contenidoImg = contenidoImg
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .trim();
-
-      // GUARDAR EN LA CARPETA RAÍZ
-      fs.writeFileSync(
-        `${dir}/prompts_imagenes_video.json`,
-        contenidoImg,
-        "utf8",
-      );
-      console.log(`   ✅ prompts_imagenes_video.json guardado.`);
-    } catch (e) {
-      console.error("   ⚠️ Error generando prompts de imagen:", e.message);
-    }
-
-    // --- 2. GUION SSML (Para Azure TTS) ---
+    // --- PASO 1: GENERAR EL GUION SSML SIN MARCAS ---
     const promptSSML = `
 Eres un guionista profesional de documentales bíblicos para YouTube, especializado en retención de audiencia y profundidad teológica. Escribís para el canal "Mahanaim", que se caracteriza por contenido exegético serio pero accesible, con narrativa envolvente.
 
@@ -758,22 +803,9 @@ REGLAS DE ESTILO Y SSML
 
 5. NO uses <prosody rate="slow"> en ningún caso. La velocidad de lectura debe mantenerse constante (rate="medium") durante TODO el guion, incluidas las citas bíblicas. Para marcar solemnidad en las citas, usá únicamente pausas antes y después (<break time="1.5s"/>). La reducción de velocidad suena artificial en la narración continua.
 
-6. Marcas de sincronización <mark name="imagen_N"/> (CRÍTICO):
-   - Insertá entre 15 y 22 marcas según la densidad narrativa del capítulo.
-   - Elegí la cantidad óptima: 15-17 para capítulos simples, 18-22 para capítulos densos con muchos cambios de escena.
-   - Cada marca debe ir JUSTO ANTES de la frase donde cambia la escena visual.
-      - REGLAS CRÍTICAS DE DISTRIBUCIÓN:
-     * Cada imagen debe durar entre 45 y 120 segundos (ni menos ni más).
-     * Con 3.200-3.800 palabras (18-22 min), si usás 20 imágenes cada una dura ~60-70 segundos.
-     * Distribuí las marcas equitativamente según los cambios narrativos reales (cambio de tema, personaje o sección).
-     * La primera marca (imagen_1) va al inicio absoluto (antes del gancho).
-     * La última marca (imagen_N) va donde empieza la conclusión, NO al principio de la aplicación.
-     * NINGUNA imagen debe durar más de 120 segundos.
-     * NINGUNA imagen debe durar menos de 45 segundos.
-   - IMPORTANTE: las marcas deben coincidir con los cambios narrativos reales.
+6. NO insertes NINGUNA etiqueta <mark> en el guion. El guion debe salir limpio, sin marcas de sincronización. Las marcas <mark> se agregan en un paso posterior del pipeline. Tu tarea es SOLO generar el guion narrativo completo con los <break> dramáticos.
 
-7. Duración objetivo: 3.200-3.800 palabras (18-22 minutos de narración a velocidad media). NO superes las 3.800 palabras. El guion completo con etiquetas SSML NO debe superar los 28.000 caracteres.
-
+7. Duración objetivo: 2.600-3.000 palabras MÁXIMO (15-18 minutos de narración a velocidad media). NO superes las 3.000 palabras bajo ninguna circunstancia. El guion completo con etiquetas SSML NO debe superar los 22.000 caracteres. Si estás cerca del límite, TERMINÁ el guion aunque falten detalles secundarios. Es preferible un guion conciso y bien estructurado que uno largo y denso.
 
 ═══════════════════════════════════════
 ESTRUCTURA DE RETENCIÓN NARRATIVA (CRÍTICO PARA 20 MIN)
@@ -817,8 +849,13 @@ MATERIAL DE REFERENCIA (estudio bíblico y sermón)
 ═══════════════════════════════════════
 ${textoCapitulo}
 
-Generá el guion SSML completo ahora. Recordá: SOLO el XML, sin explicaciones, sin markdown, sin comentarios fuera de las etiquetas SSML válidas.
+Generá el guion SSML completo ahora. Recordá:
+1. SOLO el XML, sin explicaciones, sin markdown, sin comentarios fuera de las etiquetas SSML válidas.
+2. NO incluyas NINGUNA etiqueta <mark>. El guion va limpio.
+3. Los <break> son importantes: usá <break time="1.5s"/> en cambios narrativos reales (cambio de tema, personaje o sección), y <break time="800ms"/> entre párrafos comunes.
 `;
+
+    let ssmlLimpio = "";
     try {
       const resSSML = await fetch(
         process.env.LLM_BASE_URL ||
@@ -838,17 +875,186 @@ Generá el guion SSML completo ahora. Recordá: SOLO el XML, sin explicaciones, 
         },
       );
       const dataSSML = await resSSML.json();
-      let contenidoSSML = dataSSML.choices[0]?.message?.content || "";
-      contenidoSSML = contenidoSSML
+      ssmlLimpio = dataSSML.choices[0]?.message?.content || "";
+      ssmlLimpio = ssmlLimpio
         .replace(/```xml\s*/gi, "")
         .replace(/```\s*/g, "")
         .trim();
 
-      // GUARDAR EN LA CARPETA RAÍZ
-      fs.writeFileSync(`${dir}/guion_video_tts.ssml`, contenidoSSML, "utf8");
-      console.log(`   ✅ guion_video_tts.ssml guardado.`);
+      if (!ssmlLimpio) {
+        throw new Error("La IA devolvió un SSML vacío.");
+      }
+      console.log(`   ✅ SSML limpio generado (${ssmlLimpio.length} caracteres).`);
     } catch (e) {
       console.error("   ⚠️ Error generando guion SSML:", e.message);
+      return;
+    }
+
+    // --- PASO 2: EXTRAER SEGMENTOS POR <break> ---
+    const segmentos = extraerSegmentosPorBreak(ssmlLimpio);
+    console.log(`   📄 Segmentos extraídos: ${segmentos.length}`);
+
+    if (segmentos.length === 0) {
+      console.error("   ⚠️ No se pudieron extraer segmentos del SSML.");
+      return;
+    }
+
+    // --- PASO 3: DETECTAR MOMENTOS NARRATIVOS CON IA ---
+    const momentos = await detectarMomentosNarrativos(segmentos, ctx);
+
+    if (!momentos || momentos.length === 0) {
+      console.error("   ⚠️ No se detectaron momentos narrativos.");
+      return;
+    }
+
+    // --- PASO 4: INSERTAR MARCAS EN EL SSML ---
+    const ssmlConMarcas = insertarMarcasEnSSML(ssmlLimpio, momentos);
+
+    // Verificar que se insertaron todas las marcas
+    const marcasInsertadas = (
+      ssmlConMarcas.match(/<mark\s+name="imagen_\d+"\s*\/?>/gi) || []
+    ).length;
+    console.log(
+      `   📌 Marcas insertadas: ${marcasInsertadas} de ${momentos.length}`,
+    );
+
+    // Guardar SSML final con marcas
+    fs.writeFileSync(`${dir}/guion_video_tts.ssml`, ssmlConMarcas, "utf8");
+    console.log(`   ✅ guion_video_tts.ssml guardado (${ssmlConMarcas.length} caracteres).`);
+
+    // --- PASO 5: GENERAR PROMPTS DE IMÁGENES BASADOS EN LOS MOMENTOS ---
+    const listaMomentos = momentos
+      .map(
+        (m) =>
+          `[Momento ${m.indice}] Descripción visual: ${m.descripcion_visual}`,
+      )
+      .join("\n");
+
+    const promptImagenes = `
+Eres un director de arte cinematográfico e historiador bíblico con expertise en contextos culturales de todas las épocas.
+
+TAREA: Generá EXACTAMENTE ${momentos.length} prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas. Cada prompt corresponde a UNO de los momentos narrativos del video sobre ${ctx}. La cantidad es EXACTA: ${momentos.length}. No generes más ni menos.
+
+REGLAS UNIVERSALES PARA CADA PROMPT:
+
+A) COHERENCIA HISTÓRICA Y CULTURAL:
+- Cada prompt debe incluir al inicio un bloque de contexto de época específico a ESTE capítulo.
+- Vestimenta, arquitectura, herramientas, mobiliario y entorno exactos a esa época y cultura.
+- Paleta de colores coherente con la escena (ámbar, ocre y dorado para escenas diurnas; azules fríos para nocturnas).
+- PROHIBIDO: cualquier objeto moderno o fuera de época. Prohibido mezclar culturas o siglos.
+
+B) GÉNERO EXPLÍCITO EN PERSONAJES CON NOMBRE:
+- Cada vez que un personaje con nombre aparezca, aclaralo entre paréntesis con su género.
+- Ejemplo: "Rebekah (a woman)", "Abraham (a man)", "the midwife (a woman)", "the infant (a baby boy)".
+
+C) HUMANIDAD Y PROPORCIONES:
+- Todos los personajes son seres humanos completos y normales.
+- PROPORCIONES HUMANAS CORRECTAS: adultos con proporciones adultas, niños con proporciones infantiles.
+- Al final de cada prompt: "fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs".
+
+D) POSE, COMPOSICIÓN Y MULTITUDES:
+- Poses explícitas. Figuras humanas completas.
+- MULTITUDES: proporciones correctas, sin "enanos" al fondo.
+
+E) AUTO-SUFICIENCIA:
+- Cada prompt debe entenderse por sí solo. Todo el contexto dentro del string.
+
+F) ESTILO VISUAL:
+- Ilustración cinematográfica hiperrealista con realismo estilizado (semi-stylized realism).
+- Iluminación dramática (35mm film aesthetic, shallow depth of field).
+- Texturas hiperrealistas de piel y telas. Sin efecto "plástico CGI".
+- NO caricatura, NO cartoon, NO Pixar/Disney, NO "pintura devocional del s.XIX".
+- Relación de aspecto 16:9 al final (--ar 16:9).
+
+G) PROHIBICIONES:
+- NO texto, letras ni marcas de agua.
+- NO rostros reconocibles de personas modernas.
+- NO símbolos cristianos anacrónicos.
+
+═══════════════════════════════════════
+LISTA DE MOMENTOS NARRATIVOS (${momentos.length} momentos)
+═══════════════════════════════════════
+
+${listaMomentos}
+
+═══════════════════════════════════════
+CONTEXTO DEL CAPÍTULO (para coherencia general)
+═══════════════════════════════════════
+${textoCapitulo.substring(0, 8000)}
+
+FORMATO DE SALIDA (obligatorio):
+SOLO un array JSON de EXACTAMENTE ${momentos.length} strings en INGLÉS. Sin texto adicional. Ejemplo:
+["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9", ...]
+`;
+
+    try {
+      const resImg = await fetch(
+        process.env.LLM_BASE_URL ||
+          "https://api.deepseek.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.LLM_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: process.env.LLM_MODEL || "deepseek-chat",
+            messages: [{ role: "user", content: promptImagenes }],
+            temperature: 0.7,
+            max_tokens: 16000,
+          }),
+        },
+      );
+      const dataImg = await resImg.json();
+      let contenidoImg = dataImg.choices[0]?.message?.content || "[]";
+      contenidoImg = contenidoImg
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .trim();
+
+      // Validar que sea un array JSON con la cantidad correcta
+      let arrayPrompts;
+      try {
+        arrayPrompts = JSON.parse(contenidoImg);
+      } catch (err) {
+        console.error("   ⚠️ La IA no devolvió un JSON válido de prompts.");
+        console.error("   📄 Primeros 300 chars:", contenidoImg.substring(0, 300));
+        return;
+      }
+
+      if (!Array.isArray(arrayPrompts)) {
+        console.error("   ⚠️ El output no es un array.");
+        return;
+      }
+
+      if (arrayPrompts.length !== momentos.length) {
+        console.warn(
+          `   ⚠️ ADVERTENCIA: Se esperaban ${momentos.length} prompts, la IA devolvió ${arrayPrompts.length}.`,
+        );
+        console.warn(`   ⚠️ Se recortarán o rellenarán para coincidir.`);
+
+        if (arrayPrompts.length > momentos.length) {
+          arrayPrompts = arrayPrompts.slice(0, momentos.length);
+        } else {
+          // Rellenar con prompts genéricos si faltan
+          while (arrayPrompts.length < momentos.length) {
+            arrayPrompts.push(
+              `Ancient biblical scene, cinematic hyperrealistic illustration, correct adult-child proportions, natural hands, no anachronisms, --ar 16:9`,
+            );
+          }
+        }
+      }
+
+      fs.writeFileSync(
+        `${dir}/prompts_imagenes_video.json`,
+        JSON.stringify(arrayPrompts, null, 2),
+        "utf8",
+      );
+      console.log(
+        `   ✅ prompts_imagenes_video.json guardado (${arrayPrompts.length} prompts).`,
+      );
+    } catch (e) {
+      console.error("   ⚠️ Error generando prompts de imagen:", e.message);
     }
   }
 }

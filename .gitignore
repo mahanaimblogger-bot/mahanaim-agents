@@ -37,3 +37,6 @@ medir-estudio.js
 /ffmpeg
 # FFmpeg portable (no subir a GitHub)
 tools/
+
+# Backups de archivos
+*.bak
