@@ -135,16 +135,31 @@ function getAudioDuration() {
 
 // ── Generar un clip con Ken Burns ─────────────────────────────────
 
+// ── Generar un clip con Ken Burns en 3 fases ──────────────────────
 function generarClipKenBurns(imagePath, duracion, outputPath) {
   return new Promise((resolve, reject) => {
     const fps = 24;
     const frames = Math.round(duracion * fps);
-    const zoomFinal = 1.15;
-    const incremento = (zoomFinal - 1) / frames;
+
+    // Fases proporcionales a la duración
+    const durApertura = 0.03 * duracion;
+    const durPausa = 0.03 * duracion;
+    const durCierre = 0.05 * duracion;
+
+    const zoomInicio = 2.00; // Close up inicial muy cerrado
+    const zoomMedio = 1.00;
+    const zoomLentoFin = 1.15;
+    const zoomCierre = 1.80; // Close up final muy cerrado
+
+    const t1 = durApertura;
+    const t2 = durApertura + durPausa;
+    const t3 = duracion - durCierre;
+
+    const exprZ = `if(lt(on/${fps},${t1}), ${zoomInicio} + (${zoomMedio}-${zoomInicio})*((on/${fps})/${t1}), if(lt(on/${fps},${t2}), ${zoomMedio}, if(lt(on/${fps},${t3}), ${zoomMedio} + (${zoomLentoFin}-${zoomMedio})*(((on/${fps})-${t2})/(${t3}-${t2})), ${zoomLentoFin} + (${zoomCierre}-${zoomLentoFin})*(((on/${fps})-${t3})/${durCierre}))))`;
 
     const vf = [
       `scale=8000:-1`,
-      `zoompan=z='1+${incremento}*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
+      `zoompan=z='${exprZ}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
       `format=yuv420p`,
     ].join(",");
 
@@ -157,6 +172,7 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
         "-pix_fmt yuv420p",
         "-r 24",
         `-frames:v ${frames}`,
+        "-movflags", "+faststart",
       ])
       .on("start", () =>
         console.log(

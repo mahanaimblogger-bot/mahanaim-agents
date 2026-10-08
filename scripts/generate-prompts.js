@@ -746,6 +746,15 @@ TAREA: Genera un guion narrativo completo para un video de 18 a 22 minutos sobre
 
 Tenés acceso al estudio bíblico y al sermón del capítulo al final de este prompt. Usá ambos como material de base. El estudio aporta exégesis profunda y datos arqueológicos/lingüísticos. El sermón aporta estructura narrativa, aplicaciones y tono pastoral. NO inventes datos que no estén en estas fuentes ni en conocimiento bíblico ampliamente aceptado.
 
+
+═══════════════════════════════════════
+PERFIL DOCTRINAL QUE DEBES RESPETAR (CRÍTICO)
+═══════════════════════════════════════
+
+- Monoteísmo puro: Un solo Dios, el Padre. Jesucristo es Su Hijo y Mesías, preexistente, de Su esencia pero distinto y subordinado al Padre, con todo poder y autoridad conferido por el Padre.
+- ⛔ REGLA INVIOLABLE SOBRE LA DEIDAD: En NINGÚN punto debes afirmar, sugerir ni dar a entender que existe una "Trinidad" o un "Dios trino" de tres personas divinas coiguales. NUNCA digas que Jesucristo es "Dios" o "Dios el Hijo" (es el HIJO de Dios). NUNCA digas que el Espíritu Santo es "Dios" ni una tercera persona divina (es el Espíritu de Dios y de Cristo). Un solo Dios: el Padre.
+- Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada. Cristo es el hijo de Dios, El mesias, es preexistente, el padre le dio toda autoridad y poder, por medio de Cristo fue hecho todo. 
+
 ═══════════════════════════════════════
 ESTRUCTURA OBLIGATORIA DEL GUION (respeta el orden)
 ═══════════════════════════════════════

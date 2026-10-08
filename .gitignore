@@ -40,3 +40,7 @@ tools/
 
 # Backups de archivos
 *.bak
+
+# Scripts de prueba temporales
+video/test-*.js
+video/test-*.mp4
