@@ -62,6 +62,15 @@ PERFIL CRISTOLÓGICO OBLIGATORIO:
 - "La Trinidad" o "Dios trino"
 - "Tres personas en un solo Dios"
 - "Cristo es Dios"
+- "Dios mismo se convirtió en el cordero"
+- "Dios se hizo sacrificio"
+- "Dios murió en la cruz"
+- "Dios derramó su sangre"
+- "El Cordero es Dios"
+- "Dios es el Cordero"
+- CUALQUIER fórmula que identifique a Dios (el Padre) con el Cordero, con Jesús, o con el sacrificio
+- CUALQUIER fórmula que sugiera que Dios (el Padre) se hizo carne, murió, o se sacrificó. 
+- Nada q haga entender q Jesus es Dios, o el Cordero es Dios ni q el espiritu Santo es Dios. Solo el Padre es Dios
 
 ✅ DEBES DECIR (Usa estas fórmulas):
 - "El Hijo de Dios se hizo carne"
@@ -195,11 +204,53 @@ El HTML DEBE seguir exactamente este orden:
 
 2. TÍTULO PRINCIPAL
    - <h1 class="titulo-entrada">TÍTULO IMPACTANTE</h1>
-   - El título NO debe ser "Estudio de [Libro] [Capítulo]". Debe ser una frase ORIGINAL que capte la esencia específica de ESTE pasaje y genere curiosidad — nunca genérico, nunca reciclado. Estilo de referencia (NO copies estos ejemplos ni los adaptes, son solo para mostrar el TONO):
-     * "Nada te separará: La cadena de hierro que Dios rompió por ti"
-     * "El pastor que camina hacia la muerte con su rebaño"
-     * "Cuando el Cordero rompe los sellos: El día que nadie quiere ver llegar"
-   - IMPORTANTE: crea un título 100% propio basado en el contenido específico del capítulo que estás generando ahora. Nunca reutilices, ni adaptes levemente, ninguno de los ejemplos de este prompt.
+   - El título NO debe ser "Estudio de [Libro] [Capítulo]".
+   
+   REGLAS OBLIGATORIAS DEL TÍTULO (críticas para YouTube):
+   
+   A) LONGITUD:
+      * Máximo 60 caracteres (para que no se corte en móvil).
+      * Ideal: 35-55 caracteres.
+      * SIEMPRE cuenta los caracteres antes de decidir.
+   
+   B) ESTILO PROHIBIDO:
+      * NO uses la fórmula "X: Y" (dos puntos + subtítulo).
+      * NO uses la fórmula "X que Y" (ej: "El Rey que reescribe las reglas").
+      * NO empieces con "El" o "La" + sustantivo abstracto (ej: "El Legado...", "La Promesa...", "El Rey...").
+      * NO uses palabras teológicas rebuscadas: "hermenéutica", "exégesis", "cristológica", "tipológica", "escatológica", "soteriológica".
+      * NO uses el nombre del libro o capítulo en el título (ya va en el canal).
+   
+   C) ESTILO OBLIGATORIO:
+      * Debe generar CURIOSIDAD (que el espectador quiera saber más).
+      * Debe tener GANCHO EMOCIONAL (que conecte con una necesidad real).
+      * Debe tener PROMESA IMPLÍCITA (qué va a aprender el espectador).
+      * Debe ser CORTO, DIRECTO, y FÁCIL DE LEER.
+      * Puede incluir una pregunta, un contraste, una advertencia o una promesa.
+   
+   D) EJEMPLOS DE BUENOS TÍTULOS (usa este tono, NO copies literalmente):
+      * "Lo que Jesús dijo sobre el dinero te va a sorprender"
+      * "El día que Jesús invirtió TODO"
+      * "Bienaventurados los pobres: la enseñanza más radical" (pero SIN dos puntos, mejor: "La enseñanza más radical de Jesús sobre los pobres")
+      * "Cuando Dios reescribe tus reglas"
+      * "La oración que cambió la historia"
+      * "Nadie te dijo esto sobre el perdón"
+      * "El secreto que escondieron los fariseos"
+      * "Por qué tus enemigos pueden salvarte"
+   
+   E) PROCESO DE GENERACIÓN:
+      1. Genera 3 opciones de título que cumplan TODAS las reglas de arriba.
+      2. Cuenta los caracteres de cada opción.
+      3. Elige la mejor (la más corta y con más gancho).
+      4. Devuelve SOLO el título final en el <h1>, sin las 3 opciones ni comentarios.
+      5. VERIFICA que el título NO contenga ninguna de las fórmulas prohibidas en la sección "REGLA INVIOLABLE SOBRE LA DEIDAD".
+      6. Si el título contiene alguna fórmula prohibida, DESCÁRTALO y genera otro.
+      7. Devuelve SOLO el título final en el <h1>, sin las 3 opciones ni comentarios.
+   
+   F) PROHIBICIÓN ABSOLUTA:
+      * NO reutilices ni adaptes ningún título de capítulos anteriores.
+      * NO uses fórmulas repetitivas que ya hayas usado en otros estudios.
+      * Si no se te ocurre algo bueno, mejor un título simple y directo que uno "poético" y genérico.
+      * NUNCA uses un título genérico como "Estudio de [Libro] [Capítulo]". Tampoco uses títulos con dos puntos (:), ni la fórmula "El/La + sustantivo: subtítulo", ni títulos de más de 60 caracteres.
 
 3. VERSÍCULO(S) CLAVE(S)
    - <div class="cita-versiculo"><h3>REFERENCIA</h3><p>"TEXTO"</p></div>
@@ -425,6 +476,30 @@ Antes de terminar tu respuesta, DEBES asegurarte de incluir OBLIGATORIAMENTE est
 3. <div id="apendice">...</div> (con al menos 2 secciones internas y sus respectivos "Volver al índice").
 
 Si no incluyes el <div id="apendice"> al final, tu respuesta será rechazada por el sistema. ¡NO LO OLVIDES!
+
+══════════════════════════════════════════════════
+FILTRO DE SEGURIDAD DOCTRINAL (VERIFICACIÓN FINAL)
+══════════════════════════════════════════════════
+
+Antes de devolver el resultado final, verifica MENTALMENTE cada una de estas preguntas:
+
+1. ¿El título o el contenido del estudio identifica a Dios (el Padre) con Jesús, 
+   con el Cordero, o con el sacrificio? → SI SÍ, CORRIGE.
+2. ¿El título o el contenido sugiere que Dios se hizo carne, murió, o se sacrificó? 
+   → SI SÍ, CORRIGE.
+3. ¿El título o el contenido usa fórmulas trinitarias como "Dios Hijo", "Dios trino", 
+   "tres personas"? → SI SÍ, CORRIGE.
+4. ¿El título o el contenido afirma que Cristo es Dios? → SI SÍ, CORRIGE.
+
+Si alguna respuesta es "SÍ", REESCRIBE esa parte del estudio usando las fórmulas 
+aprobadas:
+- "El Hijo de Dios se hizo carne"
+- "El Verbo se hizo carne"
+- "Cristo, el Ungido de Dios"
+- "Dios manifestó su poder y salvación en Cristo"
+- "El Hijo, quien está en el seno del Padre"
+
+NO devuelvas el estudio hasta que TODAS las respuestas sean "NO".
 
 ══════════════════════════════════════════════════
 PROHIBICIONES ABSOLUTAS

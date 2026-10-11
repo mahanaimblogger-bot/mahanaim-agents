@@ -22,22 +22,66 @@ export function generarPromptRecurso(tipo, libro, capitulo, textoCapitulo = "", 
   }
 
   // Perfil doctrinal compacto para mantener coherencia con el Prompt Maestro.
-  const PERFIL_DOCTRINAL = `
+    const PERFIL_DOCTRINAL = `
 ### PERFIL DOCTRINAL QUE DEBES RESPETAR (coherente con el Prompt Maestro):
 - Monoteísmo puro: Un solo Dios, el Padre. Jesucristo es Su Hijo y Mesías, preexistente, de Su esencia pero distinto y subordinado al Padre, con todo poder y autoridad conferido por el Padre.
 - ⛔ REGLA INVIOLABLE SOBRE LA DEIDAD: En NINGÚN punto debes afirmar, sugerir ni dar a entender que existe una "Trinidad" o un "Dios trino" de tres personas divinas coiguales. NUNCA digas que Jesucristo es "Dios" o "Dios el Hijo" (es el HIJO de Dios). NUNCA digas que el Espíritu Santo es "Dios" ni una tercera persona divina (es el Espíritu de Dios y de Cristo). Un solo Dios: el Padre.
+- ⛔ PROHIBICIONES ESPECÍFICAS (críticas): NUNCA digas "Dios se hizo cordero", "Dios mismo se convirtió en el cordero", "Dios murió en la cruz", "Dios derramó su sangre", "Dios se hizo sacrificio", "el Cordero es Dios", "Dios es el Cordero". NUNCA identifiques a Dios (el Padre) con el Cordero, con Jesús, o con el sacrificio. El Cordero es JESUCRISTO, el Hijo de Dios, NO Dios el Padre.
+- Fórmulas APROBADAS: "El Hijo de Dios se hizo carne", "El Verbo se hizo carne", "Cristo, el Ungido de Dios", "Dios manifestó su poder y salvación en Cristo", "El Hijo, quien está en el seno del Padre".
 - Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada.
 `;
 
   switch (tipo) {
 
-    case "sermon": {
+       case "sermon": {
       const fuenteEstudio = recortarFuente(materiales.estudio_html);
       return reglaOrtografia + basePrompt + PERFIL_DOCTRINAL + `
 ### TAREA: Generar un SERMÓN HOMILÉTICO COMPLETO (mínimo 3,000 palabras) para ${ctx}.
 
 #### REGLA DE ARMONÍA
 Desarrolla el TEMA del estudio. No inventes temas distintos.
+
+#### REGLAS OBLIGATORIAS DEL TÍTULO (críticas para YouTube):
+
+A) LONGITUD:
+   * Máximo 60 caracteres (para que no se corte en móvil).
+   * Ideal: 35-55 caracteres.
+   * SIEMPRE cuenta los caracteres antes de decidir.
+
+B) ESTILO PROHIBIDO:
+   * NO uses la fórmula "X: Y" (dos puntos + subtítulo).
+   * NO uses la fórmula "X que Y" (ej: "El Rey que reescribe las reglas").
+   * NO empieces con "El" o "La" + sustantivo abstracto (ej: "El Legado...", "La Promesa...", "El Rey...").
+   * NO uses palabras teológicas rebuscadas: "hermenéutica", "exégesis", "cristológica", "tipológica", "escatológica", "soteriológica".
+   * NO uses el nombre del libro o capítulo en el título (ya va en el canal).
+
+C) ESTILO OBLIGATORIO:
+   * Debe generar CURIOSIDAD (que el espectador quiera saber más).
+   * Debe tener GANCHO EMOCIONAL (que conecte con una necesidad real).
+   * Debe tener PROMESA IMPLÍCITA (qué va a aprender el espectador).
+   * Debe ser CORTO, DIRECTO, y FÁCIL DE LEER.
+   * Puede incluir una pregunta, un contraste, una advertencia o una promesa.
+
+D) EJEMPLOS DE BUENOS TÍTULOS (usa este tono, NO copies literalmente):
+   * "Lo que Jesús dijo sobre el dinero te va a sorprender"
+   * "El día que Jesús invirtió TODO"
+   * "La enseñanza más radical de Jesús sobre los pobres"
+   * "Cuando Dios reescribe tus reglas"
+   * "La oración que cambió la historia"
+   * "Nadie te dijo esto sobre el perdón"
+   * "El secreto que escondieron los fariseos"
+   * "Por qué tus enemigos pueden salvarte"
+
+E) PROCESO DE GENERACIÓN:
+   1. Genera 3 opciones de título que cumplan TODAS las reglas de arriba.
+   2. Cuenta los caracteres de cada opción.
+   3. Elige la mejor (la más corta y con más gancho).
+   4. Devuelve SOLO el título final en el <h1>, sin las 3 opciones ni comentarios.
+
+F) PROHIBICIÓN ABSOLUTA:
+   * NO reutilices ni adaptes ningún título de capítulos anteriores.
+   * NO uses fórmulas repetitivas que ya hayas usado en otros sermones.
+   * Si no se te ocurre algo bueno, mejor un título simple y directo que uno "poético" y genérico.
 
 #### DISEÑO HTML OBLIGATORIO (ESTILO RICO Y VISUAL):
 NO generes párrafos largos de texto plano. DEBES usar esta estructura HTML con estilos en línea para garantizar el diseño:
