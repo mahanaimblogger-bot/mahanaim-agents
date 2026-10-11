@@ -148,7 +148,7 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
 
     const zoomInicio = 2.00; // Close up inicial muy cerrado
     const zoomMedio = 1.00;
-    const zoomLentoFin = 1.15;
+    const zoomLentoFin = 1.25;
     const zoomCierre = 1.80; // Close up final muy cerrado
 
     const t1 = durApertura;
