@@ -1,0 +1,43 @@
+name: Generar Imágenes (fal.ai)
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: 'Libro (ej: genesis)'
+        required: true
+        type: string
+      capitulo:
+        description: 'Capítulo (ej: 22)'
+        required: true
+        type: string
+
+jobs:
+  generar-imagenes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Generar imágenes con fal.ai
+        env:
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+        run: |
+          node scripts/generar-imagenes.js \
+            "${{ inputs.libro }}" \
+            "${{ inputs.capitulo }}"
+
+      - name: Subir imágenes generadas
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: imagenes-${{ inputs.libro }}-${{ inputs.capitulo }}
+          path: prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.capitulo }}/imagenes/
