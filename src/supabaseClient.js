@@ -277,6 +277,80 @@ export async function guardarRecursoComoBorrador({
 }
 
 /**
+ * Guarda un recurso como PUBLICADO reemplazando el que ya exista, SIN borrar
+ * nada antes de tener el contenido nuevo listo.
+ *
+ * - Si no existe ningún recurso de ese tipo para el capítulo: lo inserta.
+ * - Si existe: ACTUALIZA el más reciente en el mismo registro (conserva su id,
+ *   views, destacado, orden, etc.) y solo después borra duplicados viejos,
+ *   si los hubiera (por ejemplo, de corridas antiguas con forzar=true).
+ *
+ * Se debe llamar únicamente cuando el contenido nuevo ya pasó la validación.
+ */
+export async function reemplazarOCrearRecursoPublicado({
+  chapterId,
+  tipo,
+  titulo,
+  slug,
+  contenidoHtml,
+}) {
+  if (!supabase) {
+    console.warn("No hay conexión a Supabase configurada — no se guardó nada.");
+    return null;
+  }
+
+  const { data: existentes, error: errorBusqueda } = await supabase
+    .from("resources")
+    .select("id, created_at")
+    .eq("chapter_id", chapterId)
+    .eq("tipo", tipo)
+    .order("created_at", { ascending: false });
+
+  if (errorBusqueda) {
+    throw new Error(`Error buscando el recurso a reemplazar: ${errorBusqueda.message}`);
+  }
+
+  // Caso 1: no había nada, se inserta normalmente.
+  if (!existentes || existentes.length === 0) {
+    return await guardarRecursoComoPublicado({
+      chapterId,
+      tipo,
+      titulo,
+      slug,
+      contenidoHtml,
+    });
+  }
+
+  // Caso 2: ya existía. Se actualiza el más reciente en su mismo registro.
+  const [principal, ...duplicados] = existentes;
+
+  const { data, error } = await supabase
+    .from("resources")
+    .update({
+      titulo,
+      slug,
+      contenido_html: contenidoHtml,
+      modo: "html",
+      publicado: true,
+    })
+    .eq("id", principal.id)
+    .select();
+
+  if (error) {
+    throw new Error(`Error actualizando el recurso existente: ${error.message}`);
+  }
+  console.log(`   🔄 Recurso existente actualizado en su mismo registro (id=${principal.id}).`);
+
+  // Solo ahora, con el nuevo ya guardado, se limpian duplicados viejos.
+  for (const viejo of duplicados) {
+    await eliminarRecurso(viejo.id);
+    console.log(`   🗑️  Duplicado antiguo eliminado (id=${viejo.id}).`);
+  }
+
+  return data;
+}
+
+/**
  * Obtiene TODOS los versículos de un capítulo específico de una sola vez.
  * Devuelve un string formateado listo para ser inyectado en el Prompt.
  */

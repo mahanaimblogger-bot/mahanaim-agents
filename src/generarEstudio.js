@@ -7,8 +7,7 @@ import {
   obtenerBookIdPorSlug,
   obtenerOCrearChapterId,
   existeRecurso,
-  eliminarRecursoExistente,
-  guardarRecursoComoPublicado, // <-- IMPORTAMOS LA NUEVA FUNCIÓN
+  reemplazarOCrearRecursoPublicado,
   obtenerTextoCapituloCompleto,
 } from "./supabaseClient.js";
 
@@ -29,22 +28,30 @@ function generarSlug(libro, capitulo, tipo) {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Limpia la respuesta cruda del modelo SIN tocar el cuerpo del estudio.
+ *
+ * Solo actúa en los EXTREMOS del texto:
+ *  - Quita las cercas de código (```html ... ```) del inicio y del final.
+ *  - Quita todo lo que haya ANTES del primer <h1 o <div (texto introductorio
+ *    como "Aquí tienes el estudio...", o el <head>/<style> copiado de la plantilla).
+ *  - Quita texto suelto que haya DESPUÉS del último </div> (despedidas del modelo).
+ *
+ * IMPORTANTE: no uses reemplazos con frases sueltas como "A continuación"
+ * o "estudio" aquí: sin ancla borran párrafos reales del cuerpo del estudio.
+ */
 function limpiarCercasDeCodigo(texto) {
   return texto
-    // Eliminar marcadores de código
-    .replace(/^```html\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/```\s*$/i, "")
-    // Eliminar texto introductorio común que la IA agrega
-    .replace(/Aquí tienes[\s\S]*?Prompt Maestro[\s\S]*?/gi, "")
-    .replace(/y las notas proporcionadas[.\s]*/gi, "")
-    .replace(/siguiendo estrictamente[\s\S]*?Prompt Maestro[\s\S]*?/gi, "")
-    .replace(/en formato HTML[\s\S]*?/gi, "")
-    .replace(/A continuación[\s\S]*?estudio[\s\S]*?/gi, "")
-    .replace(/Generado[\s\S]*?Prompt[\s\S]*?/gi, "")
-    // Eliminar cualquier texto antes del primer <h1 o <div
+    .trim()
+    // Cercas de código al inicio y al final
+    .replace(/^```(?:html|markdown)?\s*/i, "")
+    .replace(/\s*```\s*$/i, "")
+    // Todo lo anterior al primer <h1 o <div (solo al INICIO del texto)
     .replace(/^[\s\S]*?(?=<h1|<div)/i, "")
-    // Limpieza final
+    // Cierres </body></html> sueltos al final (si el modelo copió la plantilla completa)
+    .replace(/(?:\s*<\/(?:body|html)>)+\s*$/i, "")
+    // Texto suelto después del último </div> (solo al FINAL del texto)
+    .replace(/(<\/div>)[^<]*$/i, "$1")
     .trim();
 }
 
@@ -95,7 +102,9 @@ export async function generarEstudio({
       return { omitido: true };
     }
   } else {
-    await eliminarRecursoExistente(chapterId, "estudio");
+    // forzar=true: NO se borra nada ahora. El estudio actual se mantiene intacto
+    // y solo se reemplaza al final, si el nuevo se generó y pasó la validación.
+    console.log(`   ♻️  forzar=true: el estudio actual se conserva hasta que el nuevo pase la validación.`);
   }
 
   const promptMaestro = await readFile(path.join(process.cwd(), "prompts", "prompt-maestro.txt"), "utf-8");
@@ -141,12 +150,9 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
 
   const respuestaCruda = await generarConDeepSeek(promptMaestro, mensajeUsuario, 32000);
   const html = limpiarCercasDeCodigo(respuestaCruda);
-    // 🧹 Limpieza adicional: Eliminar texto introductorio no deseado y marcadores de código
-  let htmlLimpio = html
-    .replace(/Aquí tienes[\s\S]*?Prompt Maestro[\s\S]*?/gi, '')
-    .replace(/```html\s*/gi, '')
-    .replace(/```markdown\s*/gi, '')
-    .replace(/```\s*/gi, '')
+  // 🧹 Limpieza adicional: solo cercas de código sueltas (sin frases que borren contenido)
+  const htmlLimpio = html
+    .replace(/```(?:html|markdown)?\s*/gi, "")
     .trim();
 
   const { valido, errores, htmlCorregido, citasCorregidas } = await validarEstudio(htmlLimpio, minimoPalabras);
@@ -175,8 +181,8 @@ Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
 
   const slug = generarSlug(libro, capitulo, "estudio");
 
-  // 🚀 GUARDAR DIRECTAMENTE COMO PUBLICADO
-  await guardarRecursoComoPublicado({
+  // 🚀 GUARDAR COMO PUBLICADO (si ya existía uno, se actualiza en su mismo registro)
+  await reemplazarOCrearRecursoPublicado({
     chapterId,
     tipo: "estudio",
     titulo,

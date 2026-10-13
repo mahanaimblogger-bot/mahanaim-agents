@@ -1,6 +1,5 @@
-import { readFile } from "fs/promises";
-import path from "path";
 import { obtenerVersiculoPorSlug } from "./supabaseClient.js";
+import { resolverSlugLibro } from "./librosBiblia.js";
 
 /**
  * Normaliza un texto para comparación: minúsculas, sin puntuación, espacios únicos.
@@ -14,22 +13,11 @@ function normalizarTexto(texto) {
 }
 
 /**
- * Busca el slug del libro en libros.json basado en el nombre o abreviatura.
+ * Devuelve el slug del libro a partir de su nombre o abreviatura (coincidencia EXACTA).
+ * "Ro" -> romanos, "Is" -> isaias, "1 Co" -> 1-corintios. Si no lo reconoce, null.
  */
 async function obtenerSlugLibro(nombreLibro) {
-  const librosPath = path.join(process.cwd(), "libros.json");
-  const librosData = await readFile(librosPath, "utf-8");
-  const libros = JSON.parse(librosData);
-  
-  const nombreNormalizado = normalizarTexto(nombreLibro);
-  
-  const libroEncontrado = libros.find((libro) => {
-    const nombreNorm = normalizarTexto(libro.nombre);
-    const slugNorm = normalizarTexto(libro.slug);
-    return nombreNorm.includes(nombreNormalizado) || slugNorm.includes(nombreNormalizado);
-  });
-
-  return libroEncontrado ? libroEncontrado.slug : null;
+  return resolverSlugLibro(nombreLibro);
 }
 
 /**
@@ -86,6 +74,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   let citasCorregidas = 0;
   let citasValidadas = 0;
   let referenciasAgregadas = 0;
+  const nombresNoReconocidos = new Set();
 
   // PASO 1: Verificar tooltips existentes contra Supabase
   const tooltipRegex = /<span class="tooltip-cita">(.*?)<\/span>([\s\S]*?)(?=<\/span>\s*<\/span>)/g;
@@ -101,7 +90,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   }
 
   for (const cita of tooltipsExistentes) {
-    const matchRef = cita.referenciaCompleta.match(/^([a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-]+?)\s+(\d+):(\d+)/i);
+    const matchRef = cita.referenciaCompleta.match(/^((?:[1-3]\s*)?[a-zA-ZáéíóúñÁÉÍÓÚÑ][a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-.]*?)\s+(\d+):(\d+)/i);
     
     if (matchRef) {
       const nombreLibro = matchRef[1].trim();
@@ -109,6 +98,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
       const verso = parseInt(matchRef[3], 10);
 
       const slugLibro = await obtenerSlugLibro(nombreLibro);
+      if (!slugLibro) nombresNoReconocidos.add(nombreLibro);
 
       if (slugLibro) {
         const textoReal = await obtenerVersiculoPorSlug(slugLibro, capitulo, verso);
@@ -136,7 +126,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
 
   // PASO 2: Detectar referencias cruzadas SIN tooltip y agregarlas
   // Regex segura para Node.js: busca patrones como (Dt 34:8), (Éx 28:35,43), (Ro 4:17)
-  const referenciasDesnudasRegex = /\(([a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-]+?)\s+(\d+):(\d+(?:,\d+)*?)\)/g;
+  const referenciasDesnudasRegex = /\(((?:[1-3]\s*)?[a-zA-ZáéíóúñÁÉÍÓÚÑ][a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-.]*?)\s+(\d+):(\d+(?:,\d+)*?)\)/g;
   
   // Dividimos el HTML para NO tocar lo que ya está dentro de <span class="biblia-ref">
   const partes = htmlCorregido.split(/(<span class="biblia-ref">[\s\S]*?<\/span>)/g);
@@ -159,6 +149,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
         const endIndex = startIndex + matchTexto.length;
 
         const slugLibro = await obtenerSlugLibro(nombreLibro);
+        if (!slugLibro) nombresNoReconocidos.add(nombreLibro);
         if (slugLibro) {
           const primerVerso = parseInt(versos.split(',')[0], 10);
           const textoReal = await obtenerVersiculoPorSlug(slugLibro, capitulo, primerVerso);
@@ -180,6 +171,9 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   htmlCorregido = partes.join('');
 
   console.log(`   📊 Resumen: ${citasValidadas} tooltips validados | ${citasCorregidas} corregidos | ${referenciasAgregadas} nuevos tooltips agregados`);
+  if (nombresNoReconocidos.size > 0) {
+    console.log(`   ℹ️  Referencias con libro no reconocido (no se validaron): ${[...nombresNoReconocidos].join(", ")}`);
+  }
 
   const valido = errores.length === 0;
 
