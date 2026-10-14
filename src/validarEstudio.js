@@ -193,6 +193,7 @@ async function agregarTooltipsEnProsa(html, nombresNoReconocidos) {
  */
 export async function validarEstudio(html, minimoPalabras = 3500) {
   const errores = [];
+  const advertencias = []; // avisos de estilo: se muestran en el log pero NO impiden guardar el estudio
   let htmlCorregido = html;
 
   if (!html || html.trim().length === 0) {
@@ -223,6 +224,25 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   if (/\[TÍTULO|\[REFERENCIA|\[DATOS\]|\[CONTENIDO/i.test(html)) {
     errores.push("Quedó un [PLACEHOLDER] sin rellenar.");
   }
+
+  // Validación de estilo del título (reglas del prompt: sin dos puntos, máx. 60 caracteres, no genérico).
+  // Solo son ADVERTENCIAS: rechazar el estudio por esto tiraría una generación completa.
+  const matchTitulo = html.match(/<h1[^>]*class="[^"]*titulo-entrada[^"]*"[^>]*>([\s\S]*?)<\/h1>/i);
+  if (!matchTitulo) {
+    advertencias.push("No se encontró el título (<h1 class=\"titulo-entrada\">).");
+  } else {
+    const titulo = matchTitulo[1].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    if (titulo.includes(":")) {
+      advertencias.push(`El título tiene dos puntos (el prompt lo prohíbe): "${titulo}"`);
+    }
+    if (titulo.length > 60) {
+      advertencias.push(`El título tiene ${titulo.length} caracteres (máximo 60): "${titulo}"`);
+    }
+    if (/^(estudio|an[aá]lisis|resumen)\s+(b[ií]blico\s+)?(de|del|sobre)\b/i.test(titulo)) {
+      advertencias.push(`El título es genérico: "${titulo}"`);
+    }
+  }
+  for (const aviso of advertencias) console.log(`   ⚠️  ${aviso}`);
 
   // Validación de la imagen de portada (ÚNICA imagen permitida)
   if (!/<!--\s*IMAGEN_SUGERIDA_PORTADA:/i.test(html)) {
@@ -306,6 +326,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   return { 
     valido, 
     errores, 
+    advertencias,
     htmlCorregido,
     citasCorregidas: citasCorregidas + referenciasAgregadas 
   };
