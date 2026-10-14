@@ -24,8 +24,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Instalar dependencias
+        - name: Instalar dependencias (raíz)
         run: npm install
+
+      - name: Instalar dependencias (audio-tts)
+        run: npm install
+        working-directory: audio-tts
 
       - name: Generar audio con Google TTS
         env:
