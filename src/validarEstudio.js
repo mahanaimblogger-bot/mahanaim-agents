@@ -20,6 +20,172 @@ async function obtenerSlugLibro(nombreLibro) {
   return resolverSlugLibro(nombreLibro);
 }
 
+// ==========================================================
+// TOOLTIPS PARA REFERENCIAS BÍBLICAS EN EL TEXTO (PROSA)
+// ==========================================================
+
+const MAX_VERSOS_TOOLTIP = 6;
+
+// Zonas del HTML donde NO se deben agregar tooltips (títulos, índice, cajas de cita, enlaces...)
+const ETIQUETAS_VACIAS = new Set([
+  "br", "hr", "img", "input", "meta", "link", "area", "base", "col", "embed", "source", "track", "wbr",
+]);
+const ETIQUETAS_OMITIDAS = new Set([
+  "a", "h1", "h2", "h3", "h4", "h5", "h6", "style", "script", "title", "head",
+  "button", "select", "textarea", "pre", "code",
+]);
+const CLASES_OMITIDAS = [
+  "biblia-ref", "tooltip-text", "tooltip-cita", "cita-versiculo",
+  "indice-nav", "ref-etiqueta", "volver-indice",
+];
+
+// Ej.: "Génesis 21:10", "Fil 2:6-7", "Éx 28:35,43", "1 Co 3:5" (el nombre se valida luego con librosBiblia.js)
+const NOMBRE_LIBRO = "[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚáéíóúñÑ]*\\.?";
+const ESPEC_VERSOS = "\\d+(?:\\s?[-–]\\s?\\d+)?(?:\\s?,\\s?\\d+(?:\\s?[-–]\\s?\\d+)?)*";
+const REGEX_REFERENCIA = new RegExp(
+  `(?<![A-Za-zÁÉÍÓÚáéíóúñÑ\\d])((?:[1-3][ \\u00A0]?)?${NOMBRE_LIBRO})[ \\u00A0](\\d{1,3}):(${ESPEC_VERSOS})`,
+  "g"
+);
+
+const cacheVersiculos = new Map(); // solo guarda aciertos (si falla la red, se reintenta)
+
+async function leerVersiculo(slug, capitulo, verso) {
+  const clave = `${slug}|${capitulo}|${verso}`;
+  if (cacheVersiculos.has(clave)) return cacheVersiculos.get(clave);
+  const texto = await obtenerVersiculoPorSlug(slug, capitulo, verso);
+  if (texto) cacheVersiculos.set(clave, texto);
+  return texto;
+}
+
+function escaparHtml(texto) {
+  return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** "17-20" -> [17,18,19,20] | "35,43" -> [35,43] */
+function expandirVersos(especificacion) {
+  const lista = [];
+  for (const trozo of especificacion.split(",")) {
+    const m = trozo.trim().match(/^(\d+)(?:\s?[-–]\s?(\d+))?$/);
+    if (!m) continue;
+    const desde = parseInt(m[1], 10);
+    const hasta = m[2] ? parseInt(m[2], 10) : desde;
+    if (hasta < desde || hasta - desde > 40) {
+      lista.push(desde);
+      continue;
+    }
+    for (let v = desde; v <= hasta; v++) lista.push(v);
+  }
+  return [...new Set(lista)];
+}
+
+/** Texto RVR1960 para el tooltip: un versículo solo, o "17. texto 18. texto" si son varios. */
+async function textoParaTooltip(slug, capitulo, especificacion) {
+  const versos = expandirVersos(especificacion);
+  if (versos.length === 0) return null;
+
+  const mostrados = versos.slice(0, MAX_VERSOS_TOOLTIP);
+  const encontrados = [];
+  for (const v of mostrados) {
+    const texto = await leerVersiculo(slug, capitulo, v);
+    if (texto) encontrados.push({ verso: v, texto });
+  }
+  if (encontrados.length === 0) return null;
+
+  let resultado =
+    encontrados.length === 1 && versos.length === 1
+      ? escaparHtml(encontrados[0].texto)
+      : encontrados.map((e) => `${e.verso}. ${escaparHtml(e.texto)}`).join(" ");
+
+  if (versos.length > MAX_VERSOS_TOOLTIP) resultado += " …";
+  return resultado;
+}
+
+function abreContextoOmitido(etiquetaCompleta, nombre) {
+  if (ETIQUETAS_OMITIDAS.has(nombre)) return true;
+  const m = etiquetaCompleta.match(/class\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
+  if (!m) return false;
+  const clases = (m[1] ?? m[2]).split(/\s+/);
+  return CLASES_OMITIDAS.some((c) => clases.includes(c));
+}
+
+/**
+ * Recorre el HTML y agrega tooltip a cada referencia bíblica que aparezca en
+ * texto corrido, sin tocar etiquetas, títulos, índice, cajas de cita ni tooltips ya existentes.
+ */
+async function agregarTooltipsEnProsa(html, nombresNoReconocidos) {
+  let agregadas = 0;
+
+  async function procesarTexto(texto) {
+    const coincidencias = [...texto.matchAll(REGEX_REFERENCIA)];
+    if (coincidencias.length === 0) return texto;
+
+    let resultado = "";
+    let cursor = 0;
+    for (const m of coincidencias) {
+      const [completo, nombre, capitulo, versos] = m;
+      resultado += texto.slice(cursor, m.index);
+      cursor = m.index + completo.length;
+
+      let reemplazo = completo;
+      const slug = resolverSlugLibro(nombre);
+      if (!slug) {
+        nombresNoReconocidos.add(nombre);
+      } else {
+        const textoTooltip = await textoParaTooltip(slug, parseInt(capitulo, 10), versos);
+        if (textoTooltip) {
+          reemplazo =
+            `<span class="biblia-ref">${completo}<span class="tooltip-text">` +
+            `<span class="tooltip-cita">${completo}</span>${textoTooltip}</span></span>`;
+          agregadas++;
+          console.log(`   ➕ Agregado tooltip para "${completo}"`);
+        }
+      }
+      resultado += reemplazo;
+    }
+    return resultado + texto.slice(cursor);
+  }
+
+  // Los elementos impares son etiquetas o comentarios; los pares, texto.
+  const partes = html.split(/(<!--[\s\S]*?-->|<\/?[a-zA-Z][^>]*>)/g);
+  const pila = [];
+  let omitidos = 0;
+
+  for (let i = 0; i < partes.length; i++) {
+    const parte = partes[i];
+
+    if (i % 2 === 0) {
+      if (omitidos === 0 && parte.trim().length > 0) {
+        partes[i] = await procesarTexto(parte);
+      }
+      continue;
+    }
+    if (parte.startsWith("<!--")) continue;
+
+    const nombre = parte.match(/^<\/?([a-zA-Z][a-zA-Z0-9]*)/)[1].toLowerCase();
+
+    if (parte.startsWith("</")) {
+      let idx = -1;
+      for (let j = pila.length - 1; j >= 0; j--) {
+        if (pila[j].nombre === nombre) { idx = j; break; }
+      }
+      if (idx !== -1) {
+        while (pila.length > idx) {
+          if (pila.pop().omitir) omitidos--;
+        }
+      }
+      continue;
+    }
+
+    if (ETIQUETAS_VACIAS.has(nombre) || /\/\s*>$/.test(parte)) continue;
+
+    const omitir = abreContextoOmitido(parte, nombre);
+    pila.push({ nombre, omitir });
+    if (omitir) omitidos++;
+  }
+
+  return { html: partes.join(""), agregadas };
+}
+
 /**
  * Validaciones automáticas + CORRECCIÓN AUTOMÁTICA de citas.
  * 1. Verifica que los tooltips existentes estén correctos
@@ -124,51 +290,11 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
     }
   }
 
-  // PASO 2: Detectar referencias cruzadas SIN tooltip y agregarlas
-  // Regex segura para Node.js: busca patrones como (Dt 34:8), (Éx 28:35,43), (Ro 4:17)
-  const referenciasDesnudasRegex = /\(((?:[1-3]\s*)?[a-zA-ZáéíóúñÁÉÍÓÚÑ][a-zA-ZáéíóúñÁÉÍÓÚÑ\s\-.]*?)\s+(\d+):(\d+(?:,\d+)*?)\)/g;
-  
-  // Dividimos el HTML para NO tocar lo que ya está dentro de <span class="biblia-ref">
-  const partes = htmlCorregido.split(/(<span class="biblia-ref">[\s\S]*?<\/span>)/g);
-  
-  for (let i = 0; i < partes.length; i++) {
-    const parte = partes[i];
-    // Si la parte NO es un span de biblia-ref (los impares son los spans por el split con captura)
-    if (!parte.startsWith('<span class="biblia-ref">')) {
-      // Encontrar todas las coincidencias en esta parte
-      const coincidencias = [...parte.matchAll(referenciasDesnudasRegex)];
-      
-      // Procesamos de atrás hacia adelante para no alterar los índices de reemplazo
-      for (let j = coincidencias.length - 1; j >= 0; j--) {
-        const match = coincidencias[j];
-        const nombreLibro = match[1].trim();
-        const capitulo = parseInt(match[2], 10);
-        const versos = match[3];
-        const matchTexto = match[0];
-        const startIndex = match.index;
-        const endIndex = startIndex + matchTexto.length;
-
-        const slugLibro = await obtenerSlugLibro(nombreLibro);
-        if (!slugLibro) nombresNoReconocidos.add(nombreLibro);
-        if (slugLibro) {
-          const primerVerso = parseInt(versos.split(',')[0], 10);
-          const textoReal = await obtenerVersiculoPorSlug(slugLibro, capitulo, primerVerso);
-
-          if (textoReal) {
-            const referenciaFormateada = `${nombreLibro} ${capitulo}:${versos}`;
-            const htmlConTooltip = `<span class="biblia-ref">${referenciaFormateada}<span class="tooltip-text"><span class="tooltip-cita">${referenciaFormateada}</span>${textoReal}</span></span>`;
-            
-            // Reemplazar en la parte
-            partes[i] = partes[i].substring(0, startIndex) + htmlConTooltip + partes[i].substring(endIndex);
-            console.log(`   ➕ Agregado tooltip para "${referenciaFormateada}"`);
-            referenciasAgregadas++;
-          }
-        }
-      }
-    }
-  }
-  
-  htmlCorregido = partes.join('');
+  // PASO 2: Agregar tooltip a TODA referencia bíblica que esté en el texto sin tooltip
+  // (con o sin paréntesis, con rangos "17-20" y listas "35,43"; no toca títulos, índice ni cajas de cita)
+  const resultadoProsa = await agregarTooltipsEnProsa(htmlCorregido, nombresNoReconocidos);
+  htmlCorregido = resultadoProsa.html;
+  referenciasAgregadas = resultadoProsa.agregadas;
 
   console.log(`   📊 Resumen: ${citasValidadas} tooltips validados | ${citasCorregidas} corregidos | ${referenciasAgregadas} nuevos tooltips agregados`);
   if (nombresNoReconocidos.size > 0) {
