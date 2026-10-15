@@ -23,7 +23,10 @@ jobs:
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
-
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # <-- Agrega estas dos líneas
+          fetch-depth: 0                     # <-- Asegura que tenga todo el historial para hacer push
+     
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
