@@ -1,0 +1,164 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Filemón | Capítulo: 1
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El esclavo que volvió como hermano - Filemón 1
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El esclavo que volvió como hermano - Filemón 1</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Filemón Capítulo 1</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Colosas ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.2603!3d37.7765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.7765, 29.2603!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (implícito, ya que Filemón vivía en Colosas)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.7765°N, 29.2603°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Colosas fue una antigua ciudad de Frigia, en Asia Menor (actual Turquía). Estaba situada en el valle del río Licos, cerca de Laodicea y Hierápolis. En la época romana, era una ciudad próspera pero en declive. Las ruinas se encuentran cerca de la aldea moderna de Honaz. La ciudad es conocida por la epístola a los Colosenses y la carta a Filemón.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Colosas es el hogar de Filemón, el destinatario de la carta, y de la iglesia que se reunía en su casa. Representa el contexto donde el esclavo Onésimo debe ser recibido como hermano. Es el lugar donde la transformación social del evangelio debe manifestarse.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Roma ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d12.4964!3d41.9028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z41.9028, 12.4964!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (Pablo prisionero en Roma)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 41.9028°N, 12.4964°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Roma era la capital del Imperio Romano, una ciudad de aproximadamente un millón de habitantes en el siglo I d.C. Pablo estuvo bajo arresto domiciliario en Roma alrededor del 60-62 d.C., donde escribió las epístolas de la cautividad, incluyendo Filemón. La tradición sitúa su prisión en una casa alquilada (Hechos 28:30).</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Roma es el lugar desde donde Pablo escribe, encadenado pero espiritualmente libre. Representa la base del ministerio de Pablo y el centro desde donde el evangelio se extiende. La carta a Filemón fue escrita desde aquí, mostrando que el evangelio trasciende las barreras geográficas y sociales.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Laodicea ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.1081!3d37.8361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.8361, 29.1081!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (mencionada indirectamente por la iglesia en casa de Filemón, y en Colosenses 4:16)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.8361°N, 29.1081°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Laodicea era una ciudad importante en el valle del Licos, cerca de Colosas. Fue un centro comercial y financiero próspero. Las ruinas están cerca de la ciudad moderna de Denizli, Turquía. La iglesia de Laodicea es una de las siete iglesias del Apocalipsis.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Aunque no se menciona explícitamente en Filemón, Laodicea estaba muy cerca de Colosas y la carta a los Colosenses debía ser leída también allí (Colosenses 4:16). Esto muestra la interconexión de las iglesias primitivas y la expansión del evangelio en la región.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    4. Hierápolis ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.1264!3d37.9256!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.9256, 29.1264!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (mencionada en Colosenses 4:13, contexto cercano a Colosas)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.9256°N, 29.1264°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Hierápolis era una ciudad antigua en Frigia, cerca de Colosas y Laodicea. Era conocida por sus aguas termales y su templo a Apolo. Las ruinas están cerca de la actual Pamukkale, Turquía. Epafras, colaborador de Pablo, trabajó en esta región.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Aunque no se menciona directamente en Filemón, Hierápolis forma parte del contexto geográfico y eclesial de la carta. La iglesia en el valle del Licos estaba interconectada, y la carta a Filemón refleja la vida de estas comunidades.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    5. Éfeso 🟡
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d27.3408!3d37.9397!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.9397, 27.3408!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (posible lugar de encuentro de Pablo y Onésimo, aunque no se menciona explícitamente)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.9397°N, 27.3408°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Éfeso era una de las ciudades más importantes del Imperio Romano en Asia Menor. Pablo ministró allí durante tres años (Hechos 19). Era un centro comercial y religioso, famoso por el templo de Artemisa. Las ruinas están cerca de la actual Selçuk, Turquía.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Aunque no se menciona en Filemón, Éfeso es relevante porque Pablo pudo haber conocido a Onésimo allí, y porque era un centro clave para la difusión del evangelio en la región. La carta a Filemón pudo haber sido enviada desde Roma a Colosas pasando por Éfeso.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Probable
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Colosas (37.7765, 29.2603) - confirmada
+2. Roma (41.9028, 12.4964) - confirmada
+3. Laodicea (37.8361, 29.1081) - confirmada
+4. Hierápolis (37.9256, 29.1264) - confirmada
+5. Éfeso (37.9397, 27.3408) - probable
+
+ NOTA METODOLÓGICA:
+Las ubicaciones de Colosas, Roma, Laodicea y Hierápolis están arqueológicamente confirmadas y sus coordenadas son precisas. Éfeso también está confirmada, pero su conexión con Filemón es inferida por el contexto misionero de Pablo. No se mencionan otras ubicaciones geográficas explícitas en Filemón, pero el trasfondo geográfico incluye estas ciudades clave para entender la carta. La carta fue escrita desde Roma (probablemente) y enviada a Colosas, con posibles referencias a la región del valle del Licos.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Filemón, Capítulo: 1
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.

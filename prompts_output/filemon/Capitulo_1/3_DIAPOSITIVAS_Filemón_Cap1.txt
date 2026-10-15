@@ -1,0 +1,22 @@
+﻿═══════════════════════════════════════════
+PROMPT PARA DIAPOSITIVAS - NOTEBOOKLM
+Libro: Filemón | Capítulo: 1
+═══════════════════════════════════════════
+
+📋 INSTRUCCIONES:
+───────────────────────────────────────────
+Actúa como experto en educación bíblica y diseño instruccional. Genera una presentación de 6 diapositivas para NotebookLM basada en el estudio expositivo de Filemón capítulo 1, titulado 'El esclavo que volvió como hermano' (tema central: 'De esclavo fugitivo a hermano amado', texto base Filemón 1:1-25). Respeta esta estructura: Portada, Desarrollo, Conclusión.
+
+Diapositiva 1 (Portada): Título 'El esclavo que volvió como hermano', subtítulo 'De esclavo fugitivo a hermano amado', referencia Filemón 1:1-25, ambientación visual con paleta dorada (#d4ac0d) y azul profundo (#1a3a5c), estilo tipográfico Georgia serif elegante.
+
+Diapositiva 2 (Contexto histórico-arqueológico): Sitúa la carta en el siglo I d.C., probablemente escrita desde Roma. Explica el sistema de esclavitud del Imperio Romano, la figura del esclavo fugitivo (Onésimo), la ciudad de Colosas y el rol de un amo adinerado como Filemón. Menciona que es la carta más breve y personal de Pablo, escrita a mano y con 25 versículos.
+
+Diapositiva 3 (Análisis de personajes y palabras clave): Presenta a Pablo (anciano encadenado), Onésimo (esclavo fugitivo que se convierte) y Filemón (amo creyente). Incluye 2-3 palabras clave en griego con su significado (por ejemplo, 'doulos', 'adelphos', 'agapetos') y explica cómo Pablo transforma el lenguaje de propiedad en lenguaje de fraternidad.
+
+Diapositiva 4 (Desarrollo del mensaje central): Expone cómo Pablo intercede por Onésimo, ofreciéndose a pagar cualquier deuda y pidiendo que sea recibido 'no como esclavo, sino como hermano amado'. Resalta el principio de reconciliación y la aplicación del evangelio a las relaciones sociales de la época.
+
+Diapositiva 5 (Aplicación teológica y práctica): Extrae lecciones: la gracia que transforma identidades, la intercesión que restaura, el perdón que dignifica. Aplica a la iglesia actual: cómo tratamos al 'otro', la reconciliación en comunidad y el valor de cada persona ante Dios.
+
+Diapositiva 6 (Conclusión): Sintetiza el mensaje: 'Una carta que cambia una vida porque aplica el evangelio a una relación rota'. Cierra con una pregunta de reflexión para la audiencia y una frase final que conecte Filemón con la obra redentora de Cristo como modelo de intercesión y hermandad.
+
+Estilo general: tono expositivo, reverente y didáctico; lenguaje claro y accesible; cada diapositiva debe incluir título, 3-5 ideas breves en viñetas y una nota visual sugerida (colores, símbolos o imágenes). Mantén coherencia estética con paleta dorada y azul serif. Extensión total máxima: 4000 caracteres.

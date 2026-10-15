@@ -1,0 +1,69 @@
+﻿═══════════════════════════════════════════
+PROMPT PARA MAPA MENTAL - NOTEBOOKLM
+Libro: Filemón | Capítulo: 1
+═══════════════════════════════════════════
+
+📋 INSTRUCCIONES:
+───────────────────────────────────────────
+Genera un mapa mental esquemático en NotebookLM sobre el libro de Filemón capítulo 1, titulado 'El esclavo que volvió como hermano'.
+
+TEMA CENTRAL: La transformación redentora del evangelio: Onésimo pasa de esclavo fugitivo (doulos) a hermano amado (adelphos agapētos) mediante la intercesión de Pablo, reflejando la obra de Cristo como mediador.
+
+RAMAS PRINCIPALES Y SUBRAMAS:
+
+1. CONTEXTO HISTÓRICO (siglo I d.C., Roma/Colosas)
+   - Pablo prisionero en Roma, anciano encadenado
+   - Onésimo: esclavo fugitivo de Filemón en Colosas
+   - Filemón: creyente adinerado, líder de iglesia en su casa
+   - Sistema esclavista romano del siglo I
+   - Ley romana: esclavo fugitivo castigado severamente
+
+2. VERSÍCULOS CLAVE
+   - Filemón 1:6 - 'la comunicación de tu fe' (koinōnia)
+   - Filemón 1:10 - 'te ruego por mi hijo Onésimo' (parakalō)
+   - Filemón 1:16 - 'no como esclavo, sino como hermano amado'
+   - Filemón 1:17 - 'recíbelo como a mí mismo' (proslambanō)
+   - Filemón 1:18 - 'si en algo te ha ofendido... ponlo a mi cuenta'
+   - Filemón 1:20 - 'refrigera mi corazón en el Señor'
+
+3. PALABRAS ORIGINALES GRIEGAS
+   - Doulos (δοῦλος): esclavo, siervo
+   - Adelphos agapētos (ἀδελφὸς ἀγαπητός): hermano amado
+   - Parakalō (παρακαλῶ): ruego, exhorto, consuelo
+   - Koinōnia (κοινωνία): comunión, participación
+   - Splagchna (σπλάγχνα): entrañas, compasión profunda
+   - Onēsimos (Ὀνήσιμος): útil, provechoso
+   - Epitassō (ἐπιτάσσω): mandar, ordenar
+   - Anapauō (ἀναπαύω): refrigerar, dar descanso
+   - Hekousios (ἑκούσιος): voluntario, espontáneo
+   - Charizomai (χαρίζομαι): perdonar, conceder gracia
+
+4. TEMAS TEOLÓGICOS
+   - Intercesión: Pablo como mediador, tipo de Cristo
+   - Redención: de esclavo a hermano
+   - Perdón y restauración de relaciones
+   - Providencia divina: la fuga se convierte en salvación
+   - Igualdad en Cristo: sin distinción social
+   - Gracia vs. obligación (v.14 - sin coacción)
+   - Imputación: 'ponlo a mi cuenta' (v.18)
+
+5. ESTRUCTURA DE LA CARTA
+   - Saludo (vv.1-3)
+   - Acción de gracias (vv.4-7)
+   - Súplica por Onésimo (vv.8-16)
+   - Petición de recibirlo (vv.17-21)
+   - Cierre y saludos (vv.22-25)
+
+6. APLICACIÓN PRÁCTICA
+   - Recibir al que falló como hermano
+   - Perdonar como Cristo nos perdonó
+   - Usar influencia para reconciliar, no para dominar
+   - La fe que se expresa en amor práctico
+
+7. CRISTO EN FILEMÓN
+   - Pablo como intercesor = Cristo mediador
+   - Onésimo = pecador redimido
+   - Filemón = receptor llamado a perdonar
+   - 'Recíbelo como a mí' = justificación imputada
+
+Usa estructura jerárquica clara con nodos conectados, referencias bíblicas exactas, términos griegos transliterados con significado, y flechas de relación entre conceptos. Estilo esquemático visual con colores dorado (#d4ac0d) y azul marino (#1a3a5c).
