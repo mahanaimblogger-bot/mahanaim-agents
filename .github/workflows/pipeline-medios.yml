@@ -1,0 +1,75 @@
+name: Pipeline de Producción de Medios (Imágenes, Audio, Video)
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: "Libro bíblico (ej: genesis, numeros, romanos, filemon)"
+        required: true
+        type: string
+      rango:
+        description: "Capítulo o rango (ej: 1, 22, 1-5)"
+        required: true
+        type: string
+
+jobs:
+  produccion-medios:
+    runs-on: ubuntu-latest
+    steps:
+      # ─────────────────────────────────────────
+      # 0. Preparación (Descarga lo que ya generó el Orquestador)
+      # ─────────────────────────────────────────
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        run: |
+          npm install
+          npm install --prefix audio-tts
+
+      # ─────────────────────────────────────────
+      # 1. Generar Imágenes (fal.ai)
+      # ─────────────────────────────────────────
+      - name: Paso 1 — Generar imágenes con fal.ai
+        env:
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+        run: |
+          node scripts/generar-imagenes.js "${{ inputs.libro }}" "${{ inputs.rango }}"
+
+      # ─────────────────────────────────────────
+      # 2. Generar Audio (Google TTS)
+      # ─────────────────────────────────────────
+      - name: Paso 2 — Generar audio con Google TTS
+        env:
+          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
+          VOZ_TTS: es-US-Wavenet-C
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node audio-tts/generar-audio.js "prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/guion_video_tts_google.ssml"
+
+      # ─────────────────────────────────────────
+      # 3. Ensamblar Video (FFmpeg)
+      # ─────────────────────────────────────────
+      - name: Paso 3 — Ensamblar video con FFmpeg
+        run: |
+          node video/ensamblar-video.js "${{ inputs.libro }}" "${{ inputs.rango }}"
+
+      # ─────────────────────────────────────────
+      # 4. Subir resultado final como artefacto
+      # ─────────────────────────────────────────
+      - name: Subir artefactos finales (Video y Audio)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resultado-final-${{ inputs.libro }}-${{ inputs.rango }}
+          # Ajusta estas rutas si tus scripts guardan los archivos con nombres diferentes
+          path: |
+            video/output_final.mp4
+            audio-tts/guion_video_tts_final.mp3
+            audio-tts/guion_video_tts_timestamps.json
