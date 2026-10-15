@@ -34,8 +34,17 @@ jobs:
 
       - name: Instalar dependencias de Node
         run: |
+          # 1. Instalar dependencias de la raíz
           npm install
-          npm install --prefix audio-tts
+
+          # 2. Forzar la instalación de fluent-ffmpeg en la raíz (solución definitiva)
+          npm install fluent-ffmpeg
+
+          # 3. Instalar dependencias de audio-tts si tiene su propio package.json
+          if [ -f audio-tts/package.json ]; then npm install --prefix audio-tts; fi
+
+          # 4. Instalar dependencias de video si tiene su propio package.json
+          if [ -f video/package.json ]; then npm install --prefix video; fi
 
       # ─────────────────────────────────────────
       # 1. Generar Imágenes (fal.ai)
