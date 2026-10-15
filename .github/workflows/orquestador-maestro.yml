@@ -24,9 +24,9 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # <-- Agrega estas dos líneas
-          fetch-depth: 0                     # <-- Asegura que tenga todo el historial para hacer push
-     
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
@@ -57,14 +57,23 @@ jobs:
             --rango="${{ github.event.inputs.rango }}" \
             --indicaciones="${{ github.event.inputs.indicaciones }}"
 
-      # --- PASO CLAVE: Guardar archivos en el repositorio para que los usen los otros workflows ---
+      # --- PASO CLAVE: Guardar archivos en el repositorio (Versión robusta a prueba de fallos) ---
       - name: Guardar archivos generados en el repositorio
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add prompts_output/
-          git commit -m "chore: orquestador generó archivos para ${{ github.event.inputs.libro }} cap. ${{ github.event.inputs.rango }}" || echo "No hay cambios nuevos para commitear"
-          git push
+
+          # Intentar agregar la carpeta. El '|| echo' evita que el workflow falle si no hay archivos
+          git add prompts_output/ || echo "⚠️ No se encontraron archivos válidos en prompts_output/ para agregar a Git."
+
+          # Verificar si hay cambios reales para hacer commit
+          if git diff --staged --quiet; then
+            echo "ℹ️ No hay cambios nuevos para commitear en el repositorio."
+          else
+            echo "✅ Cambios detectados. Haciendo commit y push..."
+            git commit -m "chore: orquestador generó archivos para ${{ github.event.inputs.libro }} cap. ${{ github.event.inputs.rango }}"
+            git push
+          fi
 
       # --- OPCIONAL: Subir artefactos para descarga rápida (no afecta al repo) ---
       - name: Subir artefactos (Prompts generados)
