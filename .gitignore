@@ -44,28 +44,33 @@ video/test-*.js
 video/test-*.mp4
 
 # ============================================
-# PROMPTS_OUTPUT: Ignorar todo el contenido, pero permitir archivos de texto
+# PROMPTS_OUTPUT: Configuración infalible
 # ============================================
 
-# Ignorar todo lo que hay DENTRO de prompts_output/ (el asterisco es clave)
-prompts_output/*
+# 1. Ignorar todo el contenido de la carpeta
+/prompts_output/*
 
-# PERMITIR (excepción) solo los archivos de texto ligeros que los workflows necesitan leer
-!prompts_output/**/*.json
-!prompts_output/**/*.ssml
-!prompts_output/**/*.txt
-!prompts_output/**/*.md
-!prompts_output/**/*.html
+# 2. PERMITIR que Git entre en las subcarpetas (¡ESTA ERA LA QUE FALTABA!)
+!/prompts_output/**/
 
-# VOLVER A IGNORAR lo pesado dentro de esa carpeta
-prompts_output/**/imagenes/
-prompts_output/**/video/
-prompts_output/**/*.mp3
-prompts_output/**/*.mp4
-prompts_output/**/*.wav
-prompts_output/**/*_timestamps.json
+# 3. PERMITIR los archivos de texto específicos
+!/prompts_output/**/*.json
+!/prompts_output/**/*.ssml
+!/prompts_output/**/*.txt
+!/prompts_output/**/*.md
+!/prompts_output/**/*.html
+
+# 4. VOLVER A IGNORAR lo pesado dentro de esas subcarpetas
+/prompts_output/**/imagenes/
+/prompts_output/**/video/
+/prompts_output/**/*.mp3
+/prompts_output/**/*.mp4
+/prompts_output/**/*.wav
+/prompts_output/**/*_timestamps.json
 
 # ============================================
-# BACKUP: Ignorar carpeta de respaldo local
+# BACKUP
 # ============================================
-prompts_output_backup/
+/prompts_output_backup/
+
+   # Forzando cambio para prueba
