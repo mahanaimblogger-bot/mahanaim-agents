@@ -44,3 +44,23 @@ tools/
 # Scripts de prueba temporales
 video/test-*.js
 video/test-*.mp4
+
+# ... (tus reglas actuales de node_modules, .env, etc. se quedan igual)
+
+# 1. Ignorar la carpeta de salida por defecto
+prompts_output/
+
+# 2. PERMITIR (excepción) solo los archivos de texto ligeros que los workflows necesitan leer
+!prompts_output/**/*.json
+!prompts_output/**/*.ssml
+!prompts_output/**/*.txt
+!prompts_output/**/*.md
+!prompts_output/**/*.html
+
+# 3. VOLVER A IGNORAR lo pesado dentro de esa carpeta (aunque estén en prompts_output)
+prompts_output/**/imagenes/
+prompts_output/**/video/
+prompts_output/**/*.mp3
+prompts_output/**/*.mp4
+prompts_output/**/*.wav
+prompts_output/**/*_timestamps.json"prompts_output_backup/" 
