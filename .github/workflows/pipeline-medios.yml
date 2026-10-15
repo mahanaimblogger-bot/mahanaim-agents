@@ -39,7 +39,13 @@ jobs:
         env:
           FAL_KEY: ${{ secrets.FAL_KEY }}
         run: |
+          # Crear archivo .env temporal para que el script lo encuentre en GitHub
+          echo "FAL_KEY=${FAL_KEY}" > .env
+
           node scripts/generar-imagenes.js "${{ inputs.libro }}" "${{ inputs.rango }}"
+
+          # Limpiar el archivo .env después de usarlo por seguridad
+          rm .env
 
       # ─────────────────────────────────────────
       # 2. Generar Audio (Google TTS)
@@ -68,7 +74,6 @@ jobs:
         if: always()
         with:
           name: resultado-final-${{ inputs.libro }}-${{ inputs.rango }}
-          # Ajusta estas rutas si tus scripts guardan los archivos con nombres diferentes
           path: |
             video/output_final.mp4
             audio-tts/guion_video_tts_final.mp3
