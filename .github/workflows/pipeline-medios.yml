@@ -57,7 +57,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          node audio-tts/generar-audio.js "prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/guion_video_tts_google.ssml"
+          node audio-tts/generar-audio.js "prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/guion_video_tts.ssml"
 
       # ─────────────────────────────────────────
       # 3. Ensamblar Video (FFmpeg)
