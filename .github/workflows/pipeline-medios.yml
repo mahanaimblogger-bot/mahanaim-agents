@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # ─────────────────────────────────────────
-      # 0. Preparación (Descarga lo que ya generó el Orquestador)
+      # 0. Preparación
       # ─────────────────────────────────────────
       - name: Checkout del repositorio
         uses: actions/checkout@v4
@@ -27,7 +27,12 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias del sistema (FFmpeg)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Instalar dependencias de Node
         run: |
           npm install
           npm install --prefix audio-tts
@@ -39,12 +44,8 @@ jobs:
         env:
           FAL_KEY: ${{ secrets.FAL_KEY }}
         run: |
-          # Crear archivo .env temporal para que el script lo encuentre en GitHub
           echo "FAL_KEY=${FAL_KEY}" > .env
-
           node scripts/generar-imagenes.js "${{ inputs.libro }}" "${{ inputs.rango }}"
-
-          # Limpiar el archivo .env después de usarlo por seguridad
           rm .env
 
       # ─────────────────────────────────────────
