@@ -12,15 +12,12 @@ node_modules/
 output/
 !output/.gitkeep
 
-# Artefactos generados por el orquestador
-prompts_output/
-
-# Archivos multimedia generados
+# Archivos multimedia generados (en cualquier parte del repo)
 *.mp3
 *.wav
 *.mp4
 
-# Timestamps generados por TTS
+# Timestamps generados por TTS (en cualquier parte del repo)
 *_timestamps.json
 
 # Archivos temporales
@@ -35,6 +32,7 @@ medir-estudio.js
 # Archivos sueltos creados por error
 /cd
 /ffmpeg
+
 # FFmpeg portable (no subir a GitHub)
 tools/
 
@@ -45,22 +43,29 @@ tools/
 video/test-*.js
 video/test-*.mp4
 
-# ... (tus reglas actuales de node_modules, .env, etc. se quedan igual)
+# ============================================
+# PROMPTS_OUTPUT: Ignorar todo el contenido, pero permitir archivos de texto
+# ============================================
 
-# 1. Ignorar la carpeta de salida por defecto
-prompts_output/
+# Ignorar todo lo que hay DENTRO de prompts_output/ (el asterisco es clave)
+prompts_output/*
 
-# 2. PERMITIR (excepción) solo los archivos de texto ligeros que los workflows necesitan leer
+# PERMITIR (excepción) solo los archivos de texto ligeros que los workflows necesitan leer
 !prompts_output/**/*.json
 !prompts_output/**/*.ssml
 !prompts_output/**/*.txt
 !prompts_output/**/*.md
 !prompts_output/**/*.html
 
-# 3. VOLVER A IGNORAR lo pesado dentro de esa carpeta (aunque estén en prompts_output)
+# VOLVER A IGNORAR lo pesado dentro de esa carpeta
 prompts_output/**/imagenes/
 prompts_output/**/video/
 prompts_output/**/*.mp3
 prompts_output/**/*.mp4
 prompts_output/**/*.wav
-prompts_output/**/*_timestamps.json"prompts_output_backup/" 
+prompts_output/**/*_timestamps.json
+
+# ============================================
+# BACKUP: Ignorar carpeta de respaldo local
+# ============================================
+prompts_output_backup/
