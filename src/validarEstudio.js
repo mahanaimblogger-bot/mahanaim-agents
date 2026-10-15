@@ -244,13 +244,7 @@ export async function validarEstudio(html, minimoPalabras = 3500) {
   }
   for (const aviso of advertencias) console.log(`   ⚠️  ${aviso}`);
 
-  // Validación de la imagen de portada (ÚNICA imagen permitida)
-  if (!/<!--\s*IMAGEN_SUGERIDA_PORTADA:/i.test(html)) {
-    errores.push("Falta el marcador de imagen de portada (<!-- IMAGEN_SUGERIDA_PORTADA: ... -->).");
-  }
-
-  // NOTA: Se eliminó la validación de mínimo 2 imágenes en el contenido, 
-  // ya que el nuevo estándar es usar SOLO la imagen de portada para mantener el diseño limpio.
+  // Los estudios ya no llevan imágenes: no se exige ningún marcador de imagen.
 
   // ==========================================================
   // CORRECCIÓN AUTOMÁTICA DE CITAS BÍBLICAS

@@ -84,7 +84,6 @@ export async function generarEstudio({
   libro,
   capitulo,
   video = "SIN VIDEO",
-  imagen = "SIN IMAGEN",
   minimoPalabras = 3500,
   forzar = false,
   indicacionManual = null,
@@ -120,7 +119,6 @@ export async function generarEstudio({
 - Libro: ${libro}
 - Capítulo: CAPÍTULO ${capitulo}
 - Enlace de video YouTube: ${video}
-- Enlace de imagen de portada: ${imagen}
 
 ### NOTAS DEL AUTOR (INDICACIONES ESPECIALES - PRIORITARIAS)
 ${indicacionEspecial && indicacionEspecial !== "SIN INDICACIONES ESPECIALES"
@@ -141,7 +139,7 @@ INSTRUCCIONES OBLIGATORIAS SOBRE CITAS:
 1. Cualquier cita del capítulo que estás estudiando DEBE ser una copia exacta, palabra por palabra, del texto proporcionado arriba.
 2. Para las REFERENCIAS CRUZADAS: usa SOLO citas que conozcas con 100% de certeza en la versión RVR1960. Si tienes duda, NO pongas el texto en el tooltip.
 3. NUNCA inventes un versículo.
-4. REGLA CRÍTICA SOBRE IMÁGENES: No sugieras, insertes ni marques placeholders para imágenes en el cuerpo del HTML. ÚNICAMENTE sugiere UNA (1) sola imagen al final bajo la clave "imagen_portada".
+4. SIN IMÁGENES: el estudio no lleva imágenes. No incluyas portada, ni etiquetas <img> (salvo la miniatura del bloque de video de YouTube, si hay enlace), ni comentarios <!-- IMAGEN_SUGERIDA ... --> en ningún lugar del HTML.
 
 Responde ÚNICAMENTE con el HTML completo, sin explicaciones antes o después.
 `.trim();

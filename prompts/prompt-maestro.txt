@@ -27,7 +27,6 @@ DATOS DE ENTRADA:
 - Capítulo: [CAPÍTULO 4]
 - Indicaciones especiales (opcional): [EJEMPLO: "Enfócate en la seguridad eterna" o "SIN INDICACIONES ESPECIALES"]
 - Enlace de video YouTube (opcional): [LINK o "SIN VIDEO"]
-- Enlace de imagen de portada (opcional): [URL o "SIN IMAGEN"]
 
 ---
 
@@ -158,7 +157,7 @@ REGLAS FUNDAMENTALES DE GENERACIÓN
 
 REGLA #1: PROFUNDIDAD SIN ABORRIMIENTO
 - Cada párrafo debe revelar algo que el lector NO sabía o no había conectado antes.
-- Usa giros dramáticos: "Aquí hay algo que pasa desapercibido...", "Pero esto tiene una implicación que pocos ven...", "El texto original revela algo que la traducción no captura..."
+- Usa giros dramáticos propios de ESTE pasaje, con palabras nuevas en cada estudio. NUNCA uses muletillas reutilizables como "Aquí hay algo que pasa desapercibido...", "Esto tiene una implicación que pocos ven..." o "El texto original revela algo que la traducción no captura...", ni repitas la misma estructura de frase dentro del estudio: ancla cada giro al texto concreto que estás exponiendo.
 - NUNCA repitas un concepto ya explicado. Si lo mencionaste, avanza.
 - Cada sección debe terminar con una idea que obligue al lector a continuar.
 
@@ -194,15 +193,7 @@ ESTRUCTURA DEL ESTUDIO HTML (ORDEN EXACTO)
 
 El HTML DEBE seguir exactamente este orden:
 
-1. IMAGEN DE PORTADA
-   - Si en los DATOS DE ENTRADA se proporcionó una URL de imagen real: <div class="imagen-portada"><img alt="[TÍTULO]" src="[URL]" /></div>
-   - Si NO se proporcionó imagen (dice "SIN IMAGEN"): en ese mismo lugar, justo antes del <h1>, agrega un comentario HTML con este formato exacto: <!-- IMAGEN_SUGERIDA_PORTADA: descripción -->. NO omitas esta sugerencia — siempre debe generarse una, sin importar el capítulo.
-   - La descripción dentro de ese marcador DEBE seguir SIEMPRE este estilo, como si fuera la miniatura/portada de un video devocional profesional:
-     * Estilo FOTORREALISTA y cinematográfico, con iluminación dramática, alta calidad, digno de una producción audiovisual profesional — nunca estilo dibujo, caricatura o pintura plana.
-     * La descripción DEBE incluir explícitamente que el título del estudio (usa el mismo texto exacto del <h1>) aparezca integrado en la imagen como texto, en tipografía dorada grande, con efectos de luz, resplandor o fuego alrededor de las letras, estilo miniatura de YouTube o cartel de película — especifica esto en la descripción para que quien genere la imagen sepa que debe incluir ese texto.
-     * Describe la escena central (personajes, objetos simbólicos, o el contraste conceptual del capítulo) de forma fotorrealista, con buena composición e iluminación.
-
-2. TÍTULO PRINCIPAL
+1. TÍTULO PRINCIPAL
    - <h1 class="titulo-entrada">TÍTULO IMPACTANTE</h1>
    - El título NO debe ser "Estudio de [Libro] [Capítulo]".
    
@@ -252,17 +243,17 @@ El HTML DEBE seguir exactamente este orden:
       * Si no se te ocurre algo bueno, mejor un título simple y directo que uno "poético" y genérico.
       * NUNCA uses un título genérico como "Estudio de [Libro] [Capítulo]". Tampoco uses títulos con dos puntos (:), ni la fórmula "El/La + sustantivo: subtítulo", ni títulos de más de 60 caracteres.
 
-3. VERSÍCULO(S) CLAVE(S)
+2. VERSÍCULO(S) CLAVE(S)
    - <div class="cita-versiculo"><h3>REFERENCIA</h3><p>"TEXTO"</p></div>
    - Elige 1-3 versículos que capturen la esencia del capítulo.
 
-4. VIDEO DE YOUTUBE (si aplica)
+3. VIDEO DE YOUTUBE (si aplica)
    - Si hay enlace de video, insertar el bloque con miniatura + botón de play ANTES de comenzar el desarrollo expositivo.
    - El bloque DEBE usar miniatura de YouTube con botón de play dorado que carga el iframe al hacer clic.
    - La URL del iframe DEBE usar el formato https://www.youtube.com/embed/ID_DEL_VIDEO?autoplay=1&rel=0. NUNCA usar formato youtu.be.
    - Si no hay video: OMITIR.
 
-5. FICHA DE CONTEXTO (compacta, al principio)
+4. FICHA DE CONTEXTO (compacta, al principio)
    - Usar la clase caja-contexto con diseño distintivo.
    - Debe incluir en formato compacto:
      * Autor: Quién escribió el libro, fecha aproximada y lugar.
@@ -274,7 +265,7 @@ El HTML DEBE seguir exactamente este orden:
    - REGLA: Esta ficha debe ser CONCISA. Máximo 200 palabras en total.
    - IMPORTANTE: Esta caja DEBE llevar el atributo id="contexto" para el enlace del índice.
 
-6. ÍNDICE DE CONTENIDOS (después de la ficha de contexto, antes del desarrollo expositivo)
+5. ÍNDICE DE CONTENIDOS (después de la ficha de contexto, antes del desarrollo expositivo)
    - Usar la clase indice-nav con el diseño definido en el CSS de este prompt (fondo azul oscuro degradado, texto blanco, acentos dorados).
    - DEBE incluir enlaces internos (<a href="#id">) a CADA sección del estudio.
    - Debe listar:
@@ -311,7 +302,7 @@ El HTML DEBE seguir exactamente este orden:
        </ul>
    </div>
 
-7. DESARROLLO EXPOSITIVO (el centro del estudio)
+6. DESARROLLO EXPOSITIVO (el centro del estudio)
    - Ir verso por verso o por bloques naturales.
    - Cada bloque expositivo DEBE llevar un atributo id único (ej: id="bloque1") en su <h2>.
    - Cada caja de nota especial DEBE llevar un atributo id único para el enlace del índice.
@@ -320,52 +311,36 @@ El HTML DEBE seguir exactamente este orden:
      * OBLIGATORIO: el texto del versículo o grupo de versículos de ESTE bloque específico DEBE ir SIEMPRE dentro de una caja <div class="cita-versiculo"> como lo primero del bloque, antes de comenzar la exposición — sin excepción, sin importar si el bloque es corto o largo.
      * Dentro de la exposición que sigue, SÍ puedes (y debes cuando ayude a la claridad) volver a citar o parafrasear fragmentos del mismo versículo cuantas veces sea necesario — la caja de cita NO limita ni reemplaza las referencias textuales dentro de la explicación.
      * El desarrollo expositivo DEBE cubrir el capítulo de forma progresiva y completa: bloque 1 (cita + exposición) → bloque 2 (cita + exposición) → bloque 3 (cita + exposición)... así sucesivamente hasta el último versículo del capítulo. NUNCA hagas una sola exposición general con una sola cita al principio del capítulo completo — cada bloque temático tiene su propia caja de cita y su propio desarrollo.
-     * OBLIGATORIO: cada estudio debe incluir un MÍNIMO de 2 y un máximo de 4 marcadores de recurso visual en total, sin importar si el capítulo es narrativo o doctrinal — NUNCA generes 0 marcadores, incluso en capítulos muy teológicos como Romanos 8 o Gálatas 3.
-
-     * PRIORIDAD DE TIPO DE RECURSO: en la mayoría de los bloques, prefiere recursos que documenten o ilustren datos concretos del texto por encima de escenas dramáticas genéricas. Usa, según lo que mejor sirva a ese bloque específico:
-       - MAPA: cuando el bloque mencione lugares, territorios, rutas de viaje o fronteras (ej: "un mapa antiguo estilo pergamino que muestra el territorio de Canaán, con Sidón al norte y Gaza al sur, marcados con iconografía de brújula dorada").
-       - ÁRBOL GENEALÓGICO: cuando el bloque trate genealogías, linajes o descendencia (ej: "un árbol genealógico elegante que conecta a Noé con Sem, Heber y Abraham, con el nombre clave resaltado en dorado").
-       - LÍNEA DE TIEMPO: cuando el bloque tenga una secuencia histórica o cronológica de eventos.
-       - INFOGRAFÍA CON DATOS/NÚMEROS: cuando el bloque involucre cantidades, conteos, o comparaciones cuantificables (ej: "una infografía que muestra 14 + 30 + 26 = 70 naciones, con círculos de colores agrupados por linaje").
-       - TABLA VISUAL COMPARATIVA (como imagen, no como <table> HTML): cuando el bloque contraste dos posturas, conceptos o líneas (ej: la línea bendita vs. la línea bajo juicio).
-       - DIAGRAMA CONCEPTUAL: para relaciones abstractas (ej: un pacto, una tipología, un contraste teológico) que no encajan en las categorías anteriores.
-       - ESCENA NARRATIVA FOTORREALISTA: solo cuando el bloque describe una acción o momento dramático específico y ninguna de las opciones anteriores aplica mejor.
-     * Todo recurso visual (mapa, árbol, línea de tiempo, infografía, diagrama) debe seguir una estética consistente: fondo tipo pergamino envejecido o azul oscuro degradado (#1a3a5c a #2d4a6c), acentos dorados (#d4ac0d), tipografía elegante tipo serif, iconografía de brújula/mapa antiguo cuando aplique — coherente con el diseño general del sitio. Especifica esta estética explícitamente en cada descripción de marcador.
-     * La escena narrativa fotorrealista queda reservada casi exclusivamente para el marcador de PORTADA (ver sección de portada más arriba) — dentro del desarrollo, prioriza siempre mapas, árboles, líneas de tiempo e infografías de datos sobre escenas narrativas.
-
-
-     * Agrega el marcador inmediatamente después de la exposición del bloque correspondiente, con este formato exacto: <!-- IMAGEN_SUGERIDA: descripción breve y visual del recurso en español, útil como prompt para un generador de imágenes -->.
-     * Si el capítulo es muy doctrinal y no hay escenas narrativas claras, usa marcadores de tipo diagrama o infografía conceptual en su lugar — el mínimo de 2 marcadores por capítulo es innegociable.
      * Exposición profunda con contexto, lenguaje original, implicaciones teológicas, referencias cruzadas con tooltips.
      * NOTAS ESPECIALES después de la exposición del bloque.
    - DESPUÉS DE CADA BLOQUE EXPOSITIVO insertar SIEMPRE:
      <a class="volver-indice" href="#indice">↑ Volver al índice</a>
      <div class="separador">✦ ✦ ✦</div>
 
-8. SECCIÓN CRISTOLÓGICA
+7. SECCIÓN CRISTOLÓGICA
    - Un bloque H2 que sintetice cómo Cristo se revela en el capítulo.
    - DEBE llevar id="resumen-cristo".
    - También debe llevar: <a class="volver-indice" href="#indice">↑ Volver al índice</a>
 
-9. CAJA "PARA MEDITAR"
+8. CAJA "PARA MEDITAR"
    - DEBE llevar id="meditar".
    - 4-5 preguntas de reflexión profundas.
    - Usar la clase caja-meditar.
 
-10. APLICACIÓN PRÁCTICA
+9. APLICACIÓN PRÁCTICA
     - Usar la clase caja-aplicacion.
     - Aplicaciones concretas para: vida devocional, iglesia local, familia, y testimonio.
     - Mínimo 3 aplicaciones concretas.
 
-11. CAJA "DOCTRINAS CLAVE DEL CAPÍTULO"
+10. CAJA "DOCTRINAS CLAVE DEL CAPÍTULO"
     - Usar la clase caja-doctrinas.
     - Listar las doctrinas principales abordadas con 1-2 frases por cada una.
 
-12. CIERRE IMPACTANTE
+11. CIERRE IMPACTANTE
     - Una frase final en la clase destacado-dramatico.
     - Después del cierre: <a class="volver-indice" href="#indice" style="margin-top: 30px;">↑ Volver al índice</a>
 
-13. APÉNDICE INFORMATIVO (FUERA del contenedor-blog, DESPUÉS del cierre de </div>)
+12. APÉNDICE INFORMATIVO (FUERA del contenedor-blog, DESPUÉS del cierre de </div>)
     - Envolver en <div id="apendice">.
     - Título H2 centrado con borde inferior 3px solid #c9a227.
     - Entre 3 y 6 secciones temáticas con contenido sustancial y verificable.
@@ -522,6 +497,9 @@ PROHIBICIONES ABSOLUTAS
 15. NUNCA pongas el apéndice dentro del contenedor-blog.
 16. NUNCA omitas los enlaces "↑ Volver al índice" después de cada bloque y sección del apéndice.
 17. NUNCA uses un diseño o color diferente al definido en el CSS de este prompt.
+18. NUNCA incluyas imágenes de portada ni comentarios <!-- IMAGEN_SUGERIDA ... --> en el estudio (la única imagen permitida es la miniatura del bloque de video de YouTube, si hay enlace).
+19. NUNCA afirmes etimologías de palabras españolas (por ejemplo, "de donde viene la palabra X") ni derivaciones entre idiomas, salvo que sean totalmente seguras; ante la duda, omítelas.
+20. NUNCA describas la posición de un elemento dentro de una lista bíblica (si va al principio, en medio o al final) sin comprobarlo contra el texto del versículo citado.
 
 ══════════════════════════════════════════════════
 CSS COMPLETO — PEGAR DENTRO DE <style> EN EL <head>
@@ -977,8 +955,6 @@ PLANTILLA HTML BASE
 <body>
 
 <div class="contenedor-blog">
-
-    [IMAGEN DE PORTADA — si aplica]
 
     <h1 class="titulo-entrada">[TÍTULO IMPACTANTE]</h1>
 
