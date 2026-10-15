@@ -37,7 +37,7 @@ jobs:
           # 1. Instalar dependencias de la raíz
           npm install
 
-          # 2. Forzar la instalación de fluent-ffmpeg en la raíz (solución definitiva)
+          # 2. Forzar la instalación de fluent-ffmpeg en la raíz
           npm install fluent-ffmpeg
 
           # 3. Instalar dependencias de audio-tts si tiene su propio package.json
@@ -74,6 +74,11 @@ jobs:
       # ─────────────────────────────────────────
       - name: Paso 3 — Ensamblar video con FFmpeg
         run: |
+          # Mover los archivos de audio y timestamps a la carpeta que espera el script de video
+          mv guion_video_tts_final.mp3 audio-tts/
+          mv guion_video_tts_timestamps.json audio-tts/
+
+          # Ahora sí, ejecutar el ensamblador
           node video/ensamblar-video.js "${{ inputs.libro }}" "${{ inputs.rango }}"
 
       # ─────────────────────────────────────────
