@@ -34,16 +34,9 @@ jobs:
 
       - name: Instalar dependencias de Node
         run: |
-          # 1. Instalar dependencias de la raíz
           npm install
-
-          # 2. Forzar la instalación de fluent-ffmpeg en la raíz
           npm install fluent-ffmpeg
-
-          # 3. Instalar dependencias de audio-tts si tiene su propio package.json
           if [ -f audio-tts/package.json ]; then npm install --prefix audio-tts; fi
-
-          # 4. Instalar dependencias de video si tiene su propio package.json
           if [ -f video/package.json ]; then npm install --prefix video; fi
 
       # ─────────────────────────────────────────
@@ -74,9 +67,29 @@ jobs:
       # ─────────────────────────────────────────
       - name: Paso 3 — Ensamblar video con FFmpeg
         run: |
-          # Mover los archivos de audio y timestamps a la carpeta que espera el script de video
-          mv guion_video_tts_final.mp3 audio-tts/
-          mv guion_video_tts_timestamps.json audio-tts/
+          # Buscar el archivo de audio en todo el proyecto
+          AUDIO_FILE=$(find . -name "guion_video_tts_final.mp3" -type f | head -1)
+          TIMESTAMPS_FILE=$(find . -name "guion_video_tts_timestamps.json" -type f | head -1)
+
+          echo "🔍 Audio encontrado en: $AUDIO_FILE"
+          echo "🔍 Timestamps encontrados en: $TIMESTAMPS_FILE"
+
+          # Mover los archivos a la carpeta audio-tts/
+          if [ -n "$AUDIO_FILE" ]; then
+            mv "$AUDIO_FILE" audio-tts/guion_video_tts_final.mp3
+            echo "✅ Audio movido a audio-tts/"
+          else
+            echo "❌ No se encontró el archivo de audio"
+            exit 1
+          fi
+
+          if [ -n "$TIMESTAMPS_FILE" ]; then
+            mv "$TIMESTAMPS_FILE" audio-tts/guion_video_tts_timestamps.json
+            echo "✅ Timestamps movidos a audio-tts/"
+          else
+            echo "❌ No se encontró el archivo de timestamps"
+            exit 1
+          fi
 
           # Ahora sí, ejecutar el ensamblador
           node video/ensamblar-video.js "${{ inputs.libro }}" "${{ inputs.rango }}"
