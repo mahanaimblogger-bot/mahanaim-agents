@@ -544,9 +544,10 @@ async function generarSSMLLimpio(ctx, textoCapitulo) {
       console.log(
         `   ✅ SSML válido (${ssml.length} caracteres, ~${palabras} palabras).`,
       );
-      if (palabras < 1800 || palabras > 3600) {
+      // Referencia real: ~3.000-4.000 palabras ≈ 17-23 min con la voz sintética
+      if (palabras < 2400 || palabras > 4500) {
         console.warn(
-          `   ⚠️ Largo inusual: ${palabras} palabras (se esperaban 2600-3000).`,
+          `   ⚠️ Largo inusual: ${palabras} palabras (~${Math.round(palabras / 175)} min de audio).`,
         );
       }
       return ssml;
@@ -635,15 +636,15 @@ async function detectarMomentosNarrativos(segmentos, ctx) {
     .map((seg, i) => `[${i + 1}] (${contarPalabras(seg)} palabras) ${seg}`)
     .join("\n\n");
 
-  const prompt = `Eres un editor narrativo experto. Te paso los segmentos de un guion para un video bíblico sobre ${ctx}, cortados por pausas dramáticas. Entre paréntesis está la cantidad de palabras de cada segmento (la voz lee unas 130 palabras por minuto).
+  const prompt = `Eres un editor narrativo experto. Te paso los segmentos de un guion para un video bíblico sobre ${ctx}, cortados por pausas dramáticas. Entre paréntesis está la cantidad de palabras de cada segmento (la voz sintética lee unas 175 palabras por minuto).
 
 TAREA: Agrupá y/o dividí los segmentos en MOMENTOS NARRATIVOS. Un "momento" es un bloque que trata el mismo tema, personaje o escena, y recibirá UNA imagen en pantalla.
 
 REGLAS:
 1. Cada momento debe tener sentido narrativo propio.
-2. Cantidad: mínimo 15 y máximo 25 momentos. NO generes más de 25.
-3. ⚠️ NINGÚN momento puede superar las 200 palabras (unos 90 segundos). Si un segmento o grupo de segmentos supera ese tope, dividilo en dos o más momentos. Para dividir en medio de un segmento, "texto_inicio" debe ser las primeras palabras EXACTAS (copiadas literalmente, sin cambiar nada) de la frase donde empieza el nuevo momento.
-4. Ningún momento debe ser demasiado corto: mínimo 25 palabras.
+2. Cantidad: mínimo 15 y máximo 25 momentos. NO generes más de 25. Cada momento agrupa VARIOS segmentos (normalmente entre 3 y 8): NO hagas un momento por segmento.
+3. ⚠️ NINGÚN momento puede superar las 240 palabras (unos 80 segundos). Si un segmento o grupo de segmentos supera ese tope, dividilo en dos o más momentos. Para dividir en medio de un segmento, "texto_inicio" debe ser las primeras palabras EXACTAS (copiadas literalmente, sin cambiar nada) de la frase donde empieza el nuevo momento.
+4. Ningún momento debe ser demasiado corto: apunta a unas 120 a 220 palabras.
 5. El primer momento es el gancho inicial. El último es la conclusión y la oración final; si esa parte es larga, dividila también.
 6. "texto_inicio": 25 a 40 caracteres COPIADOS LITERALMENTE del inicio del momento. NUNCA copies el segmento completo.
 7. "descripcion_visual": una sola línea de máximo 15 palabras, en español.
@@ -755,6 +756,101 @@ function insertarMarcasEnSSML(ssml, momentos) {
   return { ssml: resultado, insertados };
 }
 
+/**
+ * Red de seguridad: si la IA fragmentó de más (p. ej. 95 momentos), agrupa
+ * momentos consecutivos por cantidad de palabras hasta quedar en ~15-25.
+ * Conserva el texto del guion intacto y renumera las marcas sin huecos.
+ */
+function consolidarMomentos(
+  ssmlConMarcas,
+  insertados,
+  { max = 240, objetivoMomentos = 21, maxMomentos = 25 } = {},
+) {
+  const partes = ssmlConMarcas.split(/<mark name="imagen_(\d+)"\/>/);
+  const pre = partes[0];
+  const bloques = [];
+  for (let i = 1; i < partes.length; i += 2) {
+    const texto = partes[i + 1] || "";
+    bloques.push({
+      numero: Number(partes[i]),
+      texto,
+      palabras: contarPalabras(ssmlATextoPlano(texto)),
+    });
+  }
+  // Un bloque gigante (p. ej. toda la conclusión) se parte en las pausas <break>
+  const expandidos = [];
+  for (const b of bloques) {
+    if (b.palabras <= max) {
+      expandidos.push(b);
+      continue;
+    }
+    let acum = "";
+    let pal = 0;
+    const cerrar = () => {
+      if (!acum) return;
+      expandidos.push({ numero: b.numero, texto: acum, palabras: pal });
+      acum = "";
+      pal = 0;
+    };
+    for (const pieza of b.texto.split(/(<break[^>]*\/>)/)) {
+      const n = contarPalabras(ssmlATextoPlano(pieza));
+      if (acum && pal + n > 150) cerrar();
+      acum += pieza;
+      pal += n;
+    }
+    cerrar();
+  }
+  const total = expandidos.reduce((a, b) => a + b.palabras, 0);
+
+  let objetivo = Math.min(Math.max(Math.ceil(total / objetivoMomentos), 120), 200);
+  let grupos = [];
+  for (let vuelta = 0; vuelta < 6; vuelta++) {
+    grupos = [];
+    let actual = null;
+    for (const b of expandidos) {
+      if (actual && actual.palabras + b.palabras > objetivo) {
+        grupos.push(actual);
+        actual = null;
+      }
+      if (!actual) actual = { bloques: [], palabras: 0 };
+      actual.bloques.push(b);
+      actual.palabras += b.palabras;
+    }
+    if (actual) grupos.push(actual);
+
+    // Un último grupo diminuto (menos de ~10 s) se une al anterior
+    if (grupos.length > 1 && grupos[grupos.length - 1].palabras < 40) {
+      const ultimo = grupos.pop();
+      const previo = grupos[grupos.length - 1];
+      previo.bloques.push(...ultimo.bloques);
+      previo.palabras += ultimo.palabras;
+    }
+    if (grupos.length <= maxMomentos || objetivo >= max) break;
+    objetivo = Math.min(Math.ceil(objetivo * 1.15), max);
+  }
+
+  const porNumero = new Map(insertados.map((m) => [m.numero, m]));
+  let nuevoSSML = pre;
+  const nuevos = grupos.map((g, idx) => {
+    const k = idx + 1;
+    nuevoSSML += `<mark name="imagen_${k}"/>` + g.bloques.map((b) => b.texto).join("");
+    const moms = g.bloques.map((b) => porNumero.get(b.numero)).filter(Boolean);
+    const primero = moms[0] || {};
+    const descripciones = [...new Set(moms.map((m) => m.descripcion_visual).filter(Boolean))]
+      .slice(0, 3)
+      .join("; ");
+    return {
+      ...primero,
+      numero: k,
+      descripcion_visual: descripciones || primero.descripcion_visual,
+      nuevo_capitulo_youtube:
+        k === 1 || moms.some((m) => m.nuevo_capitulo_youtube === true),
+    };
+  });
+
+  return { ssml: nuevoSSML, insertados: nuevos };
+}
+
 /** Avisa si alguna imagen quedaría demasiado tiempo en pantalla. */
 function advertirMomentosLargos(ssmlConMarcas, maxPalabras = 230) {
   const partes = ssmlConMarcas.split(/<mark name="imagen_(\d+)"\/>/);
@@ -763,7 +859,7 @@ function advertirMomentosLargos(ssmlConMarcas, maxPalabras = 230) {
     const palabras = contarPalabras(ssmlATextoPlano(partes[i + 1] || ""));
     if (palabras > maxPalabras) {
       console.warn(
-        `   ⚠️ imagen_${numero} cubre ~${palabras} palabras (~${Math.round(palabras / 2.2)} s). Quedará mucho tiempo en pantalla.`,
+        `   ⚠️ imagen_${numero} cubre ~${palabras} palabras (~${Math.round(palabras / 2.9)} s). Quedará mucho tiempo en pantalla.`,
       );
     }
   }
@@ -867,13 +963,23 @@ async function generarArtefactosVideo(dir, ctx, textoCapitulo) {
   const momentos = await detectarMomentosNarrativos(segmentos, ctx);
   if (!momentos.length) return null;
 
-  const { ssml: ssmlConMarcas, insertados } = insertarMarcasEnSSML(
+  let { ssml: ssmlConMarcas, insertados } = insertarMarcasEnSSML(
     ssmlLimpio,
     momentos,
   );
   console.log(
     `   📌 Marcas insertadas: ${insertados.length} de ${momentos.length}`,
   );
+  if (insertados.length > 25) {
+    const antes = insertados.length;
+    ({ ssml: ssmlConMarcas, insertados } = consolidarMomentos(
+      ssmlConMarcas,
+      insertados,
+    ));
+    console.warn(
+      `   ⚠️ La IA fragmentó de más (${antes} momentos). Se consolidaron en ${insertados.length}.`,
+    );
+  }
   if (insertados.length < 8) {
     console.error("   ❌ Muy pocas marcas insertadas; el video quedaría pobre.");
     return null;
@@ -1109,7 +1215,10 @@ ${meta.miniatura.prompt_ilustracion}
 // ============================================================
 // 4) GUION DE PODCAST (2 voces, otro ángulo)
 // ============================================================
-async function generarGuionPodcast({ info, tituloVideo, textoFuente, capitulosVideo }) {
+async function generarGuionPodcastUnaVez(
+  { info, tituloVideo, textoFuente, capitulosVideo },
+  notaExtra = "",
+) {
   console.log(`\n   🎙️ [Podcast] Generando guion de conversación...`);
 
   const temasVideo = capitulosVideo.map((c) => `- ${c.titulo}`).join("\n");
@@ -1133,12 +1242,14 @@ ESTRUCTURA:
 5. CIERRE: una idea para llevarse, una invitación breve a ver el video completo en el canal y a comentar.
 
 REGLAS:
-- Extensión total: entre 1.500 y 1.900 palabras (10 a 13 minutos).
+- Extensión total: entre 2.000 y 2.400 palabras (unos 11 a 13 minutos de audio con voz sintética) y mínimo 70 turnos. Desarrolla cada momento con varios intercambios, no con uno solo.
 - Lenguaje oral y natural, español neutro latinoamericano, tuteo. Frases cortas. Algunos turnos muy breves ("¿En serio?", "Espera, espera.") y ninguno de más de 80 palabras.
 - Está pensado para ser leído por voces sintéticas: SIN corchetes, SIN acotaciones, SIN emojis, SIN markdown. Números y referencias bíblicas escritos como se pronuncian ("Filemón, versículo quince"). Palabras griegas o hebreas solo transliteradas, nunca en su alfabeto. Sin abreviaturas ni símbolos.
 - No inventes datos que no estén en el material ni en conocimiento bíblico ampliamente aceptado.
 - Respeta este perfil doctrinal sin excepción:
 ${PERFIL_DOCTRINAL}
+
+${notaExtra}
 
 MATERIAL DE BASE:
 ${textoFuente}
@@ -1193,8 +1304,8 @@ FORMATO (JSON estricto):
   console.log(
     `   ✅ Podcast: ${turnos.length} turnos, ~${palabras} palabras, ${caracteres} caracteres.`,
   );
-  if (palabras < 1200 || palabras > 2300) {
-    console.warn(`   ⚠️ Largo inusual (${palabras} palabras; objetivo 1500-1900).`);
+  if (palabras < 1600 || palabras > 3000) {
+    console.warn(`   ⚠️ Largo inusual (${palabras} palabras; objetivo 2000-2400).`);
   }
 
   return {
@@ -1207,9 +1318,25 @@ FORMATO (JSON estricto):
     titulo_video_compañero: tituloVideo,
     voces: { A: "guía", B: "curioso" },
     caracteres_totales: caracteres,
+    palabras_totales: palabras,
     turnos,
     generado_en: new Date().toISOString(),
   };
+}
+
+/** Pide el podcast; si queda corto, reintenta una vez avisando el largo. */
+async function generarGuionPodcast(args) {
+  const primero = await generarGuionPodcastUnaVez(args);
+  if (primero && primero.palabras_totales >= 1600) return primero;
+
+  console.warn("   ⚠️ Podcast corto o ausente; se pide una segunda versión.");
+  const nota = primero
+    ? `⚠️ Tu intento anterior tuvo solo ${primero.palabras_totales} palabras y es demasiado corto. Esta vez necesitas al menos 2.000 palabras: más intercambios por momento, ejemplos concretos y preguntas de B.`
+    : "";
+  const segundo = await generarGuionPodcastUnaVez(args, nota);
+  if (!segundo) return primero;
+  if (!primero) return segundo;
+  return segundo.palabras_totales >= primero.palabras_totales ? segundo : primero;
 }
 
 function guardarPodcast(dir, info, podcast) {
