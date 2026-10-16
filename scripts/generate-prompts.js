@@ -1,7 +1,28 @@
+// ============================================================
+// scripts/generate-prompts.js  (v2: el VIDEO es la pieza central)
+// ------------------------------------------------------------
+// Orden de generación:
+//   0. Fuente consolidada
+//   1. Guion SSML del video (sin <emphasis>, validado)
+//   2. Momentos narrativos -> marcas <mark> -> prompts de imágenes
+//   3. Metadatos de YouTube (título NUEVO, descripción, tags,
+//      capítulos, miniatura) derivados del guion ya terminado
+//   4. Guion de podcast (2 voces, otro ángulo, mismo material)
+//   5. Mapa interactivo (para el sitio web)
+//
+// Archivos que genera en prompts_output/<libro>/Capitulo_<n>/:
+//   0_FUENTE_CONSOLIDADA_<Libro>_Cap<n>.txt
+//   guion_video_tts.ssml
+//   prompts_imagenes_video.json
+//   youtube_metadata.json
+//   5_YOUTUBE_PREVIEW_<Libro>_Cap<n>.txt      (lectura humana)
+//   podcast_guion.json
+//   7_PODCAST_GUION_<Libro>_Cap<n>.txt        (lectura humana)
+//   6_MAPA_INTERACTIVO_<Libro>_Cap<n>.txt
+// ============================================================
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import fs from "fs";
-import { writeFileSync, mkdirSync } from "fs";
 import path from "path";
 
 const supabase = createClient(
@@ -9,83 +30,86 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 const openai = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
+  apiKey: process.env.DEEPSEEK_API_KEY || process.env.LLM_API_KEY,
   baseURL: "https://api.deepseek.com/v1",
 });
 
 // ============================================================
-// FUNCIONES AUXILIARES
+// CONFIGURACIÓN
 // ============================================================
+// Las llamadas en modo JSON siguen usando "deepseek-chat" (como antes).
+// Las de texto libre (SSML) usan LLM_MODEL si está definido (como antes).
+const MODELO_JSON = "deepseek-chat";
+const MODELO_TEXTO = process.env.LLM_MODEL || "deepseek-chat";
 
-function generateGoogleMapsEmbedUrl(lat, lng, placeName = "") {
-  const nameParam = placeName ? encodeURIComponent(placeName) : "";
-  return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat}, ${lng}!5e1!3m2!1ses!2s!4v1`;
+// Presupuesto total (caracteres) de la fuente que alimenta guion y podcast
+const PRESUPUESTO_FUENTE = 70000;
+
+// Valores por defecto que leerá el script de subida a YouTube
+const AJUSTES_YOUTUBE = {
+  categoria_id: "27", // Educación
+  idioma: "es",
+  para_ninos: false,
+  contenido_sintetico: true, // declaración de contenido alterado / IA
+  visibilidad: "private",
+};
+
+const ANATOMIA =
+  "fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs";
+
+// ============================================================
+// TEXTOS COMPARTIDOS
+// ============================================================
+const PERFIL_DOCTRINAL = `
+- Monoteísmo puro: Un solo Dios, el Padre. Jesucristo es Su Hijo y Mesías, preexistente, de Su esencia pero distinto y subordinado al Padre, con todo poder y autoridad conferido por el Padre.
+- ⛔ REGLA INVIOLABLE SOBRE LA DEIDAD: En NINGÚN punto debes afirmar, sugerir ni dar a entender que existe una "Trinidad" o un "Dios trino" de tres personas divinas coiguales. NUNCA digas que Jesucristo es "Dios" o "Dios el Hijo" (es el HIJO de Dios). NUNCA digas que el Espíritu Santo es "Dios" ni una tercera persona divina (es el Espíritu de Dios y de Cristo). Un solo Dios: el Padre.
+- Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada. Cristo es el hijo de Dios, El mesias, es preexistente, el padre le dio toda autoridad y poder, por medio de Cristo fue hecho todo.`;
+
+const REGLAS_IMAGEN = `
+A) COHERENCIA HISTÓRICA Y CULTURAL:
+- Cada prompt debe incluir al inicio un bloque de contexto de época específico a ESTE capítulo.
+- Vestimenta, arquitectura, herramientas, mobiliario y entorno exactos a esa época y cultura.
+- Paleta de colores coherente con la escena (ámbar, ocre y dorado para escenas diurnas; azules fríos para nocturnas).
+- PROHIBIDO: cualquier objeto moderno o fuera de época. Prohibido mezclar culturas o siglos.
+
+B) GÉNERO EXPLÍCITO EN PERSONAJES CON NOMBRE:
+- Cada vez que un personaje con nombre aparezca, aclaralo entre paréntesis con su género.
+- Ejemplo: "Rebekah (a woman)", "Abraham (a man)", "the midwife (a woman)", "the infant (a baby boy)".
+
+C) HUMANIDAD Y PROPORCIONES:
+- Todos los personajes son seres humanos completos y normales.
+- PROPORCIONES HUMANAS CORRECTAS: adultos con proporciones adultas, niños con proporciones infantiles.
+- Al final de cada prompt: "${ANATOMIA}".
+
+D) POSE, COMPOSICIÓN Y MULTITUDES:
+- Poses explícitas. Figuras humanas completas.
+- MULTITUDES: proporciones correctas, sin "enanos" al fondo.
+
+E) AUTO-SUFICIENCIA:
+- Cada prompt debe entenderse por sí solo. Todo el contexto dentro del string.
+
+F) ESTILO VISUAL:
+- Ilustración cinematográfica hiperrealista con realismo estilizado (semi-stylized realism).
+- Iluminación dramática (35mm film aesthetic, shallow depth of field).
+- Texturas hiperrealistas de piel y telas. Sin efecto "plástico CGI".
+- NO caricatura, NO cartoon, NO Pixar/Disney, NO "pintura devocional del s.XIX".
+
+G) PROHIBICIONES:
+- NO texto, letras ni marcas de agua.
+- NO rostros reconocibles de personas modernas.
+- NO símbolos cristianos anacrónicos.`;
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function quitarTildes(texto) {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
-  let html = `
-<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
-  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">${titulo}</h1>
-  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">${bookName} Capítulo ${chapterNum}</h2>
-</div>
-
-<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
-  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
-  <p style="line-height: 1.8; color: #3e2723;">
-    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
-    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
-  </p>
-</div>
-`;
-
-  ubicaciones.forEach((ubicacion, index) => {
-    const embedUrl = generateGoogleMapsEmbedUrl(
-      ubicacion.latitud,
-      ubicacion.longitud,
-      ubicacion.nombre,
-    );
-    const certezaIcon =
-      ubicacion.certeza === "confirmada"
-        ? "✅"
-        : ubicacion.certeza === "probable"
-          ? "🟡"
-          : "️";
-
-    html += `
-<div style="margin-bottom: 2.5rem;">
-  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    ${index + 1}. ${ubicacion.nombre} ${certezaIcon}
-  </h3>
-  
-  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="${embedUrl}" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
-  
-  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> ${ubicacion.referencia_biblica}</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> ${ubicacion.latitud}°N, ${ubicacion.longitud}°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> ${ubicacion.contexto_historico}</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> ${ubicacion.importancia_teologica}</p>
-  </div>
-  
-  <div style="background: ${ubicacion.certeza === "confirmada" ? "#d4edda" : "#fff3cd"}; padding: 0.8rem; border-radius: 6px; border-left: 4px solid ${ubicacion.certeza === "confirmada" ? "#28a745" : "#ffc107"};">
-    <strong>Nivel de certeza:</strong> ${ubicacion.certeza.charAt(0).toUpperCase() + ubicacion.certeza.slice(1)}
-  </div>
-</div>
-`;
-  });
-
-  html += `
-<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
-  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
-  <p style="line-height: 1.8; margin: 0;">
-    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
-    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
-    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
-  </p>
-</div>
-`;
-  return html;
+function contarPalabras(texto) {
+  return (String(texto).replace(/<[^>]+>/g, " ").match(/\S+/g) || []).length;
 }
 
 function cleanHtml(html) {
@@ -104,6 +128,93 @@ function cleanHtml(html) {
     .trim();
 }
 
+function guardarTexto(dir, nombre, contenido, { bom = true } = {}) {
+  fs.writeFileSync(
+    path.join(dir, nombre),
+    (bom ? "\uFEFF" : "") + contenido,
+    "utf8",
+  );
+  console.log(`   ✅ Archivo creado: ${nombre}`);
+}
+
+function guardarJSON(dir, nombre, objeto) {
+  fs.writeFileSync(
+    path.join(dir, nombre),
+    JSON.stringify(objeto, null, 2),
+    "utf8",
+  );
+  console.log(`   ✅ Archivo creado: ${nombre}`);
+}
+
+function parsearJSON(textoCrudo) {
+  if (!textoCrudo) return null;
+  const limpio = textoCrudo
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+  try {
+    return JSON.parse(limpio);
+  } catch {
+    const ini = limpio.indexOf("{");
+    const fin = limpio.lastIndexOf("}");
+    if (ini === -1 || fin <= ini) return null;
+    try {
+      return JSON.parse(limpio.slice(ini, fin + 1));
+    } catch {
+      return null;
+    }
+  }
+}
+
+/**
+ * Llamada única a DeepSeek con reintentos y detección de truncado.
+ * Lanza error si la respuesta viene vacía o cortada por max_tokens.
+ */
+async function llamarIA({
+  etiqueta,
+  system,
+  user,
+  json = false,
+  temperature = 0.5,
+  maxTokens = 8000,
+  reintentos = 1,
+}) {
+  const messages = [];
+  if (system) messages.push({ role: "system", content: system });
+  messages.push({ role: "user", content: user });
+
+  let ultimoError;
+  for (let intento = 1; intento <= reintentos + 1; intento++) {
+    try {
+      console.log(
+        `   🤖 [${etiqueta}] Llamando a la IA (intento ${intento})...`,
+      );
+      const res = await openai.chat.completions.create({
+        model: json ? MODELO_JSON : MODELO_TEXTO,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+        ...(json ? { response_format: { type: "json_object" } } : {}),
+      });
+      const choice = res.choices[0];
+      const contenido = choice?.message?.content?.trim() || "";
+      if (!contenido) throw new Error("respuesta vacía");
+      if (choice.finish_reason === "length") {
+        throw new Error("respuesta truncada por max_tokens");
+      }
+      return contenido;
+    } catch (e) {
+      ultimoError = e;
+      console.error(`   ⚠️ [${etiqueta}] intento ${intento} falló: ${e.message}`);
+      if (intento <= reintentos) await esperar(3000 * intento);
+    }
+  }
+  throw ultimoError;
+}
+
+// ============================================================
+// SUPABASE: RECURSOS DEL CAPÍTULO
+// ============================================================
 async function fetchChapterResources(bookSlug, chapterNumber) {
   console.log(
     `🔍 Buscando recursos para ${bookSlug} capítulo ${chapterNumber}...`,
@@ -114,7 +225,6 @@ async function fetchChapterResources(bookSlug, chapterNumber) {
     .select("id, nombre, slug")
     .eq("slug", bookSlug)
     .single();
-
   if (bookError || !book) throw new Error(`Libro no encontrado: ${bookSlug}`);
 
   const { data: chapter, error: chapterError } = await supabase
@@ -123,9 +233,9 @@ async function fetchChapterResources(bookSlug, chapterNumber) {
     .eq("book_id", book.id)
     .eq("numero", chapterNumber)
     .single();
-
-  if (chapterError || !chapter)
+  if (chapterError || !chapter) {
     throw new Error(`Capítulo ${chapterNumber} no encontrado para ${bookSlug}`);
+  }
 
   return {
     chapterId: chapter.id,
@@ -140,32 +250,27 @@ async function getResourcesForChapter(chapterId) {
     .from("resources")
     .select("tipo, contenido_html, titulo")
     .eq("chapter_id", chapterId);
-
   if (error) throw error;
+
+  const html = (tipo) =>
+    resources.find((r) => r.tipo === tipo)?.contenido_html || "";
 
   return {
     estudioTitulo:
       resources.find((r) => r.tipo === "estudio")?.titulo || "Estudio Bíblico",
-    estudio: resources.find((r) => r.tipo === "estudio")?.contenido_html || "",
-    sermon: resources.find((r) => r.tipo === "sermon")?.contenido_html || "",
-    bosquejo:
-      resources.find((r) => r.tipo === "bosquejo")?.contenido_html || "", // Agregado para el podcast
-    infografia:
-      resources.find((r) => r.tipo === "infografia")?.contenido_html || "",
-    arqueologia:
-      resources.find((r) => r.tipo === "contexto_arqueologico")
-        ?.contenido_html || "",
-    palabras:
-      resources.find((r) => r.tipo === "palabras_clave")?.contenido_html || "",
-    citasTeologos:
-      resources.find((r) => r.tipo === "citas_teologos")?.contenido_html || "",
-    citasLibros:
-      resources.find((r) => r.tipo === "citas_libros")?.contenido_html || "",
+    estudio: html("estudio"),
+    sermon: html("sermon"),
+    bosquejo: html("bosquejo"),
+    infografia: html("infografia"),
+    arqueologia: html("contexto_arqueologico"),
+    palabras: html("palabras_clave"),
+    citasTeologos: html("citas_teologos"),
+    citasLibros: html("citas_libros"),
   };
 }
 
 function buildPlainTextSource(bookName, chapterNum, context) {
-  let source = `FUENTE CONSOLIDADA PARA NOTEBOOKLM\nLIBRO: ${bookName}\nCAPÍTULO: ${chapterNum}\n========================================\n\n`;
+  let source = `FUENTE CONSOLIDADA\nLIBRO: ${bookName}\nCAPÍTULO: ${chapterNum}\n========================================\n\n`;
   if (context.estudio)
     source += `--- ESTUDIO BÍBLICO: ${context.estudioTitulo} ---\n${cleanHtml(context.estudio)}\n\n`;
   if (context.sermon)
@@ -183,508 +288,23 @@ function buildPlainTextSource(bookName, chapterNum, context) {
   return source;
 }
 
-function buildPrompts(bookName, chapterNum, context) {
-  const baseInfo = `
-  LIBRO: ${bookName} | CAPÍTULO: ${chapterNum}
-  TÍTULO DEL ESTUDIO: "${context.estudioTitulo}"
-  [ESTUDIO]: ${context.estudio.substring(0, 1500)}
-  [SERMÓN]: ${context.sermon.substring(0, 1500)}
-  [BOSQUEJO]: ${context.bosquejo.substring(0, 1000)}
-  [INFOGRAFÍA]: ${context.infografia.substring(0, 1000)}
-  [ARQUEOLOGÍA]: ${context.arqueologia.substring(0, 800)}
-  [PALABRAS]: ${context.palabras.substring(0, 800)}
-  [CITAS]: ${context.citasTeologos.substring(0, 800)} ${context.citasLibros.substring(0, 800)}
-  `;
+/** Sermón (prioridad) + estudio, recortados al presupuesto. */
+function armarTextoFuente(context) {
+  const sermonLimpio = cleanHtml(context.sermon);
+  const estudioLimpio = cleanHtml(context.estudio);
 
-  return [
-    {
-      type: "prompt_video",
-      system:
-        "Eres un experto en producción de contenido viral cristiano con profundidad teológica.",
-      user: `Analiza esta información y genera 2 prompts para NotebookLM (Estilo Visual máx 4000 chars, Contenido Narrativo máx 4000 chars). Regla: usa solo 1 cita de autoridad. Formato JSON: { "prompt_estilo_visual": "...", "prompt_contenido_narrativo": "..." }.\n\nINFO:\n${baseInfo}`,
-    },
-    {
-      type: "prompt_mapa",
-      system: "Eres un experto en teología bíblica y aprendizaje visual.",
-      user: `Analiza esta información y genera 1 prompt para un Mapa Mental esquemático en NotebookLM (máx 4000 chars). Incluye: tema central, versículos clave, palabras originales. Formato JSON: { "prompt_mapa_mental": "..." }.\n\nINFO:\n${baseInfo}`,
-    },
-    {
-      type: "prompt_diapositivas",
-      system: "Eres un experto en educación bíblica y diseño instruccional.",
-      user: `Analiza esta información y genera 1 prompt para una presentación de 5 a 7 diapositivas en NotebookLM (máx 4000 chars). Estructura: Portada, Desarrollo, Conclusión. Formato JSON: { "prompt_diapositivas": "..." }.\n\nINFO:\n${baseInfo}`,
-    },
-    {
-      type: "prompt_miniatura",
-      system:
-        "Eres un experto en diseño de miniaturas virales para YouTube y prompt engineering para IA generativa de imágenes.",
-      user: `Analiza esta información y genera UN prompt en INGLÉS para crear una miniatura de YouTube ultra-llamativa. 
-      REQUISITOS: 1. Estilo cinematográfico/hiperrealista. 2. Alto contraste y espacio negativo para texto. 3. Instruye a la IA para incluir el texto exacto: "${context.estudioTitulo}" en letras grandes y legibles. 4. Colores vibrantes. 
-      Formato JSON: { "prompt_miniatura_youtube": "..." }.\n\nINFO:\n${baseInfo}`,
-    },
-    {
-      type: "prompt_descripcion",
-      system: "Eres un experto en SEO para YouTube y Copywriting cristiano.",
-      user: `Analiza esta información y genera una descripción completa y optimizada para SEO para el video de YouTube sobre este capítulo.
-      
-      ESTRUCTURA OBLIGATORIA DE LA DESCRIPCIÓN:
-      1. TÍTULO SUGERIDO: 3 opciones de títulos virales y con gancho (máx 60 caracteres).
-      2. GANCHO INICIAL: Las primeras 2 líneas que atrapan al lector (lo que se ve antes de "mostrar más").
-      3. RESUMEN: Un párrafo corto explicando qué aprenderá el espectador (usa palabras clave del estudio).
-      4. TIMESTAMPS: Sugiere una lista de capítulos con tiempos (ej: 0:00 Intro, 0:45 El conflicto, etc.) basada en la estructura del video.
-      5. VERSÍCULO CLAVE: Cita el versículo principal del capítulo.
-      6. LLAMADO A LA ACCIÓN: Invitación a suscribirse y comentar.
-      7. HASHTAGS: 5 hashtags relevantes al final.
-      
-      Formato JSON: { "descripcion_youtube": "..." } (Usa saltos de línea \\n para formatear).\n\nINFO:\n${baseInfo}`,
-    },
-    {
-      type: "prompt_mapa_interactivo",
-      system:
-        "Eres un experto en geografía bíblica, arqueología del antiguo oriente próximo y teología. Tu trabajo es identificar ubicaciones geográficas mencionadas en el estudio bíblico y crear recursos de mapa interactivo educativos.",
-      user: `Analiza este estudio bíblico de ${bookName} capítulo ${chapterNum} e identifica TODAS las ubicaciones geográficas mencionadas (ciudades, montes, ríos, regiones, etc.).
+  let sermonFinal = sermonLimpio;
+  let estudioFinal = "";
+  let restante = PRESUPUESTO_FUENTE;
 
-Para CADA ubicación identificada, genera:
-
-**INFORMACIÓN REQUERIDA:**
-1. **Nombre del lugar** (en español)
-2. **Coordenadas GPS aproximadas** (latitud, longitud)
-3. **Referencia bíblica** donde se menciona
-4. **Contexto histórico/arqueológico** breve
-5. **Importancia teológica** en el capítulo
-
-**UBICACIONES CON CERTEZA vs INCERTIDUMBRE:**
-- Si la ubicación es **confirmada** arqueológicamente: proporciona coordenadas exactas
-- Si es **probable pero debatida**: proporciona la teoría más aceptada y menciona la incertidumbre
-- Si es **desconocida**: usa la región general más probable según el contexto
-
-**FORMATO DE SALIDA JSON:**
-{
-  "titulo_recurso": "Mapa Interactivo: [Tema del capítulo] - Ubicaciones Bíblicas",
-  "ubicaciones": [
-    {
-      "nombre": "Nombre del lugar",
-      "latitud": 31.0103,
-      "longitud": 47.4344,
-      "referencia_biblica": "Génesis 2:14",
-      "contexto_historico": "Descripción breve del contexto histórico y arqueológico",
-      "importancia_teologica": "Significado teológico en el pasaje",
-      "certeza": "confirmada | probable | debatida | desconocida"
-    }
-  ],
-  "nota_metodologica": "Explicación sobre la certeza/incertidumbre de las ubicaciones"
-}
-
-**EJEMPLO DE UBICACIONES PARA ÉXODO 5:**
-1. Pi-Ramsés (capital de Faraón) - 30.8080, 31.2859
-2. Ladrilleras del Delta - 30.7500, 31.3000
-3. Monte Sinaí (Horeb) - 28.5394, 33.9746
-4. Tierra de Gosén - 30.8500, 31.6500
-
-**INFORMACIÓN DEL ESTUDIO:**
-${baseInfo}
-
-Genera el recurso de mapa en formato JSON completo.`,
-    },
-    {
-      type: "prompt_podcast_guion",
-      system:
-        "Eres un experto en guionización de podcasts cristianos. Tu tarea es transformar el estudio bíblico, el sermón y el bosquejo en un guion de podcast fluido. DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON.",
-      user: `Basado en la siguiente información, escribe un guion de podcast completo.
-      
-      ESTRUCTURA DEL GUION:
-      1. INTRODUCCIÓN (1-2 min): Gancho atractivo, presentación del tema y el texto base.
-      2. DESARROLLO (6-10 min): Explicación exegética clara, aplicación práctica.
-      3. CONCLUSIÓN Y LLAMADO (2-3 min): Resumen de la verdad central y oración final.
-      
-      TONO: Cálido, pastoral, claro. Usa indicaciones de locución entre corchetes, ej: [Música suave], [Pausa].
-      
-      INFO DEL ESTUDIO:
-      ${baseInfo}
-      
-      FORMATO DE SALIDA JSON OBLIGATORIO:
-      { "guion_podcast": "Aquí va el texto completo del guion..." }`,
-    },
-  ];
-}
-
-async function generateWithAI(promptData) {
-  console.log(`   🤖 Generando: ${promptData.type}...`);
-  try {
-    const response = await openai.chat.completions.create({
-      model: "deepseek-chat",
-      messages: [
-        { role: "system", content: promptData.system },
-        { role: "user", content: promptData.user },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.8,
-      max_tokens: 12000,
-    });
-    return JSON.parse(response.choices[0].message.content);
-  } catch (error) {
-    console.error(`   ❌ Error en IA para ${promptData.type}:`, error.message);
-    return null;
-  }
-}
-
-async function saveFilesLocally(
-  results,
-  plainTextSource,
-  bookName,
-  chapterNum,
-  studyTitle,
-) {
-  console.log(`   💾 Generando archivos de texto para descargar...`);
-
-  // 📁 CREAR CARPETA ORGANIZADA: prompts_output/{libro}/Capitulo_{numero}/
-  function quitarTildes(texto) {
-    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (sermonLimpio.length <= restante) {
+    restante -= sermonLimpio.length;
+    estudioFinal = estudioLimpio.substring(0, restante);
+  } else {
+    sermonFinal = sermonLimpio.substring(0, restante);
   }
 
-  const outputDir = path.join(
-    "prompts_output",
-    quitarTildes(bookName.toLowerCase()),
-    `Capitulo_${chapterNum}`,
-  );
-  mkdirSync(outputDir, { recursive: true });
-
-  for (const result of results) {
-    if (!result) continue;
-    const jsonData = result.data;
-    let fileContent = "";
-    let fileName = "";
-
-    if (result.type === "prompt_video") {
-      fileName = `1_VIDEO_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPTS PARA VIDEO - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 PROMPT 1 - ESTILO VISUAL:\n───────────────────────────────────────────\n${jsonData.prompt_estilo_visual}\n\n📋 PROMPT 2 - CONTENIDO NARRATIVO:\n───────────────────────────────────────────\n${jsonData.prompt_contenido_narrativo}\n`;
-    } else if (result.type === "prompt_mapa") {
-      fileName = `2_MAPA_MENTAL_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MAPA MENTAL - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_mapa_mental}\n`;
-    } else if (result.type === "prompt_diapositivas") {
-      fileName = `3_DIAPOSITIVAS_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA DIAPOSITIVAS - NOTEBOOKLM\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\n───────────────────────────────────────────\n${jsonData.prompt_diapositivas}\n`;
-    } else if (result.type === "prompt_miniatura") {
-      fileName = `4_MINIATURA_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nPROMPT PARA MINIATURA DE YOUTUBE (IA)\nLibro: ${bookName} | Capítulo: ${chapterNum}\nTítulo del Estudio: "${studyTitle}"\n═══════════════════════════════════════════\n\n📋 INSTRUCCIONES:\nCopia el siguiente prompt (en inglés) y pégalo en Midjourney/DALL-E 3.\n\n───────────────────────────────────────────\n${jsonData.prompt_miniatura_youtube}\n───────────────────────────────────────────\n\n💡 CONSEJO: Si la IA falla con el texto, genera la imagen sin texto y agrégalo luego en Canva con fuente gruesa.`;
-    } else if (result.type === "prompt_descripcion") {
-      fileName = `5_DESCRIPCION_YOUTUBE_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════\nDESCRIPCIÓN OPTIMIZADA PARA YOUTUBE\nLibro: ${bookName} | Capítulo: ${chapterNum}\n═══════════════════════════════════════════\n\n📋 COPIA Y PEGA ESTO EN LA DESCRIPCIÓN DE TU VIDEO:\n───────────────────────────────────────────\n${jsonData.descripcion_youtube}\n───────────────────────────────────────────\n\n💡 NOTA: Los timestamps son sugerencias basadas en la estructura del video. Ajustalos según la duración final.`;
-    } else if (result.type === "prompt_mapa_interactivo") {
-      fileName = `6_MAPA_INTERACTIVO_${bookName}_Cap${chapterNum}.txt`;
-
-      const mapaData = jsonData;
-      const htmlGenerado = generateMapResourceHTML(
-        mapaData.titulo_recurso,
-        mapaData.ubicaciones,
-        bookName,
-        chapterNum,
-      );
-
-      fileContent = `═══════════════════════════════════════════
-RECURSO DE MAPA INTERACTIVO - MAHANAIM
-Libro: ${bookName} | Capítulo: ${chapterNum}
-═══════════════════════════════════════════
-
-📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
-
-TÍTULO: ${mapaData.titulo_recurso}
-TIPO: mapa
-URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
-MODO: html
-
-CONTENIDO HTML:
-───────────────────────────────────────────
-${htmlGenerado}
-───────────────────────────────────────────
-
-📍 UBICACIONES IDENTIFICADAS:
-${mapaData.ubicaciones.map((u, i) => `${i + 1}. ${u.nombre} (${u.latitud}, ${u.longitud}) - ${u.certeza}`).join("\n")}
-
- NOTA METODOLÓGICA:
-${mapaData.nota_metodologica || "Las ubicaciones varían en certeza según la evidencia arqueológica disponible."}
-
-💡 INSTRUCCIONES:
-1. Copia el HTML completo de arriba
-2. Ve a /admin/recursos/nuevo
-3. Selecciona Libro: ${bookName}, Capítulo: ${chapterNum}
-4. Tipo: "mapa"
-5. Pega el HTML en "Contenido HTML"
-6. Deja "URL del recurso" vacío
-7. Guarda y publica
-
-✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
-`;
-    } else if (result.type === "prompt_podcast_guion") {
-      fileName = `7_PODCAST_GUION_${bookName}_Cap${chapterNum}.txt`;
-      fileContent = `═══════════════════════════════════════════
-GUION DE PODCAST PARA NOTEBOOKLM / TTS
-Libro: ${bookName} | Capítulo: ${chapterNum}
-═══════════════════════════════════════════
-
-🎙️ INSTRUCCIONES:
-Copia este texto y pégalo en NotebookLM (como fuente de audio) o en tu herramienta de Texto a Voz (ElevenLabs, etc.) preferida.
-
-───────────────────────────────────────────
-${jsonData.guion_podcast}
-───────────────────────────────────────────
-
-💡 NOTA: Este guion fue generado siguiendo la cadena homilética (Estudio -> Sermón -> Bosquejo -> Guion) para garantizar profundidad teológica y fluidez narrativa.
-`;
-    }
-
-    // 🛡️ Guardar con BOM UTF-8 para compatibilidad perfecta con Windows
-    writeFileSync(
-      path.join(outputDir, fileName),
-      "\uFEFF" + fileContent,
-      "utf8",
-    );
-    console.log(`   ✅ Archivo creado: ${fileName}`);
-  }
-
-  if (plainTextSource) {
-    const sourceFileName = `0_FUENTE_CONSOLIDADA_${bookName}_Cap${chapterNum}.txt`;
-    writeFileSync(
-      path.join(outputDir, sourceFileName),
-      "\uFEFF" + plainTextSource,
-      "utf8",
-    );
-    console.log(`   ✅ Archivo creado: ${sourceFileName}`);
-  }
-}
-
-// ============================================================
-// FUNCIÓN PRINCIPAL EXPORTADA (PARA SER USADA POR EL ORQUESTADOR)
-// ============================================================
-
-// ============================================================
-// FUNCIONES AUXILIARES PARA DETECCIÓN DE MOMENTOS NARRATIVOS
-// ============================================================
-
-/**
- * Extrae segmentos del SSML cortando por <break>.
- * Devuelve un array de strings (cada uno es un bloque de texto entre breaks).
- * NO incluye las etiquetas <speak>, <prosody>, ni las etiquetas <break>.
- */
-function extraerSegmentosPorBreak(ssml) {
-  if (!ssml || typeof ssml !== "string") return [];
-
-  // Quitar <speak> y <prosody> de apertura/cierre
-  let contenido = ssml
-    .replace(/<speak[^>]*>/gi, "")
-    .replace(/<\/speak>/gi, "")
-    .replace(/<prosody[^>]*>/gi, "")
-    .replace(/<\/prosody>/gi, "")
-    .trim();
-
-  // Cortar por <break time="..."/> (cualquier duración)
-  const partes = contenido.split(/<break\s+time="[^"]*"\s*\/?>/gi);
-
-  // Limpiar cada segmento
-  const segmentos = partes
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-
-  return segmentos;
-}
-
-/**
- * Llama a DeepSeek para refinar los segmentos brutos en 12-25 momentos narrativos.
- * Devuelve un array de objetos { indice, texto_inicio, descripcion_visual }.
- */
-async function detectarMomentosNarrativos(segmentos, ctx) {
-  if (!segmentos || segmentos.length === 0) return [];
-
-  // Unir los segmentos numerados para pasárselos a la IA
-  const segmentosNumerados = segmentos
-    .map((seg, i) => `[${i + 1}] ${seg}`)
-    .join("\n\n");
-
-  const prompt = `Eres un editor narrativo experto. Te paso los segmentos de un guion para un video bíblico sobre ${ctx}, cortados por pausas dramáticas.
-
-TAREA: Analizá los segmentos y agrupalos en 12-25 MOMENTOS NARRATIVOS. Un "momento narrativo" es un bloque donde se habla del mismo tema, personaje o sección. Cada momento puede contener 1 o varios segmentos consecutivos.
-
-REGLAS:
-1. Cada momento debe tener sentido narrativo propio.
-2. NO fragmentes en exceso (no hagas 40 momentos).
-3. NO fusiones en exceso (no hagas 5 momentos).
-4. La cantidad óptima es 15-22 momentos.
-5. El primer momento SIEMPRE es el gancho inicial.
-6. El último momento SIEMPRE es la conclusión.
-7. NINGÚN momento debe ser demasiado largo ni demasiado corto. Si un bloque de segmentos es muy extenso, dividilo en dos momentos. Si es muy corto, fusionálo con el siguiente.
-8. La cantidad IDEAL es 15-22 momentos. Si te salen más de 25, fusioná los más cortos. Si te salen menos de 12, dividí los más largos.
-
-SEGMENTOS:
-${segmentosNumerados}
-
-FORMATO DE SALIDA (JSON estricto):
-{
-  "momentos": [
-    {
-      "indice": 1,
-      "inicio_segmento": 1,
-      "fin_segmento": 2,
-      "texto_inicio": "primeras palabras exactas del momento (20-30 caracteres)",
-      "descripcion_visual": "descripción breve de qué mostrar visualmente (una línea, en español)"
-    },
-    ...
-  ]
-}
-
-Devolvé SOLO el JSON, sin markdown, sin explicaciones.`;
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "deepseek-chat",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-      temperature: 0.3,
-      max_tokens: 4000,
-    });
-
-    const parsed = JSON.parse(response.choices[0].message.content);
-
-    if (!parsed.momentos || !Array.isArray(parsed.momentos)) {
-      console.error("   ⚠️ La IA no devolvió momentos válidos.");
-      return [];
-    }
-
-    console.log(`   📊 Momentos narrativos detectados: ${parsed.momentos.length}`);
-    return parsed.momentos;
-  } catch (error) {
-    console.error("   ❌ Error detectando momentos narrativos:", error.message);
-    return [];
-  }
-}
-
-/**
- * Inserta las marcas <mark name="imagen_N"/> en el SSML, antes de cada momento narrativo.
- * Busca el texto exacto de inicio del momento y le inserta la marca antes.
- */
-
-function insertarMarcasEnSSML(ssml, momentos) {
-  if (!ssml || !momentos || momentos.length === 0) return ssml;
-
-  // Ordenar los momentos por su índice (1, 2, 3, ...)
-  const momentosOrdenados = [...momentos].sort(
-    (a, b) => (a.indice || 0) - (b.indice || 0),
-  );
-
-  let ssmlConMarcas = ssml;
-  let posicionAnterior = 0;
-
-  for (let i = 0; i < momentosOrdenados.length; i++) {
-    const momento = momentosOrdenados[i];
-    const numImagen = i + 1;
-
-    // Buscar texto de inicio con diferentes longitudes (fallback progresivo)
-    const textosBuscar = [
-      (momento.texto_inicio || "").substring(0, 25),
-      (momento.texto_inicio || "").substring(0, 15),
-      (momento.texto_inicio || "").substring(0, 10),
-    ].filter((t) => t.length > 0);
-
-    let posicion = -1;
-
-    for (const texto of textosBuscar) {
-      const pos = ssmlConMarcas.indexOf(texto, posicionAnterior);
-      if (pos !== -1) {
-        posicion = pos;
-        break;
-      }
-    }
-
-    if (posicion === -1) {
-      console.error(
-        `   ⚠️ No se encontró el momento ${numImagen} en el SSML.`,
-      );
-      continue;
-    }
-
-    // Insertar la marca justo antes del texto encontrado
-    const marca = `<mark name="imagen_${numImagen}"/>`;
-    ssmlConMarcas =
-      ssmlConMarcas.slice(0, posicion) +
-      marca +
-      ssmlConMarcas.slice(posicion);
-
-    // Actualizar la posición anterior (para la próxima búsqueda)
-    posicionAnterior = posicion + marca.length;
-
-    console.log(`   ✓ Momento ${numImagen} insertado en posición ${posicion}`);
-  }
-
-  return ssmlConMarcas;
-}
-
-export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
-  try {
-    const chapterInfo = await fetchChapterResources(bookSlug, chapterNumber);
-    console.log(
-      `   ✅ Capítulo encontrado: ID ${chapterInfo.chapterId}, Libro: ${chapterInfo.bookName}`,
-    );
-
-    const context = await getResourcesForChapter(chapterInfo.chapterId);
-    const plainTextSource = buildPlainTextSource(
-      chapterInfo.bookName,
-      chapterInfo.chapterNumber,
-      context,
-    );
-    const promptsToGenerate = buildPrompts(
-      chapterInfo.bookName,
-      chapterInfo.chapterNumber,
-      context,
-    );
-
-    const results = [];
-    for (const p of promptsToGenerate) {
-      const aiResponse = await generateWithAI(p);
-      if (aiResponse) results.push({ type: p.type, data: aiResponse });
-    }
-
-    await saveFilesLocally(
-      results,
-      plainTextSource,
-      chapterInfo.bookName,
-      chapterInfo.chapterNumber,
-      context.estudioTitulo,
-    );
-    // NUEVO: Generar artefactos para Video Automático (Azure + Replicate)
-    // Extraemos el texto del estudio si existe
-
-    // Presupuesto total para la fuente que va al SSML (en caracteres)
-    const PRESUPUESTO_FUENTE = 70000;
-
-    // 1. Sermón completo (limpio de HTML) — fuente narrativa principal
-    const sermonLimpio = context.sermon
-      ? context.sermon
-          .replace(/<[^>]*>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-      : "";
-
-    // 2. Estudio completo (limpio de HTML) — fuente exegética
-    const estudioLimpio = context.estudio
-      ? context.estudio
-          .replace(/<[^>]*>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-      : "";
-
-    // 3. Priorización dinámica: primero el sermón, el resto al estudio
-    let sermonFinal = sermonLimpio;
-    let estudioFinal = "";
-    let presupuestoRestante = PRESUPUESTO_FUENTE;
-
-    if (sermonLimpio.length <= presupuestoRestante) {
-      presupuestoRestante -= sermonLimpio.length;
-      estudioFinal = estudioLimpio.substring(0, presupuestoRestante);
-    } else {
-      sermonFinal = sermonLimpio.substring(0, presupuestoRestante);
-      estudioFinal = "";
-    }
-
-    // 4. Armar el bloque final
-    const textoEstudioAmpliado = `
+  const texto = `
 TÍTULO DEL ESTUDIO: "${context.estudioTitulo}"
 
 ═══════════════════════════════════════
@@ -697,49 +317,17 @@ ESTUDIO BÍBLICO ${estudioFinal.length < estudioLimpio.length ? "(recortado)" : 
 ═══════════════════════════════════════
 ${estudioFinal}
 `;
+  console.log(
+    `📏 Fuente consolidada: ${texto.length} caracteres (estudio: ${estudioFinal.length}, sermón: ${sermonFinal.length})`,
+  );
+  return texto;
+}
 
-    console.log(
-      `📏 Fuente consolidada: ${textoEstudioAmpliado.length} caracteres (estudio: ${estudioFinal.length}, sermón: ${sermonFinal.length})`,
-    );
-
-    await generarArtefactosVideo(
-      chapterInfo.bookName,
-      chapterInfo.chapterNumber,
-      textoEstudioAmpliado,
-    );
-    console.log(`   ✨ ¡Prompts listos para ${bookSlug} ${chapterNumber}!`);
-    return true;
-  } catch (error) {
-    console.error(
-      `   ❌ Error fatal en el workflow de prompts:`,
-      error.message,
-    );
-    return false;
-  }
-
-  // NUEVOS ARTEFACTOS PARA PIPELINE DE VIDEO (rediseñado)
-  // ============================================================
-
-  async function generarArtefactosVideo(libro, capitulo, textoCapitulo) {
-    console.log(
-      `\n    [Paso 3.1] Generando artefactos para Video Automático...`,
-    );
-
-    // Guardar en la EXACTA misma carpeta que los otros 8 archivos del capítulo
-    function quitarTildes(texto) {
-      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-    const dir = path.join(
-      "prompts_output",
-      quitarTildes(libro.toLowerCase()),
-      `Capitulo_${capitulo}`,
-    );
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-    const ctx = `${libro} capítulo ${capitulo}`;
-
-    // --- PASO 1: GENERAR EL GUION SSML SIN MARCAS ---
-    const promptSSML = `
+// ============================================================
+// 1) GUION SSML DEL VIDEO
+// ============================================================
+function promptSSML(ctx, textoCapitulo) {
+  return `
 Eres un guionista profesional de documentales bíblicos para YouTube, especializado en retención de audiencia y profundidad teológica. Escribís para el canal "Mahanaim", que se caracteriza por contenido exegético serio pero accesible, con narrativa envolvente.
 
 TAREA: Genera un guion narrativo completo para un video de 18 a 22 minutos sobre ${ctx}, en formato SSML válido para Google Cloud Text-to-Speech.
@@ -750,10 +338,7 @@ Tenés acceso al estudio bíblico y al sermón del capítulo al final de este pr
 ═══════════════════════════════════════
 PERFIL DOCTRINAL QUE DEBES RESPETAR (CRÍTICO)
 ═══════════════════════════════════════
-
-- Monoteísmo puro: Un solo Dios, el Padre. Jesucristo es Su Hijo y Mesías, preexistente, de Su esencia pero distinto y subordinado al Padre, con todo poder y autoridad conferido por el Padre.
-- ⛔ REGLA INVIOLABLE SOBRE LA DEIDAD: En NINGÚN punto debes afirmar, sugerir ni dar a entender que existe una "Trinidad" o un "Dios trino" de tres personas divinas coiguales. NUNCA digas que Jesucristo es "Dios" o "Dios el Hijo" (es el HIJO de Dios). NUNCA digas que el Espíritu Santo es "Dios" ni una tercera persona divina (es el Espíritu de Dios y de Cristo). Un solo Dios: el Padre.
-- Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada. Cristo es el hijo de Dios, El mesias, es preexistente, el padre le dio toda autoridad y poder, por medio de Cristo fue hecho todo. 
+${PERFIL_DOCTRINAL}
 
 ═══════════════════════════════════════
 ESTRUCTURA OBLIGATORIA DEL GUION (respeta el orden)
@@ -808,13 +393,20 @@ REGLAS DE ESTILO Y SSML
 
 3. Usá <break time="800ms"/> entre párrafos y <break time="1.5s"/> para pausas dramáticas después de frases clave.
 
-4. Usá <emphasis level="moderate"> para palabras clave teológicas o giros importantes.
+4. ⛔ NO uses <emphasis> en ningún caso. Hace que la voz suene artificial. La importancia de una palabra se transmite con la redacción y con las pausas, no con etiquetas.
 
 5. NO uses <prosody rate="slow"> en ningún caso. La velocidad de lectura debe mantenerse constante (rate="medium") durante TODO el guion, incluidas las citas bíblicas. Para marcar solemnidad en las citas, usá únicamente pausas antes y después (<break time="1.5s"/>). La reducción de velocidad suena artificial en la narración continua.
 
 6. NO insertes NINGUNA etiqueta <mark> en el guion. El guion debe salir limpio, sin marcas de sincronización. Las marcas <mark> se agregan en un paso posterior del pipeline. Tu tarea es SOLO generar el guion narrativo completo con los <break> dramáticos.
 
 7. Duración objetivo: 2.600-3.000 palabras MÁXIMO (15-18 minutos de narración a velocidad media). NO superes las 3.000 palabras bajo ninguna circunstancia. El guion completo con etiquetas SSML NO debe superar los 22.000 caracteres. Si estás cerca del límite, TERMINÁ el guion aunque falten detalles secundarios. Es preferible un guion conciso y bien estructurado que uno largo y denso.
+
+8. TEXTO PENSADO PARA SER LEÍDO POR UNA VOZ SINTÉTICA (para que suene natural):
+   - Escribí números y referencias bíblicas tal como se pronuncian: "Filemón, versículo quince", "el siglo primero", "sesenta años". Nada de "Flm 1:15", "v. 15" ni cifras sueltas.
+   - NO uses abreviaturas, símbolos (&, %, §, /), paréntesis con citas ni guiones largos como adorno.
+   - NO escribas en alfabeto griego ni hebreo. Transliterá la palabra original (por ejemplo: "la palabra griega agápe") y explicá su significado.
+   - Frases de largo moderado: una idea por frase. Evitá oraciones de más de 35 palabras.
+   - Los nombres propios se escriben con su ortografía normal en español.
 
 ═══════════════════════════════════════
 ESTRUCTURA DE RETENCIÓN NARRATIVA (CRÍTICO PARA 20 MIN)
@@ -860,128 +452,291 @@ ${textoCapitulo}
 
 Generá el guion SSML completo ahora. Recordá:
 1. SOLO el XML, sin explicaciones, sin markdown, sin comentarios fuera de las etiquetas SSML válidas.
-2. NO incluyas NINGUNA etiqueta <mark>. El guion va limpio.
+2. NO incluyas NINGUNA etiqueta <mark> ni <emphasis>. El guion va limpio.
 3. Los <break> son importantes: usá <break time="1.5s"/> en cambios narrativos reales (cambio de tema, personaje o sección), y <break time="800ms"/> entre párrafos comunes.
+4. Cerrá siempre con </prosody></speak>.
 `;
+}
 
-    let ssmlLimpio = "";
+/** Limpia y normaliza lo que devuelve la IA para que Google TTS lo acepte. */
+function limpiarSSML(crudo) {
+  let s = crudo.replace(/```xml\s*/gi, "").replace(/```\s*/g, "").trim();
+
+  const ini = s.indexOf("<speak");
+  const fin = s.lastIndexOf("</speak>");
+  if (ini === -1 || fin === -1) {
+    throw new Error("el SSML no tiene <speak> ... </speak>");
+  }
+  s = s.slice(ini, fin + "</speak>".length);
+
+  // Fuera énfasis y marcas (las marcas se agregan después)
+  s = s.replace(/<\/?emphasis[^>]*>/gi, "");
+  s = s.replace(/<mark[^>]*\/>/gi, "");
+
+  // generar-audio.js espera UNA sola envoltura <prosody>
+  const aperturas = [...s.matchAll(/<prosody[^>]*>/gi)];
+  if (aperturas.length > 1) {
+    const primera = aperturas[0];
+    const finPrimera = primera.index + primera[0].length;
+    const antes = s.slice(0, finPrimera);
+    const resto = s.slice(finPrimera);
+    const ultimoCierre = resto.lastIndexOf("</prosody>");
+    const cuerpo = (
+      ultimoCierre !== -1 ? resto.slice(0, ultimoCierre) : resto
+    ).replace(/<\/?prosody[^>]*>/gi, "");
+    const cola = ultimoCierre !== -1 ? resto.slice(ultimoCierre) : "";
+    s = antes + cuerpo + cola;
+  }
+
+  // "&" suelto rompe el XML
+  s = s.replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-f]+);)/gi, "&amp;");
+  return s;
+}
+
+function validarSSML(ssml) {
+  const errores = [];
+  if (!/^<speak[\s>]/.test(ssml)) errores.push("no empieza con <speak>");
+  if (!ssml.endsWith("</speak>")) errores.push("no termina con </speak>");
+  const abre = (ssml.match(/<prosody[^>]*>/gi) || []).length;
+  const cierra = (ssml.match(/<\/prosody>/gi) || []).length;
+  if (abre !== 1 || cierra !== 1) {
+    errores.push(`prosody: ${abre} aperturas y ${cierra} cierres (se espera 1 y 1)`);
+  }
+  const breaks = (ssml.match(/<break\s+time="[^"]*"\s*\/?>/gi) || []).length;
+  if (breaks < 10) errores.push(`solo ${breaks} pausas <break> (muy pocas)`);
+  return errores;
+}
+
+function ssmlATextoPlano(ssml) {
+  return ssml
+    .replace(/<mark[^>]*\/>/gi, "")
+    .replace(/<break[^>]*\/>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function generarSSMLLimpio(ctx, textoCapitulo) {
+  for (let intento = 1; intento <= 2; intento++) {
     try {
-      const resSSML = await fetch(
-        process.env.LLM_BASE_URL ||
-          "https://api.deepseek.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.LLM_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: process.env.LLM_MODEL || "deepseek-chat",
-            messages: [{ role: "user", content: promptSSML }],
-            temperature: 0.5,
-            max_tokens: 20000,
-          }),
-        },
+      const crudo = await llamarIA({
+        etiqueta: "SSML del video",
+        user: promptSSML(ctx, textoCapitulo),
+        temperature: 0.5,
+        maxTokens: 20000,
+        reintentos: 0,
+      });
+      const ssml = limpiarSSML(crudo);
+      const errores = validarSSML(ssml);
+      if (errores.length) throw new Error(errores.join("; "));
+
+      const palabras = contarPalabras(ssmlATextoPlano(ssml));
+      console.log(
+        `   ✅ SSML válido (${ssml.length} caracteres, ~${palabras} palabras).`,
       );
-      const dataSSML = await resSSML.json();
-      ssmlLimpio = dataSSML.choices[0]?.message?.content || "";
-      ssmlLimpio = ssmlLimpio
-        .replace(/```xml\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .trim();
-
-      if (!ssmlLimpio) {
-        throw new Error("La IA devolvió un SSML vacío.");
+      if (palabras < 1800 || palabras > 3600) {
+        console.warn(
+          `   ⚠️ Largo inusual: ${palabras} palabras (se esperaban 2600-3000).`,
+        );
       }
-      console.log(`   ✅ SSML limpio generado (${ssmlLimpio.length} caracteres).`);
+      return ssml;
     } catch (e) {
-      console.error("   ⚠️ Error generando guion SSML:", e.message);
-      return;
+      console.error(`   ⚠️ SSML intento ${intento} inválido: ${e.message}`);
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// 2) MOMENTOS NARRATIVOS, MARCAS E IMÁGENES
+// ============================================================
+function extraerSegmentosPorBreak(ssml) {
+  if (!ssml || typeof ssml !== "string") return [];
+  const contenido = ssml
+    .replace(/<speak[^>]*>/gi, "")
+    .replace(/<\/speak>/gi, "")
+    .replace(/<prosody[^>]*>/gi, "")
+    .replace(/<\/prosody>/gi, "")
+    .trim();
+  return contenido
+    .split(/<break\s+time="[^"]*"\s*\/?>/gi)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+async function detectarMomentosNarrativos(segmentos, ctx) {
+  if (!segmentos.length) return [];
+
+  const lista = segmentos
+    .map((seg, i) => `[${i + 1}] (${contarPalabras(seg)} palabras) ${seg}`)
+    .join("\n\n");
+
+  const prompt = `Eres un editor narrativo experto. Te paso los segmentos de un guion para un video bíblico sobre ${ctx}, cortados por pausas dramáticas. Entre paréntesis está la cantidad de palabras de cada segmento (la voz lee unas 130 palabras por minuto).
+
+TAREA: Agrupá y/o dividí los segmentos en MOMENTOS NARRATIVOS. Un "momento" es un bloque que trata el mismo tema, personaje o escena, y recibirá UNA imagen en pantalla.
+
+REGLAS:
+1. Cada momento debe tener sentido narrativo propio.
+2. Cantidad: mínimo 15 y máximo 25 momentos.
+3. ⚠️ NINGÚN momento puede superar las 200 palabras (unos 90 segundos). Si un segmento o grupo de segmentos supera ese tope, dividilo en dos o más momentos. Para dividir en medio de un segmento, "texto_inicio" debe ser las primeras palabras EXACTAS (copiadas literalmente, sin cambiar nada) de la frase donde empieza el nuevo momento.
+4. Ningún momento debe ser demasiado corto: mínimo 25 palabras.
+5. El primer momento es el gancho inicial. El último es la conclusión y la oración final; si esa parte es larga, dividila también.
+6. "texto_inicio": 25 a 40 caracteres COPIADOS LITERALMENTE del inicio del momento.
+7. "titulo_capitulo": nombre corto (2 a 6 palabras, sin números ni signos raros) para un capítulo de YouTube.
+8. "nuevo_capitulo_youtube": true en 8 a 12 momentos bien repartidos (el primero siempre true), false en el resto. Los que valen true marcan cambios grandes de tema.
+
+SEGMENTOS:
+${lista}
+
+FORMATO DE SALIDA (JSON estricto):
+{
+  "momentos": [
+    {
+      "indice": 1,
+      "texto_inicio": "texto literal del inicio del momento",
+      "descripcion_visual": "qué mostrar visualmente (una línea, en español)",
+      "titulo_capitulo": "Nombre corto",
+      "nuevo_capitulo_youtube": true
+    }
+  ]
+}
+
+Devolvé SOLO el JSON.`;
+
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Momentos narrativos",
+      user: prompt,
+      json: true,
+      temperature: 0.3,
+      maxTokens: 6000,
+    });
+    const parsed = parsearJSON(crudo);
+    if (!parsed?.momentos || !Array.isArray(parsed.momentos)) {
+      console.error("   ⚠️ La IA no devolvió momentos válidos.");
+      return [];
+    }
+    console.log(`   📊 Momentos narrativos detectados: ${parsed.momentos.length}`);
+    return parsed.momentos;
+  } catch (e) {
+    console.error("   ❌ Error detectando momentos narrativos:", e.message);
+    return [];
+  }
+}
+
+/**
+ * Inserta <mark name="imagen_N"/> antes de cada momento.
+ *  - La primera marca va SIEMPRE al comienzo del guion (así el video y el
+ *    audio arrancan juntos).
+ *  - Si un momento no se encuentra, se omite y la numeración sigue sin
+ *    huecos (imagen_1, imagen_2, ... consecutivas).
+ * Devuelve el SSML y los momentos que sí se insertaron.
+ */
+function insertarMarcasEnSSML(ssml, momentos) {
+  const ordenados = [...momentos].sort(
+    (a, b) => (a.indice || 0) - (b.indice || 0),
+  );
+
+  const mProsody = ssml.match(/<prosody[^>]*>/i);
+  const inicioContenido = mProsody
+    ? mProsody.index + mProsody[0].length
+    : ssml.indexOf(">") + 1;
+
+  let resultado = ssml;
+  let desde = inicioContenido;
+  const insertados = [];
+
+  for (const momento of ordenados) {
+    let pos = -1;
+
+    if (insertados.length === 0) {
+      pos = inicioContenido;
+    } else {
+      const base = (momento.texto_inicio || "").trim();
+      for (const largo of [35, 25, 15]) {
+        const t = base.substring(0, largo).trim();
+        if (t.length < 8) continue;
+        const p = resultado.indexOf(t, desde);
+        if (p !== -1) {
+          pos = p;
+          break;
+        }
+      }
     }
 
-    // --- PASO 2: EXTRAER SEGMENTOS POR <break> ---
-    const segmentos = extraerSegmentosPorBreak(ssmlLimpio);
-    console.log(`   📄 Segmentos extraídos: ${segmentos.length}`);
-
-    if (segmentos.length === 0) {
-      console.error("   ⚠️ No se pudieron extraer segmentos del SSML.");
-      return;
+    if (pos === -1) {
+      console.warn(
+        `   ⚠️ No se encontró el momento ${momento.indice} en el SSML; se omite.`,
+      );
+      continue;
     }
 
-    // --- PASO 3: DETECTAR MOMENTOS NARRATIVOS CON IA ---
-    const momentos = await detectarMomentosNarrativos(segmentos, ctx);
+    const numero = insertados.length + 1;
+    const marca = `<mark name="imagen_${numero}"/>`;
+    resultado = resultado.slice(0, pos) + marca + resultado.slice(pos);
+    desde = pos + marca.length;
+    insertados.push({ ...momento, numero });
+  }
 
-    if (!momentos || momentos.length === 0) {
-      console.error("   ⚠️ No se detectaron momentos narrativos.");
-      return;
+  return { ssml: resultado, insertados };
+}
+
+/** Avisa si alguna imagen quedaría demasiado tiempo en pantalla. */
+function advertirMomentosLargos(ssmlConMarcas, maxPalabras = 230) {
+  const partes = ssmlConMarcas.split(/<mark name="imagen_(\d+)"\/>/);
+  for (let i = 1; i < partes.length; i += 2) {
+    const numero = partes[i];
+    const palabras = contarPalabras(ssmlATextoPlano(partes[i + 1] || ""));
+    if (palabras > maxPalabras) {
+      console.warn(
+        `   ⚠️ imagen_${numero} cubre ~${palabras} palabras (~${Math.round(palabras / 2.2)} s). Quedará mucho tiempo en pantalla.`,
+      );
     }
+  }
+}
 
-    // --- PASO 4: INSERTAR MARCAS EN EL SSML ---
-    const ssmlConMarcas = insertarMarcasEnSSML(ssmlLimpio, momentos);
+function elegirCapitulosYoutube(insertados) {
+  let elegidos = insertados.filter(
+    (m, i) => i === 0 || m.nuevo_capitulo_youtube === true,
+  );
 
-    // Verificar que se insertaron todas las marcas
-    const marcasInsertadas = (
-      ssmlConMarcas.match(/<mark\s+name="imagen_\d+"\s*\/?>/gi) || []
-    ).length;
-    console.log(
-      `   📌 Marcas insertadas: ${marcasInsertadas} de ${momentos.length}`,
+  if (elegidos.length < 6 || elegidos.length > 14) {
+    const objetivo = Math.min(10, insertados.length);
+    const paso = insertados.length / objetivo;
+    const idx = new Set(
+      Array.from({ length: objetivo }, (_, k) => Math.floor(k * paso)),
     );
+    elegidos = insertados.filter((_, i) => idx.has(i));
+  }
 
-    // Guardar SSML final con marcas
-    fs.writeFileSync(`${dir}/guion_video_tts.ssml`, ssmlConMarcas, "utf8");
-    console.log(`   ✅ guion_video_tts.ssml guardado (${ssmlConMarcas.length} caracteres).`);
+  return elegidos.map((m) => ({
+    marca: `imagen_${m.numero}`,
+    titulo: String(m.titulo_capitulo || `Parte ${m.numero}`)
+      .replace(/[<>]/g, "")
+      .trim(),
+  }));
+}
 
-    // --- PASO 5: GENERAR PROMPTS DE IMÁGENES BASADOS EN LOS MOMENTOS ---
-    const listaMomentos = momentos
-      .map(
-        (m) =>
-          `[Momento ${m.indice}] Descripción visual: ${m.descripcion_visual}`,
-      )
-      .join("\n");
+async function generarPromptsImagenes(insertados, ctx, textoCapitulo) {
+  const listaMomentos = insertados
+    .map((m) => `[Momento ${m.numero}] Descripción visual: ${m.descripcion_visual}`)
+    .join("\n");
 
-    const promptImagenes = `
+  const prompt = `
 Eres un director de arte cinematográfico e historiador bíblico con expertise en contextos culturales de todas las épocas.
 
-TAREA: Generá EXACTAMENTE ${momentos.length} prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas. Cada prompt corresponde a UNO de los momentos narrativos del video sobre ${ctx}. La cantidad es EXACTA: ${momentos.length}. No generes más ni menos.
+TAREA: Generá EXACTAMENTE ${insertados.length} prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas. Cada prompt corresponde a UNO de los momentos narrativos del video sobre ${ctx}. La cantidad es EXACTA: ${insertados.length}. No generes más ni menos.
 
 REGLAS UNIVERSALES PARA CADA PROMPT:
-
-A) COHERENCIA HISTÓRICA Y CULTURAL:
-- Cada prompt debe incluir al inicio un bloque de contexto de época específico a ESTE capítulo.
-- Vestimenta, arquitectura, herramientas, mobiliario y entorno exactos a esa época y cultura.
-- Paleta de colores coherente con la escena (ámbar, ocre y dorado para escenas diurnas; azules fríos para nocturnas).
-- PROHIBIDO: cualquier objeto moderno o fuera de época. Prohibido mezclar culturas o siglos.
-
-B) GÉNERO EXPLÍCITO EN PERSONAJES CON NOMBRE:
-- Cada vez que un personaje con nombre aparezca, aclaralo entre paréntesis con su género.
-- Ejemplo: "Rebekah (a woman)", "Abraham (a man)", "the midwife (a woman)", "the infant (a baby boy)".
-
-C) HUMANIDAD Y PROPORCIONES:
-- Todos los personajes son seres humanos completos y normales.
-- PROPORCIONES HUMANAS CORRECTAS: adultos con proporciones adultas, niños con proporciones infantiles.
-- Al final de cada prompt: "fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs".
-
-D) POSE, COMPOSICIÓN Y MULTITUDES:
-- Poses explícitas. Figuras humanas completas.
-- MULTITUDES: proporciones correctas, sin "enanos" al fondo.
-
-E) AUTO-SUFICIENCIA:
-- Cada prompt debe entenderse por sí solo. Todo el contexto dentro del string.
-
-F) ESTILO VISUAL:
-- Ilustración cinematográfica hiperrealista con realismo estilizado (semi-stylized realism).
-- Iluminación dramática (35mm film aesthetic, shallow depth of field).
-- Texturas hiperrealistas de piel y telas. Sin efecto "plástico CGI".
-- NO caricatura, NO cartoon, NO Pixar/Disney, NO "pintura devocional del s.XIX".
-- Relación de aspecto 16:9 al final (--ar 16:9).
-
-G) PROHIBICIONES:
-- NO texto, letras ni marcas de agua.
-- NO rostros reconocibles de personas modernas.
-- NO símbolos cristianos anacrónicos.
+${REGLAS_IMAGEN}
+- Relación de aspecto 16:9 al final de cada prompt (--ar 16:9).
 
 ═══════════════════════════════════════
-LISTA DE MOMENTOS NARRATIVOS (${momentos.length} momentos)
+LISTA DE MOMENTOS NARRATIVOS (${insertados.length} momentos)
 ═══════════════════════════════════════
 
 ${listaMomentos}
@@ -991,79 +746,690 @@ CONTEXTO DEL CAPÍTULO (para coherencia general)
 ═══════════════════════════════════════
 ${textoCapitulo.substring(0, 8000)}
 
-FORMATO DE SALIDA (obligatorio):
-SOLO un array JSON de EXACTAMENTE ${momentos.length} strings en INGLÉS. Sin texto adicional. Ejemplo:
-["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9", ...]
+FORMATO DE SALIDA (obligatorio): un objeto JSON con un array "prompts" de EXACTAMENTE ${insertados.length} strings en INGLÉS, en el mismo orden de los momentos:
+{ "prompts": ["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9"] }
 `;
 
-    try {
-      const resImg = await fetch(
-        process.env.LLM_BASE_URL ||
-          "https://api.deepseek.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.LLM_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: process.env.LLM_MODEL || "deepseek-chat",
-            messages: [{ role: "user", content: promptImagenes }],
-            temperature: 0.7,
-            max_tokens: 16000,
-          }),
-        },
+  let lista = [];
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Prompts de imágenes",
+      user: prompt,
+      json: true,
+      temperature: 0.7,
+      maxTokens: 16000,
+    });
+    const parsed = parsearJSON(crudo);
+    lista = Array.isArray(parsed) ? parsed : parsed?.prompts;
+    if (!Array.isArray(lista)) throw new Error("no hay array 'prompts'");
+  } catch (e) {
+    console.error("   ❌ Error generando prompts de imágenes:", e.message);
+    return null;
+  }
+
+  lista = lista.filter((p) => typeof p === "string" && p.trim().length > 20);
+
+  if (lista.length !== insertados.length) {
+    console.warn(
+      `   ⚠️ Se esperaban ${insertados.length} prompts y llegaron ${lista.length}. Se ajusta.`,
+    );
+    lista = lista.slice(0, insertados.length);
+    while (lista.length < insertados.length) {
+      const m = insertados[lista.length];
+      lista.push(
+        `Hyperrealistic cinematic illustration, semi-stylized realism, 35mm film aesthetic, shallow depth of field. Ancient biblical scene: ${m.descripcion_visual}. Warm amber and ocre lighting. No text, no letters, no watermarks, no modern objects. ${ANATOMIA} --ar 16:9`,
       );
-      const dataImg = await resImg.json();
-      let contenidoImg = dataImg.choices[0]?.message?.content || "[]";
-      contenidoImg = contenidoImg
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .trim();
-
-      // Validar que sea un array JSON con la cantidad correcta
-      let arrayPrompts;
-      try {
-        arrayPrompts = JSON.parse(contenidoImg);
-      } catch (err) {
-        console.error("   ⚠️ La IA no devolvió un JSON válido de prompts.");
-        console.error("   📄 Primeros 300 chars:", contenidoImg.substring(0, 300));
-        return;
-      }
-
-      if (!Array.isArray(arrayPrompts)) {
-        console.error("   ⚠️ El output no es un array.");
-        return;
-      }
-
-      if (arrayPrompts.length !== momentos.length) {
-        console.warn(
-          `   ⚠️ ADVERTENCIA: Se esperaban ${momentos.length} prompts, la IA devolvió ${arrayPrompts.length}.`,
-        );
-        console.warn(`   ⚠️ Se recortarán o rellenarán para coincidir.`);
-
-        if (arrayPrompts.length > momentos.length) {
-          arrayPrompts = arrayPrompts.slice(0, momentos.length);
-        } else {
-          // Rellenar con prompts genéricos si faltan
-          while (arrayPrompts.length < momentos.length) {
-            arrayPrompts.push(
-              `Ancient biblical scene, cinematic hyperrealistic illustration, correct adult-child proportions, natural hands, no anachronisms, --ar 16:9`,
-            );
-          }
-        }
-      }
-
-      fs.writeFileSync(
-        `${dir}/prompts_imagenes_video.json`,
-        JSON.stringify(arrayPrompts, null, 2),
-        "utf8",
-      );
-      console.log(
-        `   ✅ prompts_imagenes_video.json guardado (${arrayPrompts.length} prompts).`,
-      );
-    } catch (e) {
-      console.error("   ⚠️ Error generando prompts de imagen:", e.message);
     }
+  }
+  return lista;
+}
+
+async function generarArtefactosVideo(dir, ctx, textoCapitulo) {
+  console.log(`\n   🎬 [Video] Generando guion y prompts de imágenes...`);
+
+  const ssmlLimpio = await generarSSMLLimpio(ctx, textoCapitulo);
+  if (!ssmlLimpio) return null;
+
+  const segmentos = extraerSegmentosPorBreak(ssmlLimpio);
+  console.log(`   📄 Segmentos extraídos: ${segmentos.length}`);
+  if (!segmentos.length) return null;
+
+  const momentos = await detectarMomentosNarrativos(segmentos, ctx);
+  if (!momentos.length) return null;
+
+  const { ssml: ssmlConMarcas, insertados } = insertarMarcasEnSSML(
+    ssmlLimpio,
+    momentos,
+  );
+  console.log(
+    `   📌 Marcas insertadas: ${insertados.length} de ${momentos.length}`,
+  );
+  if (insertados.length < 8) {
+    console.error("   ❌ Muy pocas marcas insertadas; el video quedaría pobre.");
+    return null;
+  }
+  advertirMomentosLargos(ssmlConMarcas);
+
+  const prompts = await generarPromptsImagenes(insertados, ctx, textoCapitulo);
+  if (!prompts) return null;
+
+  // Solo se guarda todo cuando TODO el bloque salió bien
+  fs.writeFileSync(path.join(dir, "guion_video_tts.ssml"), ssmlConMarcas, "utf8");
+  console.log(
+    `   ✅ guion_video_tts.ssml guardado (${ssmlConMarcas.length} caracteres, ${insertados.length} marcas).`,
+  );
+  guardarJSON(dir, "prompts_imagenes_video.json", prompts);
+
+  return {
+    ssml: ssmlConMarcas,
+    insertados,
+    capitulosYT: elegirCapitulosYoutube(insertados),
+  };
+}
+
+// ============================================================
+// 3) METADATOS DE YOUTUBE (derivados del guion terminado)
+// ============================================================
+function elegirTitulo(m) {
+  const candidatos = [m.titulo, ...(m.titulos_alternativos || [])]
+    .filter((t) => typeof t === "string")
+    .map((t) => t.replace(/[<>]/g, "").trim())
+    .filter(Boolean);
+  const bueno = candidatos.find((t) => t.length <= 70);
+  if (bueno) return bueno;
+  if (candidatos[0]) {
+    return candidatos[0].slice(0, 70).replace(/\s+\S*$/, "").trim();
+  }
+  return null;
+}
+
+function limpiarTags(tags, tope = 450) {
+  const vistos = new Set();
+  const salida = [];
+  let total = 0;
+  for (const t of Array.isArray(tags) ? tags : []) {
+    const tag = String(t)
+      .replace(/[<>#"]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!tag || tag.length > 60) continue;
+    const clave = tag.toLowerCase();
+    if (vistos.has(clave)) continue;
+    const costo = tag.length + (tag.includes(" ") ? 2 : 0) + 1;
+    if (total + costo > tope) break;
+    vistos.add(clave);
+    salida.push(tag);
+    total += costo;
+  }
+  return salida;
+}
+
+function limpiarHashtags(hashtags) {
+  return (Array.isArray(hashtags) ? hashtags : [])
+    .map((h) => String(h).replace(/[<>\s]/g, "").replace(/^#*/, ""))
+    .filter((h) => h.length > 1)
+    .slice(0, 5)
+    .map((h) => `#${h}`);
+}
+
+function armarDescripcion(m, hashtags) {
+  const quitar = (t) => String(t || "").replace(/[<>]/g, "").trim();
+  const lineas = [
+    quitar(m.gancho),
+    "",
+    quitar(m.resumen),
+    "",
+    "⏱️ CAPÍTULOS",
+    "{{CAPITULOS}}",
+    "",
+  ];
+  if (m.versiculo_clave) {
+    lineas.push(`📖 Versículo clave: ${quitar(m.versiculo_clave)}`, "");
+  }
+  lineas.push(
+    "🔔 Suscríbete al canal y cuéntanos en los comentarios qué te dejó este pasaje.",
+    "",
+    hashtags.join(" "),
+  );
+  return lineas.join("\n").trim();
+}
+
+async function generarMetadatosYoutube({ info, ssml, capitulosYT }) {
+  console.log(`\n   📺 [YouTube] Generando metadatos a partir del guion...`);
+  const guion = ssmlATextoPlano(ssml).substring(0, 30000);
+
+  const prompt = `Analiza el GUION FINAL de un video de YouTube del canal "Mahanaim" sobre ${info.bookName} capítulo ${info.chapterNumber}, y genera sus metadatos. Todo debe salir de lo que dice el guion (no del estudio original), para que título, descripción y miniatura coincidan con el video real.
+
+Respeta este perfil doctrinal (no escribas nada que lo contradiga):
+${PERFIL_DOCTRINAL}
+
+GENERA:
+1. "titulo": título NUEVO del video, máximo 60 caracteres. Debe nacer del gancho o de la idea más fuerte del guion, despertar curiosidad y ser verdadero (nada de clickbait falso). Sin MAYÚSCULAS completas. Si cabe, incluye el libro y capítulo al final.
+2. "titulos_alternativos": 2 opciones más, máximo 60 caracteres cada una.
+3. "gancho": las 2 primeras líneas de la descripción (lo que se ve antes de "mostrar más"), máximo 200 caracteres, con la palabra clave principal.
+4. "resumen": un párrafo de 60 a 100 palabras sobre lo que aprenderá el espectador, con palabras clave naturales.
+5. "versiculo_clave": referencia y una frase breve del versículo principal.
+6. "tags": de 15 a 25 etiquetas para búsqueda (libro, capítulo, personajes, temas, palabras clave). Sin el símbolo #.
+7. "hashtags": 3 a 5 hashtags relevantes.
+8. "miniatura": diseño de la miniatura. El texto lo agrega un programa después, NO la IA de imágenes:
+   - "texto_principal": gancho de 2 a 3 palabras en MAYÚSCULAS, máximo 20 caracteres (ej: "¿PERDONARÍAS?").
+   - "texto_secundario": complemento de 1 a 4 palabras en MAYÚSCULAS, máximo 25 caracteres (puede ir vacío).
+   - "lado_texto": "left" o "right" (el lado donde irá el texto).
+   - "prompt_ilustracion": prompt en INGLÉS para una ilustración SIN TEXTO: primer plano emotivo del personaje central del pasaje (rostro con emoción fuerte), contraluz dorado dramático, fondo oscuro. No indiques la posición del personaje en el cuadro. Aplica estas reglas:
+${REGLAS_IMAGEN}
+
+GUION DEL VIDEO:
+${guion}
+
+FORMATO (JSON estricto):
+{
+  "titulo": "...",
+  "titulos_alternativos": ["...", "..."],
+  "gancho": "...",
+  "resumen": "...",
+  "versiculo_clave": "...",
+  "tags": ["..."],
+  "hashtags": ["#..."],
+  "miniatura": {
+    "texto_principal": "...",
+    "texto_secundario": "...",
+    "lado_texto": "right",
+    "prompt_ilustracion": "..."
+  }
+}`;
+
+  let m;
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Metadatos de YouTube",
+      system:
+        "Eres un experto en SEO para YouTube, copywriting cristiano y diseño de miniaturas virales.",
+      user: prompt,
+      json: true,
+      temperature: 0.7,
+      maxTokens: 6000,
+    });
+    m = parsearJSON(crudo);
+  } catch (e) {
+    console.error("   ❌ Error generando metadatos:", e.message);
+    return null;
+  }
+
+  const titulo = m ? elegirTitulo(m) : null;
+  if (!m || !titulo || !m.gancho || !m.resumen || !m.miniatura?.prompt_ilustracion) {
+    console.error("   ❌ Los metadatos vienen incompletos.");
+    return null;
+  }
+
+  const tags = limpiarTags(m.tags);
+  const hashtags = limpiarHashtags(m.hashtags);
+  const ladoTexto = m.miniatura.lado_texto === "left" ? "left" : "right";
+  const ladoSujeto = ladoTexto === "left" ? "right" : "left";
+
+  const promptIlustracion = [
+    String(m.miniatura.prompt_ilustracion).trim().replace(/--ar\s*\d+:\d+/g, ""),
+    `Subject placed on the ${ladoSujeto} third of the frame; the ${ladoTexto} third is dark, empty negative space.`,
+    "Ultra high contrast, dramatic golden rim backlight, deep shadows, saturated warm amber and gold tones, intense emotional close-up, cinematic 35mm look.",
+    `No text, no letters, no watermarks, no modern objects. ${ANATOMIA}`,
+  ].join(" ");
+
+  const metadata = {
+    libro: info.bookName,
+    capitulo: info.chapterNumber,
+    titulo,
+    titulos_alternativos: (m.titulos_alternativos || [])
+      .filter((t) => typeof t === "string")
+      .map((t) => t.trim()),
+    descripcion: armarDescripcion(m, hashtags), // contiene {{CAPITULOS}}
+    tags,
+    hashtags,
+    capitulos_youtube: capitulosYT, // [{ marca: "imagen_1", titulo: "..." }]
+    ajustes_youtube: AJUSTES_YOUTUBE,
+    miniatura: {
+      texto_principal: String(m.miniatura.texto_principal || "").trim().toUpperCase(),
+      texto_secundario: String(m.miniatura.texto_secundario || "").trim().toUpperCase(),
+      etiqueta: `${info.bookName.toUpperCase()} ${info.chapterNumber}`,
+      lado_texto: ladoTexto,
+      prompt_ilustracion: promptIlustracion,
+      aspect_ratio: "16:9",
+      salida_ancho: 1280,
+      salida_alto: 720,
+    },
+    generado_en: new Date().toISOString(),
+  };
+
+  console.log(`   ✅ Título del video: "${titulo}" (${titulo.length} caracteres)`);
+  return metadata;
+}
+
+function guardarVistaPreviaYoutube(dir, info, meta) {
+  const contenido = `═══════════════════════════════════════════
+VISTA PREVIA DE YOUTUBE (solo lectura; el script de subida usa youtube_metadata.json)
+Libro: ${info.bookName} | Capítulo: ${info.chapterNumber}
+═══════════════════════════════════════════
+
+TÍTULO (${meta.titulo.length} caracteres):
+${meta.titulo}
+
+ALTERNATIVAS:
+${meta.titulos_alternativos.map((t) => `- ${t}`).join("\n")}
+
+DESCRIPCIÓN (los capítulos con tiempos se completan después del audio):
+───────────────────────────────────────────
+${meta.descripcion}
+───────────────────────────────────────────
+
+CAPÍTULOS PREVISTOS:
+${meta.capitulos_youtube.map((c) => `- ${c.marca}: ${c.titulo}`).join("\n")}
+
+TAGS (${meta.tags.join(",").length} caracteres):
+${meta.tags.join(", ")}
+
+MINIATURA:
+- Texto principal: ${meta.miniatura.texto_principal}
+- Texto secundario: ${meta.miniatura.texto_secundario || "(ninguno)"}
+- Etiqueta: ${meta.miniatura.etiqueta}
+- Texto a la: ${meta.miniatura.lado_texto}
+- Prompt de ilustración:
+${meta.miniatura.prompt_ilustracion}
+`;
+  guardarTexto(dir, `5_YOUTUBE_PREVIEW_${info.bookName}_Cap${info.chapterNumber}.txt`, contenido);
+}
+
+// ============================================================
+// 4) GUION DE PODCAST (2 voces, otro ángulo)
+// ============================================================
+async function generarGuionPodcast({ info, tituloVideo, textoFuente, capitulosVideo }) {
+  console.log(`\n   🎙️ [Podcast] Generando guion de conversación...`);
+
+  const temasVideo = capitulosVideo.map((c) => `- ${c.titulo}`).join("\n");
+
+  const prompt = `Escribe el guion de un PODCAST conversacional de dos personas sobre ${info.bookName} capítulo ${info.chapterNumber}, para el canal "Mahanaim". Es el compañero del video titulado "${tituloVideo}": usa el mismo material, pero con OTRO ángulo.
+
+EL VIDEO YA CUBRE (no lo repitas como repaso ordenado):
+${temasVideo}
+
+ÁNGULO DEL PODCAST: el dilema humano. Preguntas incómodas, tensiones, "¿qué habría hecho yo en su lugar?", y lo que este pasaje cambia en la vida de hoy. Sin repaso versículo por versículo.
+
+LOCUTORES:
+- "A" (el guía): conoce el tema a fondo, explica con claridad y cuenta con ritmo.
+- "B" (el curioso): pregunta lo que el oyente se preguntaría, se sorprende, objeta con respeto y lo baja a la vida diaria.
+
+ESTRUCTURA:
+1. GANCHO (primeros 30 a 40 segundos): una escena fuerte o una pregunta que atrape. NADA de "hoy vamos a hablar de" ni saludos largos.
+2. CONTEXTO JUSTO (1 a 2 minutos): lo mínimo para entender la situación.
+3. TRES O CUATRO MOMENTOS CON GIRO: cada uno apoyado en un dato real del material (una palabra del original, un dato histórico, una conexión con otro pasaje) y terminando en una pregunta o sorpresa que lleve al siguiente.
+4. "¿QUÉ HARÍAS TÚ?": B y A aterrizan el pasaje en una situación concreta de hoy.
+5. CIERRE: una idea para llevarse, una invitación breve a ver el video completo en el canal y a comentar.
+
+REGLAS:
+- Extensión total: entre 1.500 y 1.900 palabras (10 a 13 minutos).
+- Lenguaje oral y natural, español neutro latinoamericano, tuteo. Frases cortas. Algunos turnos muy breves ("¿En serio?", "Espera, espera.") y ninguno de más de 80 palabras.
+- Está pensado para ser leído por voces sintéticas: SIN corchetes, SIN acotaciones, SIN emojis, SIN markdown. Números y referencias bíblicas escritos como se pronuncian ("Filemón, versículo quince"). Palabras griegas o hebreas solo transliteradas, nunca en su alfabeto. Sin abreviaturas ni símbolos.
+- No inventes datos que no estén en el material ni en conocimiento bíblico ampliamente aceptado.
+- Respeta este perfil doctrinal sin excepción:
+${PERFIL_DOCTRINAL}
+
+MATERIAL DE BASE:
+${textoFuente}
+
+FORMATO (JSON estricto):
+{
+  "titulo_podcast": "máximo 70 caracteres, distinto al del video pero reconocible como compañero, con el libro y capítulo",
+  "turnos": [
+    { "locutor": "A", "texto": "..." },
+    { "locutor": "B", "texto": "..." }
+  ]
+}`;
+
+  let data;
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Guion de podcast",
+      system:
+        "Eres un guionista de podcasts cristianos dinámicos, con oído para el lenguaje hablado. Respondes únicamente con JSON válido.",
+      user: prompt,
+      json: true,
+      temperature: 0.8,
+      maxTokens: 8000,
+    });
+    data = parsearJSON(crudo);
+  } catch (e) {
+    console.error("   ❌ Error generando podcast:", e.message);
+    return null;
+  }
+
+  const turnos = (data?.turnos || [])
+    .filter(
+      (t) =>
+        t &&
+        (t.locutor === "A" || t.locutor === "B") &&
+        typeof t.texto === "string" &&
+        t.texto.trim().length > 0,
+    )
+    .map((t) => ({
+      locutor: t.locutor,
+      texto: t.texto.replace(/\[[^\]]*\]/g, "").replace(/\s+/g, " ").trim(),
+    }))
+    .filter((t) => t.texto.length > 0);
+
+  if (turnos.length < 30) {
+    console.error(`   ❌ Podcast con solo ${turnos.length} turnos (se esperaban 30 o más).`);
+    return null;
+  }
+
+  const palabras = turnos.reduce((acc, t) => acc + contarPalabras(t.texto), 0);
+  const caracteres = turnos.reduce((acc, t) => acc + t.texto.length, 0);
+  console.log(
+    `   ✅ Podcast: ${turnos.length} turnos, ~${palabras} palabras, ${caracteres} caracteres.`,
+  );
+  if (palabras < 1200 || palabras > 2300) {
+    console.warn(`   ⚠️ Largo inusual (${palabras} palabras; objetivo 1500-1900).`);
+  }
+
+  return {
+    libro: info.bookName,
+    capitulo: info.chapterNumber,
+    titulo_podcast: String(data.titulo_podcast || `${tituloVideo} (conversación)`)
+      .replace(/[<>]/g, "")
+      .trim()
+      .slice(0, 100),
+    titulo_video_compañero: tituloVideo,
+    voces: { A: "guía", B: "curioso" },
+    caracteres_totales: caracteres,
+    turnos,
+    generado_en: new Date().toISOString(),
+  };
+}
+
+function guardarPodcast(dir, info, podcast) {
+  guardarJSON(dir, "podcast_guion.json", podcast);
+  const cuerpo = podcast.turnos.map((t) => `${t.locutor}: ${t.texto}`).join("\n\n");
+  guardarTexto(
+    dir,
+    `7_PODCAST_GUION_${info.bookName}_Cap${info.chapterNumber}.txt`,
+    `═══════════════════════════════════════════
+GUION DE PODCAST (2 voces: A = guía, B = curioso)
+Libro: ${info.bookName} | Capítulo: ${info.chapterNumber}
+Título: ${podcast.titulo_podcast}
+(La fuente para el audio es podcast_guion.json)
+═══════════════════════════════════════════
+
+${cuerpo}
+`,
+  );
+}
+
+// ============================================================
+// 5) MAPA INTERACTIVO (para el sitio web)
+// ============================================================
+function generateGoogleMapsEmbedUrl(lat, lng) {
+  return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat}, ${lng}!5e1!3m2!1ses!2s!4v1`;
+}
+
+function generateMapResourceHTML(titulo, ubicaciones, bookName, chapterNum) {
+  let html = `
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">${titulo}</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">${bookName} Capítulo ${chapterNum}</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+`;
+
+  ubicaciones.forEach((ubicacion, index) => {
+    const embedUrl = generateGoogleMapsEmbedUrl(ubicacion.latitud, ubicacion.longitud);
+    const certeza = String(ubicacion.certeza || "desconocida");
+    const certezaIcon =
+      certeza === "confirmada" ? "✅" : certeza === "probable" ? "🟡" : "️";
+
+    html += `
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    ${index + 1}. ${ubicacion.nombre} ${certezaIcon}
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="${embedUrl}" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> ${ubicacion.referencia_biblica}</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> ${ubicacion.latitud}°N, ${ubicacion.longitud}°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> ${ubicacion.contexto_historico}</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> ${ubicacion.importancia_teologica}</p>
+  </div>
+  
+  <div style="background: ${certeza === "confirmada" ? "#d4edda" : "#fff3cd"}; padding: 0.8rem; border-radius: 6px; border-left: 4px solid ${certeza === "confirmada" ? "#28a745" : "#ffc107"};">
+    <strong>Nivel de certeza:</strong> ${certeza.charAt(0).toUpperCase() + certeza.slice(1)}
+  </div>
+</div>
+`;
+  });
+
+  html += `
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+`;
+  return html;
+}
+
+async function generarMapaInteractivo(dir, info, context) {
+  console.log(`\n   🗺️ [Mapa] Generando mapa interactivo...`);
+  const recorte = (html, n) => cleanHtml(html).substring(0, n);
+
+  const baseInfo = `
+  LIBRO: ${info.bookName} | CAPÍTULO: ${info.chapterNumber}
+  TÍTULO DEL ESTUDIO: "${context.estudioTitulo}"
+  [ESTUDIO]: ${recorte(context.estudio, 8000)}
+  [SERMÓN]: ${recorte(context.sermon, 3000)}
+  [ARQUEOLOGÍA]: ${recorte(context.arqueologia, 1500)}
+  [PALABRAS]: ${recorte(context.palabras, 800)}
+  `;
+
+  const user = `Analiza este estudio bíblico de ${info.bookName} capítulo ${info.chapterNumber} e identifica TODAS las ubicaciones geográficas mencionadas (ciudades, montes, ríos, regiones, etc.).
+
+Para CADA ubicación identificada, genera:
+
+**INFORMACIÓN REQUERIDA:**
+1. **Nombre del lugar** (en español)
+2. **Coordenadas GPS aproximadas** (latitud, longitud)
+3. **Referencia bíblica** donde se menciona
+4. **Contexto histórico/arqueológico** breve
+5. **Importancia teológica** en el capítulo
+
+**UBICACIONES CON CERTEZA vs INCERTIDUMBRE:**
+- Si la ubicación es **confirmada** arqueológicamente: proporciona coordenadas exactas
+- Si es **probable pero debatida**: proporciona la teoría más aceptada y menciona la incertidumbre
+- Si es **desconocida**: usa la región general más probable según el contexto
+
+**FORMATO DE SALIDA JSON:**
+{
+  "titulo_recurso": "Mapa Interactivo: [Tema del capítulo] - Ubicaciones Bíblicas",
+  "ubicaciones": [
+    {
+      "nombre": "Nombre del lugar",
+      "latitud": 31.0103,
+      "longitud": 47.4344,
+      "referencia_biblica": "Génesis 2:14",
+      "contexto_historico": "Descripción breve del contexto histórico y arqueológico",
+      "importancia_teologica": "Significado teológico en el pasaje",
+      "certeza": "confirmada | probable | debatida | desconocida"
+    }
+  ],
+  "nota_metodologica": "Explicación sobre la certeza/incertidumbre de las ubicaciones"
+}
+
+**EJEMPLO DE UBICACIONES PARA ÉXODO 5:**
+1. Pi-Ramsés (capital de Faraón) - 30.8080, 31.2859
+2. Ladrilleras del Delta - 30.7500, 31.3000
+3. Monte Sinaí (Horeb) - 28.5394, 33.9746
+4. Tierra de Gosén - 30.8500, 31.6500
+
+**INFORMACIÓN DEL ESTUDIO:**
+${baseInfo}
+
+Genera el recurso de mapa en formato JSON completo.`;
+
+  let mapa;
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Mapa interactivo",
+      system:
+        "Eres un experto en geografía bíblica, arqueología del antiguo oriente próximo y teología. Tu trabajo es identificar ubicaciones geográficas mencionadas en el estudio bíblico y crear recursos de mapa interactivo educativos. Respondes únicamente con JSON válido.",
+      user,
+      json: true,
+      temperature: 0.4,
+      maxTokens: 8000,
+    });
+    mapa = parsearJSON(crudo);
+  } catch (e) {
+    console.error("   ❌ Error generando mapa:", e.message);
+    return false;
+  }
+
+  if (!mapa || !Array.isArray(mapa.ubicaciones) || mapa.ubicaciones.length === 0) {
+    console.error("   ❌ El mapa no trae ubicaciones válidas.");
+    return false;
+  }
+
+  const html = generateMapResourceHTML(
+    mapa.titulo_recurso || `Mapa Interactivo: ${info.bookName} ${info.chapterNumber}`,
+    mapa.ubicaciones,
+    info.bookName,
+    info.chapterNumber,
+  );
+
+  const contenido = `═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: ${info.bookName} | Capítulo: ${info.chapterNumber}
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: ${mapa.titulo_recurso}
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+${html}
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+${mapa.ubicaciones.map((u, i) => `${i + 1}. ${u.nombre} (${u.latitud}, ${u.longitud}) - ${u.certeza}`).join("\n")}
+
+ NOTA METODOLÓGICA:
+${mapa.nota_metodologica || "Las ubicaciones varían en certeza según la evidencia arqueológica disponible."}
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: ${info.bookName}, Capítulo: ${info.chapterNumber}
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
+`;
+  guardarTexto(dir, `6_MAPA_INTERACTIVO_${info.bookName}_Cap${info.chapterNumber}.txt`, contenido);
+  return true;
+}
+
+// ============================================================
+// FUNCIÓN PRINCIPAL EXPORTADA (la usa el orquestador)
+// ============================================================
+export async function generarPromptsCapitulo(bookSlug, chapterNumber) {
+  const avisos = [];
+
+  try {
+    const info = await fetchChapterResources(bookSlug, chapterNumber);
+    console.log(
+      `   ✅ Capítulo encontrado: ID ${info.chapterId}, Libro: ${info.bookName}`,
+    );
+
+    const context = await getResourcesForChapter(info.chapterId);
+    const dir = path.join(
+      "prompts_output",
+      quitarTildes(info.bookName.toLowerCase()),
+      `Capitulo_${info.chapterNumber}`,
+    );
+    fs.mkdirSync(dir, { recursive: true });
+
+    // 0) Fuente consolidada
+    guardarTexto(
+      dir,
+      `0_FUENTE_CONSOLIDADA_${info.bookName}_Cap${info.chapterNumber}.txt`,
+      buildPlainTextSource(info.bookName, info.chapterNumber, context),
+    );
+    const textoFuente = armarTextoFuente(context);
+    const ctx = `${info.bookName} capítulo ${info.chapterNumber}`;
+
+    // 1-2) Guion, marcas e imágenes (CRÍTICO)
+    const video = await generarArtefactosVideo(dir, ctx, textoFuente);
+    if (!video) {
+      console.error("   ❌ No se pudo generar el bloque del video.");
+      return false;
+    }
+
+    // 3) Metadatos de YouTube (CRÍTICO)
+    const meta = await generarMetadatosYoutube({
+      info,
+      ssml: video.ssml,
+      capitulosYT: video.capitulosYT,
+    });
+    if (!meta) {
+      console.error("   ❌ No se pudieron generar los metadatos de YouTube.");
+      return false;
+    }
+    guardarJSON(dir, "youtube_metadata.json", meta);
+    guardarVistaPreviaYoutube(dir, info, meta);
+
+    // 4) Podcast (no crítico)
+    try {
+      const podcast = await generarGuionPodcast({
+        info,
+        tituloVideo: meta.titulo,
+        textoFuente,
+        capitulosVideo: video.capitulosYT,
+      });
+      if (podcast) guardarPodcast(dir, info, podcast);
+      else avisos.push("podcast");
+    } catch (e) {
+      console.error("   ❌ Error en podcast:", e.message);
+      avisos.push("podcast");
+    }
+
+    // 5) Mapa interactivo (no crítico)
+    try {
+      const ok = await generarMapaInteractivo(dir, info, context);
+      if (!ok) avisos.push("mapa interactivo");
+    } catch (e) {
+      console.error("   ❌ Error en mapa:", e.message);
+      avisos.push("mapa interactivo");
+    }
+
+    if (avisos.length) {
+      console.warn(`   ⚠️ Terminó con pendientes: ${avisos.join(", ")}`);
+    }
+    console.log(`   ✨ ¡Prompts listos para ${bookSlug} ${chapterNumber}!`);
+    return true;
+  } catch (error) {
+    console.error(`   ❌ Error fatal en el workflow de prompts:`, error.message);
+    return false;
   }
 }
