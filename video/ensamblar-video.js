@@ -4,11 +4,10 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// ── Raíz del repo (100% confiable en GitHub Actions y local) ─────────────────────────
+// ── Raíz del repo (relativa a este archivo, no al cwd) ────────────
+// Este archivo vive en <repo>/video/, así que la raíz es un nivel arriba.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// process.cwd() en GitHub Actions es SIEMPRE la raíz del repositorio clonado.
-// Esto evita cualquier error de resolución de rutas con __dirname.
-const repoRoot = path.resolve(process.cwd());
+const repoRoot = path.resolve(__dirname, "..");
 console.log("🔍 repoRoot detectado como:", repoRoot);
 
 // ── Detectar FFmpeg portable (solo Windows) ───────────────────────
@@ -38,7 +37,12 @@ if (!bookName || !chapterNum) {
 
 // ── Rutas ─────────────────────────────────────────────────────────
 const audioDir = path.join(repoRoot, "audio-tts");
-const chapterDir = path.join(repoRoot, "prompts_output", bookName, `Capitulo_${chapterNum}`);
+const chapterDir = path.join(
+  repoRoot,
+  "prompts_output",
+  bookName,
+  `Capitulo_${chapterNum}`,
+);
 const imagesDir = path.join(chapterDir, "imagenes");
 const outputDir = path.join(chapterDir, "video");
 
@@ -60,6 +64,18 @@ for (const [name, p] of [
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
+// ── Indexar imágenes (tolerante a nombre/extensión/mayúsculas) ────
+const archivosImagenes = fs.readdirSync(imagesDir);
+const imagenesPorIndice = {};
+for (const file of archivosImagenes) {
+  const m = file.match(/^imagen[_-]?0*(\d+)\.(png|jpe?g|webp)$/i);
+  if (m) imagenesPorIndice[Number(m[1])] = path.join(imagesDir, file);
+}
+console.log(
+  `🖼️  Imágenes en carpeta (${Object.keys(imagenesPorIndice).length} reconocidas de ${archivosImagenes.length} archivos):`,
+  archivosImagenes.join(", ") || "(vacía)",
+);
+
 // ── Leer timestamps ───────────────────────────────────────────────
 const timestampsRaw = JSON.parse(fs.readFileSync(timestampsPath, "utf-8"));
 
@@ -80,7 +96,9 @@ for (const [k, v] of Object.entries(marks)) {
 }
 
 // ── Detectar cantidad dinámica de marcas ──────────────────────────
-const NUM_IMAGENES = Object.keys(marks).filter((k) => k.startsWith("imagen_")).length;
+const NUM_IMAGENES = Object.keys(marks).filter((k) =>
+  k.startsWith("imagen_"),
+).length;
 
 if (NUM_IMAGENES === 0) {
   console.error("❌ No se encontraron marcas 'imagen_N' en el JSON.");
@@ -98,17 +116,21 @@ for (let i = 1; i <= NUM_IMAGENES; i++) {
   const start = marks[currentKey];
 
   if (start === undefined) {
-    console.error(`❌ Falta la marca "${currentKey}" en el JSON de timestamps.`);
+    console.error(
+      `❌ Falta la marca "${currentKey}" en el JSON de timestamps.`,
+    );
     process.exit(1);
   }
 
   let end;
   if (i === NUM_IMAGENES) {
-    end = null;
+    end = null; // Se resuelve con la duración real del audio
   } else if (marks[nextKey] !== undefined) {
     end = marks[nextKey];
   } else {
-    console.error(`❌ Falta la marca "${nextKey}" necesaria para calcular la duración de la imagen ${i}.`);
+    console.error(
+      `❌ Falta la marca "${nextKey}" necesaria para calcular la duración de la imagen ${i}.`,
+    );
     process.exit(1);
   }
 
@@ -164,7 +186,11 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
         "-movflags",
         "+faststart",
       ])
-      .on("start", () => console.log(`   ▶️  Iniciando render del clip ${path.basename(outputPath)}`))
+      .on("start", () =>
+        console.log(
+          `   ▶️  Iniciando render del clip ${path.basename(outputPath)}`,
+        ),
+      )
       .on("end", () => resolve(outputPath))
       .on("error", (err) => reject(err))
       .save(outputPath);
@@ -175,7 +201,9 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
 function concatenarClips(clipPaths, outputPath) {
   return new Promise((resolve, reject) => {
     const listPath = path.join(outputDir, "clips_list.txt");
-    const contenido = clipPaths.map((p) => `file '${p.replace(/\\/g, "/")}'`).join("\n");
+    const contenido = clipPaths
+      .map((p) => `file '${p.replace(/\\/g, "/")}'`)
+      .join("\n");
     fs.writeFileSync(listPath, contenido, "utf-8");
 
     ffmpeg()
@@ -206,6 +234,21 @@ async function main() {
   try {
     console.log(`\n🎬 Ensamblando video para ${bookName} ${chapterNum}...\n`);
 
+    // Validar TODAS las imágenes antes de renderizar nada
+    const faltantes = duraciones
+      .filter((d) => !imagenesPorIndice[d.index])
+      .map((d) => d.index);
+    if (faltantes.length > 0) {
+      console.error(
+        `❌ Faltan ${faltantes.length} imagen(es) para los índices: ${faltantes.join(", ")}`,
+      );
+      console.error(`   Carpeta revisada: ${imagesDir}`);
+      console.error(
+        `   Archivos presentes: ${archivosImagenes.join(", ") || "(ninguno)"}`,
+      );
+      process.exit(1);
+    }
+
     const audioDuration = await getAudioDuration();
     console.log(`⏱️  Duración del audio: ${audioDuration.toFixed(2)}s\n`);
 
@@ -214,23 +257,24 @@ async function main() {
     console.log("📋 Duraciones por imagen:");
     for (const d of duraciones) {
       const dur = d.end - d.start;
-      console.log(`   imagen_${String(d.index).padStart(2, "0")}: ${dur.toFixed(2)}s`);
+      console.log(
+        `   imagen_${String(d.index).padStart(2, "0")}: ${dur.toFixed(2)}s`,
+      );
     }
     console.log();
 
     const clipPaths = [];
     for (const d of duraciones) {
-      const imageName = `imagen_${String(d.index).padStart(2, "0")}.png`;
-      const imagePath = path.join(imagesDir, imageName);
-      const clipPath = path.join(outputDir, `clip_${String(d.index).padStart(2, "0")}.mp4`);
+      const imagePath = imagenesPorIndice[d.index];
+      const clipPath = path.join(
+        outputDir,
+        `clip_${String(d.index).padStart(2, "0")}.mp4`,
+      );
       const dur = d.end - d.start;
 
-      if (!fs.existsSync(imagePath)) {
-        console.error(`❌ No se encontró la imagen: ${imagePath}`);
-        process.exit(1);
-      }
-
-      console.log(`   🎞️  [${d.index}/${NUM_IMAGENES}] Renderizando clip (${dur.toFixed(2)}s)...`);
+      console.log(
+        `   🎞️  [${d.index}/${NUM_IMAGENES}] Renderizando clip (${dur.toFixed(2)}s) con ${path.basename(imagePath)}...`,
+      );
       await generarClipKenBurns(imagePath, dur, clipPath);
       clipPaths.push(clipPath);
     }
