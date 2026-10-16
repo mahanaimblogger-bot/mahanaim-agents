@@ -3,48 +3,51 @@ VISTA PREVIA DE YOUTUBE (solo lectura; el script de subida usa youtube_metadata.
 Libro: Filemón | Capítulo: 1
 ═══════════════════════════════════════════
 
-TÍTULO (54 caracteres):
-Ponlo a mi cuenta: el corazón del evangelio en Filemón
+TÍTULO (42 caracteres):
+Ponlo a mi cuenta: el evangelio en Filemón
 
 ALTERNATIVAS:
-- Filemón: la carta que cambiará tu forma de perdonar
-- Onésimo: de esclavo fugitivo a hermano amado
+- El esclavo que volvió como hermano | Filemón
+- Filemón: la carta que cambia todo
 
 DESCRIPCIÓN (los capítulos con tiempos se completan después del audio):
 ───────────────────────────────────────────
-¿Qué harías si te entregaran una carta que no era tuya y descubrieras que fue escrita para ti? La carta a Filemón es ese documento breve que contiene el evangelio aplicado a una situación imposible.
+«Ponlo a mi cuenta»: la frase que resume el evangelio en la carta más breve de Pablo. Descubre en Filemón la historia del esclavo que volvió como hermano.
 
-En este video exploramos la carta a Filemón, un documento de apenas 25 versículos que revela el corazón del evangelio. Aprenderás cómo Pablo intercede por Onésimo, un esclavo fugitivo, y cómo la gracia transforma las relaciones. Descubrirás el significado de 'ponlo a mi cuenta', una imagen poderosa de la sustitución de Cristo. Veremos cómo el perdón no niega la deuda, sino que la transfiere, y cómo Dios usa todas las cosas para cumplir sus propósitos de gracia.
+En la carta a Filemón, Pablo intercede por Onésimo, un esclavo fugitivo que se convirtió en Roma. Aprenderás cómo la gracia transforma al inútil en provechoso, al fugitivo en hijo y al esclavo en hermano amado. Verás en Pablo al intercesor que asume la deuda del culpable, y en Filemón al amo llamado a perdonar. Una parábola viviente del evangelio: Cristo pagó nuestra deuda y nos recibe como a sí mismo. Un estudio bíblico breve pero explosivo.
 
 ⏱️ CAPÍTULOS
 {{CAPITULOS}}
 
-📖 Versículo clave: Filemón 1:18 - 'Y si en algo te dañó, o te debe, ponlo a mi cuenta.'
+📖 Versículo clave: Filemón 1:18 — «Si en algo te dañó, o te debe, ponlo a mi cuenta».
 
 🔔 Suscríbete al canal y cuéntanos en los comentarios qué te dejó este pasaje.
 
-#Filemón #Perdón #Gracia #EstudioBíblico #Evangelio
+#Filemón #EstudioBíblico #Onésimo #Gracia #Perdón
 ───────────────────────────────────────────
 
 CAPÍTULOS PREVISTOS:
-- imagen_1: La Carta Para Ti
-- imagen_10: El Conflicto De Pablo
-- imagen_20: La Iglesia En Tu Casa
-- imagen_29: Ruego Por Amor
-- imagen_39: Onésimo El Útil
-- imagen_48: Propósito Providencial
-- imagen_58: Ponlo A Mi Cuenta
-- imagen_67: Imagen Del Evangelio
-- imagen_77: Nombres Y Saludos
-- imagen_86: Un Espejo Para Hoy
+- imagen_1: Filemón: El Evangelio en Miniatura
+- imagen_2: Filemón: El Evangelio en Miniatura
+- imagen_4: Filemón: El Evangelio en Miniatura
+- imagen_5: Filemón: El Evangelio en Miniatura
+- imagen_6: Filemón: El Evangelio en Miniatura
+- imagen_7: Filemón: El Evangelio en Miniatura
+- imagen_9: Filemón: El Evangelio en Miniatura
+- imagen_12: Filemón: El Evangelio en Miniatura
+- imagen_18: Filemón: El Evangelio en Miniatura
+- imagen_19: Filemón: El Evangelio en Miniatura
+- imagen_20: Filemón: El Evangelio en Miniatura
+- imagen_21: Filemón: El Evangelio en Miniatura
+- imagen_23: Filemón: El Evangelio en Miniatura
 
-TAGS (277 caracteres):
-Filemón, Onésimo, Pablo, carta a Filemón, perdón, gracia, sustitución, esclavitud, Nuevo Testamento, estudio bíblico, teología, evangelio, reconciliación, intercesión, amor cristiano, deuda, redención, Filemón 1, Biblia, cristianismo, perdón cristiano, gracia de Dios, Pablo prisionero, hermano amado
+TAGS (311 caracteres):
+Filemón, Filemón 1, carta a Filemón, Onésimo, Pablo, esclavo fugitivo, perdón, intercesión, gracia, sustitución, ponlo a mi cuenta, evangelio en miniatura, estudio bíblico, Nuevo Testamento, epístolas de Pablo, prisionero de Cristo, redención, reconciliación, hermano amado, imputación, Colosas, restauración, amor fraternal, Mahanaim
 
 MINIATURA:
-- Texto principal: PONLO A MI CUENTA
-- Texto secundario: FILEMÓN 1
+- Texto principal: ¿PERDONARÍAS?
+- Texto secundario: PONLO A MI CUENTA
 - Etiqueta: FILEMÓN 1
 - Texto a la: right
 - Prompt de ilustración:
-Biblical scene set in Rome around 60 AD, in a dimly lit ancient Roman house prison. The central figure is the apostle Paul (an elderly man, around 60 years old), with a strong emotional expression of compassion and determination, chains on his wrists, writing a letter on parchment. He is wearing a simple, worn tunic, typical of a first-century prisoner. The background shows a dark, stone-walled room with a small oil lamp casting warm light. Dramatic golden backlighting from a small window creates a rim light on his face and hair. Hyperrealistic cinematic illustration, semi-stylized realism, 35mm film aesthetic, shallow depth of field, hyperrealistic skin and fabric textures, no plastic CGI look. No text, no letters, no watermarks. No modern objects. The scene is historically accurate to the 1st century Roman Empire. The figure is fully human with correct adult proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs. Subject placed on the left third of the frame; the right third is dark, empty negative space. Ultra high contrast, dramatic golden rim backlight, deep shadows, saturated warm amber and gold tones, intense emotional close-up, cinematic 35mm look. No text, no letters, no watermarks, no modern objects. fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs
+Cinematic hyperrealistic illustration with semi-stylized realism, dramatic 35mm film aesthetic, shallow depth of field. Setting: Rome, circa 60 AD, a dim rented house-church room with ochre plaster walls, a small oil lamp, a wooden stool, and a scroll on a low table. Close-up emotional portrait of Pablo (an elderly Jewish man, prisoner of Christ), around 60 years old, balding with a graying beard, wearing a simple rough woolen tunic and a light chain on his wrist, seated, face marked by deep compassion and resolve, eyes glistening with tears, one hand extended forward as if writing or signing. Background dark and blurred, warm amber and golden backlight rimming his head and shoulders, cool blue shadows in the room. Hyperrealistic skin and fabric textures, no plastic CGI look. No text, no letters, no watermark. No modern objects. No recognizable modern faces. No anachronistic Christian symbols. Fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs. Subject placed on the left third of the frame; the right third is dark, empty negative space. Ultra high contrast, dramatic golden rim backlight, deep shadows, saturated warm amber and gold tones, intense emotional close-up, cinematic 35mm look. No text, no letters, no watermarks, no modern objects. fully human anatomy with correct adult-child proportions, natural hands, no deformed fingers, no floating heads, no cut-off bodies, no dismembered limbs

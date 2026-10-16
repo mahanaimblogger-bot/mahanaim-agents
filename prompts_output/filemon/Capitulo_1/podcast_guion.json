@@ -1,250 +1,343 @@
 {
   "libro": "Filemón",
   "capitulo": 1,
-  "titulo_podcast": "El dilema de Filemón: ¿Qué harías tú?",
-  "titulo_video_compañero": "Ponlo a mi cuenta: el corazón del evangelio en Filemón",
+  "titulo_podcast": "Filemón uno: el dilema humano del perdón",
+  "titulo_video_compañero": "Ponlo a mi cuenta: el evangelio en Filemón",
   "voces": {
     "A": "guía",
     "B": "curioso"
   },
-  "caracteres_totales": 6433,
+  "caracteres_totales": 9251,
+  "palabras_totales": 1630,
   "turnos": [
     {
       "locutor": "A",
-      "texto": "Imagina que tu empleado te roba y desaparece."
+      "texto": "Imagina que tienes un esclavo. Se escapa. Te roba. Desaparece. Y meses después, alguien te escribe una carta desde la cárcel y te dice: recibelo como si fuera yo. ¿Qué harías tú?"
     },
     {
       "locutor": "B",
-      "texto": "¿En serio? ¿Y qué tiene que ver eso con la Biblia?"
+      "texto": "Uf. Esa pregunta es incómoda."
     },
     {
       "locutor": "A",
-      "texto": "Tiene todo que ver. Filemón, capítulo uno. Un esclavo llamado Onésimo huyó de su amo, probablemente robándole para financiar su escape."
+      "texto": "Bienvenidos a Mahanaim. Hoy no venimos a repasar la carta a Filemón versículo por versículo. Venimos a meternos en el dilema humano. En las preguntas que no queremos hacernos."
     },
     {
       "locutor": "B",
-      "texto": "Espera, espera. ¿Un esclavo fugitivo en la Biblia?"
+      "texto": "Porque es fácil decir perdona. Otra cosa es estar en los zapatos de Filemón."
     },
     {
       "locutor": "A",
-      "texto": "Sí. Y lo increíble es que Pablo lo envía de vuelta a su amo con una carta. Una carta que plantea un dilema humano enorme."
+      "texto": "Exacto. Vamos a ponernos en su lugar. Filemón era un hombre adinerado en Colosas. Tenía esclavos. Uno de ellos, Onésimo, huyó. Probablemente robándole para financiar su escape."
     },
     {
       "locutor": "B",
-      "texto": "¿Y qué dilema? Si yo fuera el amo, lo mínimo sería castigarlo."
+      "texto": "O sea, no solo se fue. Se fue con lo que no era suyo."
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Ese es el dilema. Filemón tenía todo el derecho legal de castigarlo, incluso con la muerte. Pero Pablo le pide algo radical: recibirlo como a un hermano."
+      "texto": "Así es. En la ley romana, un esclavo fugitivo era un delincuente. El amo podía castigarlo severamente, incluso con la muerte. Algunos amos marcaban la frente de los fugitivos con las letras F U G, de fugitivus."
     },
     {
       "locutor": "B",
-      "texto": "¿Y qué habrías hecho tú en su lugar?"
+      "texto": "Qué horrible. Una marca permanente."
     },
     {
       "locutor": "A",
-      "texto": "Esa es la pregunta que vamos a explorar hoy. Porque este pasaje no es solo una historia antigua; es un espejo para nuestra vida."
+      "texto": "Sí. Y ese era el destino probable de Onésimo si lo atrapaban. Pero no lo atraparon. Huyó lejos, probablemente a Roma, para perderse en la multitud."
     },
     {
       "locutor": "B",
-      "texto": "Me intriga. Cuéntame más."
+      "texto": "¿Y qué pasó en Roma?"
     },
     {
       "locutor": "A",
-      "texto": "Para entender el dilema, necesitamos el contexto justo. Pablo está preso en Roma, alrededor del año sesenta. Onésimo, esclavo de Filemón, un creyente adinerado de Colosas, huyó. En Roma conoce a Pablo y se convierte."
+      "texto": "Allí se encontró con Pablo. Pablo estaba preso, encadenado. Y en esa prisión, Onésimo escuchó el evangelio y se convirtió. Pablo lo llama mi hijo, a quien engendré en mis prisiones."
     },
     {
       "locutor": "B",
-      "texto": "O sea, el esclavo se hace cristiano."
+      "texto": "Qué giro. El fugitivo termina siendo hijo espiritual del apóstol."
     },
     {
       "locutor": "A",
-      "texto": "Sí. Y Pablo, en lugar de quedarse con él, lo envía de vuelta con esta carta. La carta es breve, pero densa. Y la iglesia se reunía en la casa de Filemón, así que la carta se leería públicamente."
+      "texto": "Pero aquí viene el dilema. Pablo decide enviarlo de vuelta a Filemón. No lo retiene, aunque quería. Y le escribe una carta pidiéndole que lo reciba como hermano."
     },
     {
       "locutor": "B",
-      "texto": "Entonces, Filemón no podía simplemente ignorarla. Todos se enterarían."
+      "texto": "Espera, espera. ¿Pablo lo manda de vuelta? ¿No era peligroso para Onésimo?"
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Ahí está la tensión. Ahora, veamos tres momentos que giran la historia."
+      "texto": "Muy peligroso. Podía ser castigado. Pero Pablo no quería actuar a espaldas de Filemón. Quería que todo se hiciera con transparencia y con consentimiento."
     },
     {
       "locutor": "B",
-      "texto": "A ver."
+      "texto": "Entonces, Filemón tenía en sus manos el destino de Onésimo. Podía perdonarlo o destruirlo."
     },
     {
       "locutor": "A",
-      "texto": "Primer giro: Pablo no manda, ruega. Tenía autoridad para ordenar, pero dice: te ruego por amor. Y usa una palabra griega, parakalo, que significa consolar, exhortar, animar. No es una orden militar."
+      "texto": "Exacto. Y la carta se leería públicamente, delante de toda la iglesia que se reunía en su casa. Imagínate la presión."
     },
     {
       "locutor": "B",
-      "texto": "¿Por qué no usar su autoridad?"
+      "texto": "Uy. Ahora sí que era un dilema público."
     },
     {
       "locutor": "A",
-      "texto": "Porque el evangelio no se impone. Pablo quiere que Filemón actúe por convicción, no por obligación. Si lo obliga, el acto pierde valor. ¿No te pasa que a veces haces cosas por presión y no por amor?"
+      "texto": "Primer momento con giro. Pablo tiene autoridad para mandar. De hecho, dice: tengo mucha libertad en Cristo para mandarte lo que conviene. La palabra griega es parresia, franqueza, autoridad."
     },
     {
       "locutor": "B",
-      "texto": "Totalmente. Y no es lo mismo."
+      "texto": "O sea, podía ordenarlo."
     },
     {
       "locutor": "A",
-      "texto": "Segundo giro: Pablo se ofrece a pagar la deuda. Le dice: si en algo te dañó, ponlo a mi cuenta. Usa un término contable, ellogao, que significa cargar a una cuenta. Es lenguaje de contabilidad."
+      "texto": "Sí. Pero no lo hace. Dice: más bien te ruego por amor. La palabra griega es parakalo, que significa consolar, exhortar, rogar. Es un verbo de relación, no de poder."
     },
     {
       "locutor": "B",
-      "texto": "O sea, Pablo asume la deuda de Onésimo."
+      "texto": "Entonces, Pablo renuncia a su derecho de mandar."
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Y no solo eso, firma un pagaré: yo Pablo lo escribo de mi mano, yo lo pagaré. Es una garantía legal. Pero luego añade: por no decirte que aun tú mismo te me debes también."
+      "texto": "Exacto. Y eso nos confronta. ¿Cómo usamos nuestra autoridad? ¿Como un martillo o como una mano extendida?"
     },
     {
       "locutor": "B",
-      "texto": "¡Uy! Eso es fuerte. Le recuerda que él también le debe."
+      "texto": "¿Qué harías tú si tuvieras el poder de obligar a alguien a hacer lo correcto? ¿Lo obligarías o lo persuadirías?"
     },
     {
       "locutor": "A",
-      "texto": "Sí. Filemón le debe a Pablo su conversión. Entonces, ¿cómo no va a perdonar una deuda material? Es una jugada brillante."
+      "texto": "Buena pregunta. Porque a veces queremos que las personas cambien a la fuerza, pero Dios prefiere una obediencia voluntaria."
     },
     {
       "locutor": "B",
-      "texto": "Me deja pensando. ¿Cuántas veces exigimos que otros paguen lo que nos deben, olvidando lo que nosotros debemos?"
+      "texto": "Y eso me lleva a otra cosa. Pablo dice: si en algo te dañó, o te debe, ponlo a mi cuenta."
     },
     {
       "locutor": "A",
-      "texto": "Tercer giro: Pablo reinterpreta la fuga como providencia. Dice: quizá para esto se apartó de ti por algún tiempo, para que le recibieses para siempre. La palabra quizá, tacha, no es duda, es una conclusión reverente."
+      "texto": "Ahí está el segundo giro. Pablo usa lenguaje contable. La palabra griega es ellogao, que significa cargar a una cuenta, imputar. Es un término que aparece solo aquí en todo el Nuevo Testamento."
     },
     {
       "locutor": "B",
-      "texto": "¿Está diciendo que Dios usó la fuga?"
+      "texto": "O sea, Pablo está diciendo: yo pago la deuda de Onésimo."
     },
     {
       "locutor": "A",
-      "texto": "Sí. No que Dios causó el mal, pero sí que lo encaminó para bien. Como José dijo a sus hermanos: vosotros pensasteis mal contra mí, mas Dios lo encaminó a bien. La fuga fue un mal, pero Dios la usó para salvación."
+      "texto": "Exacto. Y no solo eso. Añade: yo Pablo lo escribo de mi mano, yo lo pagaré. En el mundo antiguo, la firma autógrafa era una garantía legal. Pablo está firmando un pagaré."
     },
     {
       "locutor": "B",
-      "texto": "Eso cambia la perspectiva. A veces vemos nuestros errores como desastres, pero Dios puede usarlos."
+      "texto": "Increíble. Pablo asume una deuda que no era suya."
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Y el cuarto giro: Pablo pide que Filemón reciba a Onésimo como a mí mismo. Identificación total. Lo que se le haga a Onésimo, se le hace a Pablo."
+      "texto": "Y luego añade una frase sorprendente: por no decirte que aun tú mismo te me debes también. Le recuerda a Filemón que él también le debe su vida espiritual, porque Pablo fue quien le predicó el evangelio."
     },
     {
       "locutor": "B",
-      "texto": "Eso es radical. Onésimo era un esclavo fugitivo, un delincuente."
+      "texto": "Uf, eso es poner las cosas en perspectiva."
     },
     {
       "locutor": "A",
-      "texto": "Y ahora es hermano amado. La palabra hermano, adelphos, significa miembro de la familia de Dios. En Cristo, la relación de amo y esclavo es trascendida."
+      "texto": "Sí. Filemón le debe a Pablo su salvación. ¿Cómo no va a perdonar una deuda material a Onésimo?"
     },
     {
       "locutor": "B",
-      "texto": "Pero seguía siendo esclavo legalmente, ¿no?"
+      "texto": "Pero pensemos en Filemón. No era fácil. Onésimo no solo le robó. También lo traicionó. Confió en él y le falló."
     },
     {
       "locutor": "A",
-      "texto": "Sí, Pablo no pide explícitamente la manumisión, pero su lenguaje apunta a eso. Confía en que Filemón hará aun más de lo que dice. La gracia siempre produce más."
+      "texto": "Exacto. Y ahí está la tensión. Perdonar no es decir que no pasó nada. Es asumir el costo de la restauración."
     },
     {
       "locutor": "B",
-      "texto": "Entonces, ¿qué harías tú? Si tuvieras un empleado que te roba y huye, y luego vuelve convertido, ¿lo recibirías como hermano?"
+      "texto": "¿Y qué harías tú? Si alguien te traiciona, te roba, huye, y luego vuelve arrepentido, ¿lo recibes como hermano o le haces pagar?"
     },
     {
       "locutor": "A",
-      "texto": "Ese es el punto. No es solo una historia antigua. Es un llamado a examinar nuestro corazón. ¿A quién necesitas recibir como hermano? ¿A quién necesitas perdonar?"
+      "texto": "Esa es la pregunta. Porque todos queremos justicia para los demás, pero misericordia para nosotros."
     },
     {
       "locutor": "B",
-      "texto": "A veces es más fácil decir que perdonamos que realmente hacerlo."
+      "texto": "Tercer giro. Pablo reinterpreta la fuga de Onésimo. Dice: quizá para esto se apartó de ti por algún tiempo, para que le recibieses para siempre."
     },
     {
       "locutor": "A",
-      "texto": "Cierto. Pero pensemos en situaciones concretas. Imagina que un socio te estafa y quiebra tu negocio. Años después, arruinado, se convierte y te pide perdón. ¿Qué haces?"
+      "texto": "Ahí está la palabra quizá. En griego tacha. No expresa duda, sino una conclusión reverente. Pablo sugiere que Dios usó la fuga para un propósito mayor."
     },
     {
       "locutor": "B",
-      "texto": "Uf. Duro. Pero si Dios me perdonó a mí, tengo que perdonar."
+      "texto": "O sea, Dios no causó el mal, pero lo usó para bien."
     },
     {
       "locutor": "A",
-      "texto": "Eso es exactamente lo que Pablo argumenta. Si Cristo pagó nuestra deuda, ¿cómo no vamos a cancelar las deudas de otros? La medida con que perdonamos es la medida con que hemos sido perdonados."
+      "texto": "Exacto. Como con José, cuando dijo a sus hermanos: vosotros pensasteis mal contra mí, mas Dios lo encaminó a bien. Y como con la crucifixión, el mayor crimen, que se convirtió en salvación."
     },
     {
       "locutor": "B",
-      "texto": "Pero también está la justicia. No se trata de ignorar el daño."
+      "texto": "Entonces, la fuga de Onésimo, que fue un mal, Dios la usó para traerlo a la fe y para transformar su relación con Filemón."
     },
     {
       "locutor": "A",
-      "texto": "Correcto. Pablo no dice que la deuda no existe. Dice: ponlo a mi cuenta. Reconoce la deuda, pero la asume él. Eso es sustitución. Así como Cristo asumió nuestra deuda."
+      "texto": "Sí. Y aquí viene lo más revolucionario: Pablo dice que Onésimo vuelve no ya como esclavo, sino como más que esclavo, como hermano amado."
     },
     {
       "locutor": "B",
-      "texto": "Entonces, perdonar no es decir que no pasó nada, sino asumir el costo."
+      "texto": "Hermano amado. Esa palabra, adelphos, significa miembro de la familia de Dios."
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Perdonar cuesta. Alguien tiene que pagar. Y en el evangelio, Cristo pagó. Nosotros estamos llamados a reflejar eso."
+      "texto": "Exacto. En Cristo, la relación de amo y esclavo es trascendida por la relación de hermanos. No niega la realidad social, pero declara una realidad espiritual superior."
     },
     {
       "locutor": "B",
-      "texto": "¿Y qué hay de la otra parte? Onésimo tuvo que volver. Eso también requirió valentía."
+      "texto": "¿Y qué harías tú si alguien que te ha fallado se convierte y ahora es tu hermano en la fe? ¿Lo tratas como hermano o como siervo?"
     },
     {
       "locutor": "A",
-      "texto": "Sí. Onésimo pudo haberse negado, pero volvió. A veces nosotros somos Onésimo, necesitamos volver y pedir perdón. O somos Filemón, necesitamos recibir. O somos Pablo, necesitamos interceder."
+      "texto": "Cuarto giro. Pablo dice: recíbele como a mí mismo. Es una identificación radical. Lo que se le haga a Onésimo, se le hace a Pablo."
     },
     {
       "locutor": "B",
-      "texto": "¿Y si no podemos perdonar? ¿Qué hacemos?"
+      "texto": "Eso me recuerda a Jesús: en cuanto lo hicisteis a uno de estos mis hermanos más pequeños, a mí lo hicisteis."
     },
     {
       "locutor": "A",
-      "texto": "Podemos orar como Corrie ten Boom, que perdonó a un guardia de campo de concentración. Ella dijo que el amor de Dios fluyó a través de ella. No es fuerza humana, es gracia."
+      "texto": "Exacto. Y Pablo no solo pide que lo reciba. Pide que lo reciba como si fuera Pablo mismo. Con el mismo honor, el mismo afecto, la misma dignidad."
     },
     {
       "locutor": "B",
-      "texto": "Eso me consuela. No tengo que hacerlo solo con mis fuerzas."
+      "texto": "Es una locura. Onésimo era un esclavo fugitivo. Y ahora debe ser recibido como el apóstol Pablo."
     },
     {
       "locutor": "A",
-      "texto": "Así es. La gracia nos capacita. Y al final, la carta a Filemón termina con nombres y una bendición. La gracia de nuestro Señor Jesucristo sea con vuestro espíritu. Esa gracia es la que transforma esclavos en hermanos."
+      "texto": "Así es el evangelio. Dios nos recibe como recibe a su Hijo. Nos ve en Cristo. Nos ama en Cristo."
     },
     {
       "locutor": "B",
-      "texto": "Entonces, ¿qué idea me llevo?"
+      "texto": "Entonces, la carta a Filemón es una parábola viviente del evangelio."
     },
     {
       "locutor": "A",
-      "texto": "Que el evangelio no es teoría, se vive en relaciones concretas. Dios usó la fuga de Onésimo para salvación. Tal vez Dios quiere usar esa ofensa que te hicieron para algo mayor. Pero tienes que elegir: ¿te aferras al rencor o recibes al hermano?"
+      "texto": "Sí. Onésimo es el pecador. Pablo es el intercesor. Filemón es el Padre que tiene derecho a castigar, pero es llamado a perdonar."
     },
     {
       "locutor": "B",
-      "texto": "Y si quiero profundizar, ¿dónde veo más?"
+      "texto": "Y Cristo es el Pablo de nuestra historia. Él se puso en nuestro lugar. Él asumió nuestra deuda. Él dijo: yo lo pagaré."
     },
     {
       "locutor": "A",
-      "texto": "Te invito a ver el video completo en el canal Mahanaim. Se titula Ponlo a mi cuenta: el corazón del evangelio en Filemón. Ahí encontrarás más detalles y aplicaciones."
+      "texto": "Exacto. Y el Padre, por amor al Hijo, nos recibe no como esclavos, sino como hijos. No como criminales, sino como herederos."
     },
     {
       "locutor": "B",
-      "texto": "Y también podemos comentar. ¿Qué harías tú en el lugar de Filemón?"
+      "texto": "Ahora, bajemos esto a la vida diaria. ¿Qué harías tú si tuvieras que perdonar a alguien que te ha hecho daño?"
     },
     {
       "locutor": "A",
-      "texto": "Exacto. Comparte tu respuesta en los comentarios. Nos encantará leerte."
+      "texto": "Pensemos en situaciones concretas. Imagina que un empleado te roba. Lo despiden. Meses después, te pide trabajo de nuevo. ¿Qué haces?"
     },
     {
       "locutor": "B",
-      "texto": "Entonces, la próxima vez que alguien te falle, recuerda: ponlo a mi cuenta. No es solo una frase, es el corazón del evangelio."
+      "texto": "Uf. Depende. Si está arrepentido y ha cambiado, tal vez. Pero cuesta."
     },
     {
       "locutor": "A",
-      "texto": "Amén. Nos vemos en el próximo episodio."
+      "texto": "O imagina que un familiar te debe dinero. No te paga. Y luego se convierte y viene a pedirte perdón. ¿Le condonas la deuda?"
+    },
+    {
+      "locutor": "B",
+      "texto": "Es difícil. Porque uno piensa: justicia es que pague. Pero la gracia dice: yo pago."
+    },
+    {
+      "locutor": "A",
+      "texto": "Exacto. Y ahí está el punto. No se trata de ignorar la deuda. Se trata de asumirla tú. Como hizo Pablo. Como hizo Cristo."
+    },
+    {
+      "locutor": "B",
+      "texto": "Pero, ¿y si la otra persona no se arrepiente? ¿También hay que perdonar?"
+    },
+    {
+      "locutor": "A",
+      "texto": "El perdón es una decisión personal. No depende del arrepentimiento del otro. Pero la reconciliación sí requiere arrepentimiento. En el caso de Onésimo, hubo arrepentimiento y restitución."
+    },
+    {
+      "locutor": "B",
+      "texto": "Entonces, el perdón es liberar al ofensor de la deuda, pero la reconciliación es restaurar la relación."
+    },
+    {
+      "locutor": "A",
+      "texto": "Correcto. Y Filemón estaba llamado a ambas cosas: perdonar y recibir como hermano."
+    },
+    {
+      "locutor": "B",
+      "texto": "¿Y qué hay de la justicia? ¿No se supone que debemos buscar justicia?"
+    },
+    {
+      "locutor": "A",
+      "texto": "Sí, pero la justicia sin misericordia es cruel. Y la misericordia sin justicia es complicidad. Pablo no niega la deuda. La asume. Eso es justicia y misericordia juntas."
+    },
+    {
+      "locutor": "B",
+      "texto": "Me encanta eso. No es borrón y cuenta nueva. Es transferencia de deuda."
+    },
+    {
+      "locutor": "A",
+      "texto": "Exacto. Y eso es lo que Cristo hizo. No ignoró nuestro pecado. Lo llevó. No ignoró la deuda. La pagó."
+    },
+    {
+      "locutor": "B",
+      "texto": "Entonces, la pregunta para el oyente es: ¿A quién necesitas recibir hoy como hermano? ¿A quién necesitas perdonar? ¿A quién necesitas asumirle la deuda?"
+    },
+    {
+      "locutor": "A",
+      "texto": "Y también: ¿Te has sentido como Onésimo? ¿Un fugitivo que necesita volver a casa? ¿Has experimentado el perdón de Dios?"
+    },
+    {
+      "locutor": "B",
+      "texto": "Porque todos somos Onésimo. Todos hemos huido de Dios. Todos hemos pecado. Y Dios, en Cristo, nos recibe como hijos."
+    },
+    {
+      "locutor": "A",
+      "texto": "Y todos somos Filemón. Todos tenemos a alguien que nos ha fallado y necesitamos perdonar."
+    },
+    {
+      "locutor": "B",
+      "texto": "Y todos estamos llamados a ser Pablo. A interceder por otros, a asumir sus deudas, a restaurarlos."
+    },
+    {
+      "locutor": "A",
+      "texto": "Así que la carta a Filemón no es solo una historia antigua. Es un espejo. Nos muestra quiénes somos y quiénes estamos llamados a ser."
+    },
+    {
+      "locutor": "B",
+      "texto": "Y nos confronta con decisiones concretas. Perdonar no es un sentimiento. Es una acción. Es recibir al otro como hermano."
+    },
+    {
+      "locutor": "A",
+      "texto": "Sí. Y eso solo es posible cuando recordamos cuánto hemos sido perdonados. Cuando entendemos que nuestra deuda fue pagada por Cristo."
+    },
+    {
+      "locutor": "B",
+      "texto": "Entonces, la idea para llevarse hoy es: perdona como fuiste perdonado. Recibe como fuiste recibido. Ama como fuiste amado."
+    },
+    {
+      "locutor": "A",
+      "texto": "Exacto. Y te invitamos a ver el video completo en el canal Mahanaim, titulado: Ponlo a mi cuenta: el evangelio en Filemón. Allí profundizamos en cada detalle."
+    },
+    {
+      "locutor": "B",
+      "texto": "Y también te invitamos a comentar. ¿Qué harías tú en el lugar de Filemón? ¿Has tenido que perdonar una deuda grande? Comparte tu experiencia."
+    },
+    {
+      "locutor": "A",
+      "texto": "Nos encantará leerte. Y recuerda: la gracia de nuestro Señor Jesucristo sea con tu espíritu. Amén."
+    },
+    {
+      "locutor": "B",
+      "texto": "Hasta la próxima."
     }
   ],
-  "generado_en": "2026-10-16T07:38:02.078Z"
+  "generado_en": "2026-10-16T09:31:39.147Z"
 }
