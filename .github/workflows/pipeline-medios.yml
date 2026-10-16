@@ -62,6 +62,11 @@ jobs:
         run: |
           node audio-tts/generar-audio.js "prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/guion_video_tts.ssml"
 
+      - name: Debug imágenes generadas
+        run: |
+          echo "📂 Archivos en prompts_output/${{ inputs.libro }}:"
+          find "prompts_output/${{ inputs.libro }}" -type f | head -60
+
       # ─────────────────────────────────────────
       # 3. Ensamblar Video (FFmpeg)
       # ─────────────────────────────────────────

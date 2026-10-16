@@ -268,7 +268,9 @@ async function main() {
       await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
 
       console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
-      await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
+      // Paso 3/3 (reemplaza la línea de generarPromptsCapitulo)
+const ok = await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
+if (!ok) throw new Error("Falló la generación de prompts multimedia (revisa el log)");
 
       console.log(`\n   🎉 ¡Capítulo ${capituloNum} completado exitosamente!`);
     } catch (error) {

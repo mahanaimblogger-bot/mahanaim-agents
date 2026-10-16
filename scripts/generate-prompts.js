@@ -178,6 +178,7 @@ async function llamarIA({
   temperature = 0.5,
   maxTokens = 8000,
   reintentos = 1,
+  tolerarTruncado = false,
 }) {
   const messages = [];
   if (system) messages.push({ role: "system", content: system });
@@ -200,7 +201,12 @@ async function llamarIA({
       const contenido = choice?.message?.content?.trim() || "";
       if (!contenido) throw new Error("respuesta vacía");
       if (choice.finish_reason === "length") {
-        throw new Error("respuesta truncada por max_tokens");
+        if (!tolerarTruncado) {
+          throw new Error("respuesta truncada por max_tokens");
+        }
+        console.warn(
+          `   ⚠️ [${etiqueta}] respuesta truncada por max_tokens; se intentará rescatar lo completo.`,
+        );
       }
       return contenido;
     } catch (e) {
@@ -568,6 +574,60 @@ function extraerSegmentosPorBreak(ssml) {
     .filter((s) => s.length > 0);
 }
 
+/** Rescata los objetos completos de un JSON de "momentos" cortado a la mitad. */
+function rescatarMomentosTruncados(texto) {
+  const limpio = texto.replace(/```json\s*/gi, "").replace(/```\s*/g, "");
+  let corte = limpio.length;
+  for (let i = 0; i < 40; i++) {
+    corte = limpio.lastIndexOf("}", corte - 1);
+    if (corte === -1) return null;
+    try {
+      const parsed = JSON.parse(limpio.slice(0, corte + 1) + "]}");
+      if (Array.isArray(parsed.momentos) && parsed.momentos.length) {
+        return parsed;
+      }
+    } catch {
+      /* seguir retrocediendo */
+    }
+  }
+  return null;
+}
+
+/**
+ * Plan B sin IA: agrupa segmentos consecutivos hasta ~100-190 palabras.
+ * Los nombres de capítulo quedan genéricos ("Parte N"), pero el pipeline sigue.
+ */
+function momentosDeRespaldo(segmentos) {
+  const momentos = [];
+  let grupo = [];
+  let palabras = 0;
+
+  const cerrar = () => {
+    if (!grupo.length) return;
+    const primero = grupo[0];
+    const resumen = grupo.join(" ").replace(/\s+/g, " ").trim();
+    momentos.push({
+      indice: momentos.length + 1,
+      texto_inicio: primero.replace(/\s+/g, " ").trim().substring(0, 35),
+      descripcion_visual: resumen.substring(0, 160),
+      titulo_capitulo: `Parte ${momentos.length + 1}`,
+      nuevo_capitulo_youtube: false,
+    });
+    grupo = [];
+    palabras = 0;
+  };
+
+  for (const seg of segmentos) {
+    const n = contarPalabras(seg);
+    if (grupo.length && palabras + n > 190) cerrar();
+    grupo.push(seg);
+    palabras += n;
+    if (palabras >= 100) cerrar();
+  }
+  cerrar();
+  return momentos;
+}
+
 async function detectarMomentosNarrativos(segmentos, ctx) {
   if (!segmentos.length) return [];
 
@@ -581,51 +641,61 @@ TAREA: Agrupá y/o dividí los segmentos en MOMENTOS NARRATIVOS. Un "momento" es
 
 REGLAS:
 1. Cada momento debe tener sentido narrativo propio.
-2. Cantidad: mínimo 15 y máximo 25 momentos.
+2. Cantidad: mínimo 15 y máximo 25 momentos. NO generes más de 25.
 3. ⚠️ NINGÚN momento puede superar las 200 palabras (unos 90 segundos). Si un segmento o grupo de segmentos supera ese tope, dividilo en dos o más momentos. Para dividir en medio de un segmento, "texto_inicio" debe ser las primeras palabras EXACTAS (copiadas literalmente, sin cambiar nada) de la frase donde empieza el nuevo momento.
 4. Ningún momento debe ser demasiado corto: mínimo 25 palabras.
 5. El primer momento es el gancho inicial. El último es la conclusión y la oración final; si esa parte es larga, dividila también.
-6. "texto_inicio": 25 a 40 caracteres COPIADOS LITERALMENTE del inicio del momento.
-7. "titulo_capitulo": nombre corto (2 a 6 palabras, sin números ni signos raros) para un capítulo de YouTube.
-8. "nuevo_capitulo_youtube": true en 8 a 12 momentos bien repartidos (el primero siempre true), false en el resto. Los que valen true marcan cambios grandes de tema.
+6. "texto_inicio": 25 a 40 caracteres COPIADOS LITERALMENTE del inicio del momento. NUNCA copies el segmento completo.
+7. "descripcion_visual": una sola línea de máximo 15 palabras, en español.
+8. "titulo_capitulo": nombre corto (2 a 5 palabras, sin números ni signos raros) para un capítulo de YouTube.
+9. "nuevo_capitulo_youtube": true en 8 a 12 momentos bien repartidos (el primero siempre true), false en el resto.
 
 SEGMENTOS:
 ${lista}
 
-FORMATO DE SALIDA (JSON estricto):
-{
-  "momentos": [
-    {
-      "indice": 1,
-      "texto_inicio": "texto literal del inicio del momento",
-      "descripcion_visual": "qué mostrar visualmente (una línea, en español)",
-      "titulo_capitulo": "Nombre corto",
-      "nuevo_capitulo_youtube": true
-    }
-  ]
-}
+FORMATO DE SALIDA (JSON estricto, compacto, sin texto extra):
+{"momentos":[{"indice":1,"texto_inicio":"...","descripcion_visual":"...","titulo_capitulo":"...","nuevo_capitulo_youtube":true}]}`;
 
-Devolvé SOLO el JSON.`;
-
+  let crudo = "";
   try {
-    const crudo = await llamarIA({
+    crudo = await llamarIA({
       etiqueta: "Momentos narrativos",
       user: prompt,
       json: true,
       temperature: 0.3,
-      maxTokens: 6000,
+      maxTokens: 8000,
+      reintentos: 0,
+      tolerarTruncado: true,
     });
-    const parsed = parsearJSON(crudo);
-    if (!parsed?.momentos || !Array.isArray(parsed.momentos)) {
-      console.error("   ⚠️ La IA no devolvió momentos válidos.");
-      return [];
-    }
-    console.log(`   📊 Momentos narrativos detectados: ${parsed.momentos.length}`);
-    return parsed.momentos;
   } catch (e) {
     console.error("   ❌ Error detectando momentos narrativos:", e.message);
-    return [];
   }
+
+  let parsed = crudo ? parsearJSON(crudo) : null;
+  if (!parsed?.momentos && crudo) {
+    parsed = rescatarMomentosTruncados(crudo);
+    if (parsed) {
+      console.warn(
+        `   ⚠️ Se rescataron ${parsed.momentos.length} momentos de una respuesta cortada.`,
+      );
+    }
+  }
+
+  if (Array.isArray(parsed?.momentos) && parsed.momentos.length >= 8) {
+    console.log(`   📊 Momentos narrativos detectados: ${parsed.momentos.length}`);
+    return parsed.momentos;
+  }
+
+  // Diagnóstico para el próximo ajuste
+  if (crudo) {
+    console.error(`   📄 Respuesta cruda (inicio): ${crudo.substring(0, 400)}`);
+    console.error(`   📄 Respuesta cruda (final): ${crudo.slice(-300)}`);
+  }
+  const respaldo = momentosDeRespaldo(segmentos);
+  console.warn(
+    `   ⚠️ Plan B: se agruparon los segmentos por cantidad de palabras (${respaldo.length} momentos, capítulos genéricos).`,
+  );
+  return respaldo;
 }
 
 /**
