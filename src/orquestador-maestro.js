@@ -1,5 +1,5 @@
 import "dotenv/config";
-import fs from 'fs'; // <-- NUEVO: Para leer el JSON
+import fs from 'fs'; // Para leer el JSON de ilustraciones
 import { generarEstudio } from "./generarEstudio.js";
 import { generarPromptsCapitulo } from "../scripts/generate-prompts.js";
 import { 
@@ -38,14 +38,14 @@ const RECURSOS_IA = [
   "contexto_arqueologico",     
   "citas_autoridades",         
   "aplicaciones_practicas",
-  "ilustraciones"              // <-- NUEVO
+  "ilustraciones"
 ];
 
 const FUENTES_CADENA = {
   sermon: ["estudio"],
   bosquejo: ["sermon"],
   aplicaciones_practicas: ["sermon"],
-  ilustraciones: ["estudio"]   // <-- NUEVO
+  ilustraciones: ["estudio"]
 };
 const TIPOS_CADENA = new Set(Object.keys(FUENTES_CADENA));
 
@@ -60,7 +60,7 @@ const MAX_TOKENS_POR_TIPO = {
   contexto_arqueologico: 6000,
   citas_autoridades: 6000,      
   aplicaciones_practicas: 6000,
-  ilustraciones: 6000           // <-- NUEVO
+  ilustraciones: 6000
 };
 
 async function llamarIA(prompt, tipoRecurso) {
@@ -187,7 +187,7 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
       if (hallados.estudio) materiales.estudio_html = hallados.estudio;
       if (hallados.sermon) materiales.sermon_html = hallados.sermon;
 
-      // <-- CAMBIO AQUÍ: Se pasa BASE_ILUSTRACIONES como último argumento
+      // Se pasa BASE_ILUSTRACIONES como último argumento
       const prompt = generarPromptRecurso(tipo, libroInfo.nombre, capituloNum, textoCapitulo, materiales, BASE_ILUSTRACIONES);
       
       console.log(`   🔍 [${tipo}] Prompt generado (primeros 300 chars):`, prompt.substring(0, 300));
@@ -223,10 +223,17 @@ async function generarRecursosIA(libro, capituloNum, chapterId, libroInfo) {
 // FUNCIÓN PRINCIPAL (MAESTRA)
 // ============================================================
 async function main() {
+  // Argumentos --clave=valor. Se corta SOLO en el primer "=", así las
+  // indicaciones pueden contener "=" sin perder texto.
   const args = {};
   for (const arg of process.argv.slice(2)) {
-    const [clave, valor] = arg.replace(/^--/, "").split("=");
-    args[clave] = valor;
+    const limpio = arg.replace(/^--/, "");
+    const i = limpio.indexOf("=");
+    if (i === -1) {
+      args[limpio] = true;
+    } else {
+      args[limpio.slice(0, i)] = limpio.slice(i + 1);
+    }
   }
 
   if (!args.libro || !args.rango) {
@@ -236,7 +243,7 @@ async function main() {
 
   const { libro, rango, indicaciones } = args;
   
-  const indicacionManual = (indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
+  const indicacionManual = (typeof indicaciones === "string" && indicaciones && indicaciones !== "SIN INDICACIONES ESPECIALES") ? indicaciones : null;
   
   const capitulos = parsearRango(rango);
   console.log(`\n🚀 INICIANDO ORQUESTADOR MAESTRO`);
@@ -248,6 +255,7 @@ async function main() {
   console.log(`════════════════════════════════════════════\n`);
 
   const libroInfo = await obtenerBookIdPorSlug(libro);
+  const capitulosConError = [];
 
   for (const capituloNum of capitulos) {
     console.log(`\n🔄 ══════ PROCESANDO CAPÍTULO ${capituloNum} ══════`);
@@ -268,18 +276,29 @@ async function main() {
       await generarRecursosIA(libro, capituloNum, chapterId, libroInfo);
 
       console.log(`\n   🎙️ [Paso 3/3] Generando prompts multimedia...`);
-      // Paso 3/3 (reemplaza la línea de generarPromptsCapitulo)
-const ok = await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
-if (!ok) throw new Error("Falló la generación de prompts multimedia (revisa el log)");
+      const ok = await generarPromptsCapitulo(libro.toLowerCase(), capituloNum);
+      if (!ok) {
+        throw new Error("Falló la generación de prompts multimedia (revisa el log de arriba)");
+      }
 
       console.log(`\n   🎉 ¡Capítulo ${capituloNum} completado exitosamente!`);
     } catch (error) {
       console.error(`\n   💥 ERROR CRÍTICO en capítulo ${capituloNum}:`, error.message);
+      capitulosConError.push(capituloNum);
+      process.exitCode = 1; // que el workflow quede en rojo
     }
   }
 
-  console.log(`\n\n🏁 ══════ LOTE FINALIZADO ══════`);
-  console.log(`📁 Todos los prompts están en: prompts_output/${libro.toLowerCase()}/`);
+  if (capitulosConError.length > 0) {
+    console.log(`\n\n⚠️ ══════ LOTE FINALIZADO CON ERRORES ══════`);
+    console.log(`❌ Capítulos con error: ${capitulosConError.join(", ")}`);
+  } else {
+    console.log(`\n\n🏁 ══════ LOTE FINALIZADO ══════`);
+  }
+  console.log(`📁 Los prompts están en: prompts_output/${libro.toLowerCase()}/`);
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
