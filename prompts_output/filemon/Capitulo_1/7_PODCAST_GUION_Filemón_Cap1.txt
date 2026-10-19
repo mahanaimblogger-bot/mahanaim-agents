@@ -1,170 +1,212 @@
 ﻿═══════════════════════════════════════════
 GUION DE PODCAST (2 voces: A = guía, B = curioso)
 Libro: Filemón | Capítulo: 1
-Título: Filemón uno: el dilema humano del perdón
+Título: Filemón 1: el dilema de perdonar a quien te falló
 (La fuente para el audio es podcast_guion.json)
 ═══════════════════════════════════════════
 
-A: Imagina que tienes un esclavo. Se escapa. Te roba. Desaparece. Y meses después, alguien te escribe una carta desde la cárcel y te dice: recibelo como si fuera yo. ¿Qué harías tú?
+A: Un hombre tiene en sus manos el derecho legal de castigar a su esclavo fugitivo. Puede marcarlo, venderlo, incluso matarlo. Y ese esclavo está de pie frente a él, temblando, con una carta en la mano. ¿Tú qué harías en su lugar?
 
-B: Uf. Esa pregunta es incómoda.
+B: Espera, espera. ¿Estamos hablando de un esclavo real, con amo real, en el primer siglo?
 
-A: Bienvenidos a Mahanaim. Hoy no venimos a repasar la carta a Filemón versículo por versículo. Venimos a meternos en el dilema humano. En las preguntas que no queremos hacernos.
+A: Real como el dinero. Se llama Onésimo. Su amo se llama Filemón. Y la carta la escribe Pablo desde una prisión en Roma.
 
-B: Porque es fácil decir perdona. Otra cosa es estar en los zapatos de Filemón.
+B: Y esa carta está en la Biblia. Veinticinco versículos. Yo siempre la salto.
 
-A: Exacto. Vamos a ponernos en su lugar. Filemón era un hombre adinerado en Colosas. Tenía esclavos. Uno de ellos, Onésimo, huyó. Probablemente robándole para financiar su escape.
+A: Casi todos la saltamos. Y sin embargo, es la carta más incómoda del Nuevo Testamento, porque no te deja esconderte en doctrina abstracta. Te pone frente a frente con una persona que te debe.
 
-B: O sea, no solo se fue. Se fue con lo que no era suyo.
+B: A ver, ponme en situación. ¿Qué pasó exactamente?
 
-A: Así es. En la ley romana, un esclavo fugitivo era un delincuente. El amo podía castigarlo severamente, incluso con la muerte. Algunos amos marcaban la frente de los fugitivos con las letras F U G, de fugitivus.
+A: Onésimo era esclavo de Filemón, un creyente adinerado de Colosas. Su casa era el lugar donde se reunía la iglesia. Un día Onésimo se escapó. Y probablemente se llevó dinero de su amo para financiar la huida.
 
-B: Qué horrible. Una marca permanente.
+B: O sea, no solo se fue. Robó.
 
-A: Sí. Y ese era el destino probable de Onésimo si lo atrapaban. Pero no lo atraparon. Huyó lejos, probablemente a Roma, para perderse en la multitud.
+A: Según la ley romana, un esclavo fugitivo era un delincuente. Si lo atrapaban, el amo podía castigarlo severamente. Algunos le marcaban la frente con letras para que todo el mundo supiera lo que había hecho.
 
-B: ¿Y qué pasó en Roma?
+B: Qué horror. Y este hombre termina nada menos que en Roma.
 
-A: Allí se encontró con Pablo. Pablo estaba preso, encadenado. Y en esa prisión, Onésimo escuchó el evangelio y se convirtió. Pablo lo llama mi hijo, a quien engendré en mis prisiones.
+A: Cruzó medio imperio. Y en Roma, de todas las personas del mundo, termina escuchando a Pablo predicar. Ahí nace de nuevo. El fugitivo se convierte en hijo espiritual del apóstol.
 
-B: Qué giro. El fugitivo termina siendo hijo espiritual del apóstol.
+B: Y Pablo lo manda de vuelta. Con la carta. Eso es lo que me cuesta.
 
-A: Pero aquí viene el dilema. Pablo decide enviarlo de vuelta a Filemón. No lo retiene, aunque quería. Y le escribe una carta pidiéndole que lo reciba como hermano.
+A: A mí también. Pablo lo quería retener. Lo dice: quisiera quedarme contigo. Pero no lo hace sin el consentimiento de Filemón. Y aquí empieza el dilema del que quiero hablar hoy.
 
-B: Espera, espera. ¿Pablo lo manda de vuelta? ¿No era peligroso para Onésimo?
+B: ¿Cuál? Porque dilemas hay varios.
 
-A: Muy peligroso. Podía ser castigado. Pero Pablo no quería actuar a espaldas de Filemón. Quería que todo se hiciera con transparencia y con consentimiento.
+A: El primero es de Filemón. Imagina la escena: tocan a tu puerta. Abres. Ahí está el esclavo que te robó, el que te humilló, el que te hizo pasar vergüenza delante de tus vecinos. Y no viene solo. Trae una carta de un apóstol.
 
-B: Entonces, Filemón tenía en sus manos el destino de Onésimo. Podía perdonarlo o destruirlo.
+B: Y la carta no dice: castígalo. Dice: recíbelo como a mí mismo.
 
-A: Exacto. Y la carta se leería públicamente, delante de toda la iglesia que se reunía en su casa. Imagínate la presión.
+A: Ahí está la tensión. Pablo no le niega el derecho. No le dice que la deuda no existe. Le dice: ponlo a mi cuenta.
 
-B: Uy. Ahora sí que era un dilema público.
+B: Y esa frase es rarísima. Un apóstol pagando una deuda ajena.
 
-A: Primer momento con giro. Pablo tiene autoridad para mandar. De hecho, dice: tengo mucha libertad en Cristo para mandarte lo que conviene. La palabra griega es parresia, franqueza, autoridad.
+A: Es lenguaje de contabilidad. La palabra griega que se usa ahí aparece una sola vez en todo el Nuevo Testamento. Significa cargar a una cuenta. Imputar. Transferir una deuda.
 
-B: O sea, podía ordenarlo.
+B: Como cuando alguien paga tu tarjeta sin que tú lo sepas.
 
-A: Sí. Pero no lo hace. Dice: más bien te ruego por amor. La palabra griega es parakalo, que significa consolar, exhortar, rogar. Es un verbo de relación, no de poder.
+A: Exactamente eso. Pablo dice: lo que te debe, cóbramelo a mí. Y lo firma de su propia mano. En el mundo antiguo, la firma al final de un documento era una garantía legal.
 
-B: Entonces, Pablo renuncia a su derecho de mandar.
+B: O sea que Pablo se está endeudando por un esclavo fugitivo.
 
-A: Exacto. Y eso nos confronta. ¿Cómo usamos nuestra autoridad? ¿Como un martillo o como una mano extendida?
+A: Y fíjate en el detalle que casi nadie nota. Inmediatamente después de firmar, Pablo añade: por no decirte que aun tú mismo te me debes también.
 
-B: ¿Qué harías tú si tuvieras el poder de obligar a alguien a hacer lo correcto? ¿Lo obligarías o lo persuadirías?
+B: Espera. Le está recordando a Filemón que le debe su propia vida.
 
-A: Buena pregunta. Porque a veces queremos que las personas cambien a la fuerza, pero Dios prefiere una obediencia voluntaria.
+A: Le está recordando que fue él quien le predicó el evangelio. Filemón le debe su salvación, humanamente hablando. Y si le debe eso, ¿cómo no va a perdonar una deuda de dinero?
 
-B: Y eso me lleva a otra cosa. Pablo dice: si en algo te dañó, o te debe, ponlo a mi cuenta.
+B: Eso es un golpe bajo. Pero muy elegante.
 
-A: Ahí está el segundo giro. Pablo usa lenguaje contable. La palabra griega es ellogao, que significa cargar a una cuenta, imputar. Es un término que aparece solo aquí en todo el Nuevo Testamento.
+A: Es el corazón de todo. Todos somos deudores de la gracia. El problema es que se nos olvida en cuanto alguien nos debe a nosotros.
 
-B: O sea, Pablo está diciendo: yo pago la deuda de Onésimo.
+B: Y ahí viene mi objeción. Porque yo entiendo el perdón. Pero una cosa es perdonar y otra es recibir a esa persona como si nada hubiera pasado.
 
-A: Exacto. Y no solo eso. Añade: yo Pablo lo escribo de mi mano, yo lo pagaré. En el mundo antiguo, la firma autógrafa era una garantía legal. Pablo está firmando un pagaré.
+A: Buen punto. Porque Pablo no dice: olvídalo. Dice: recíbelo como a mí mismo. Es más fuerte que perdonar. Es restaurar la relación completa.
 
-B: Increíble. Pablo asume una deuda que no era suya.
+B: Y con el mismo honor que recibirías al apóstol.
 
-A: Y luego añade una frase sorprendente: por no decirte que aun tú mismo te me debes también. Le recuerda a Filemón que él también le debe su vida espiritual, porque Pablo fue quien le predicó el evangelio.
+A: Con la misma dignidad. Con el mismo afecto. Pablo se pone en el lugar de Onésimo. Lo que le hagas a él, me lo haces a mí.
 
-B: Uf, eso es poner las cosas en perspectiva.
+B: Eso me suena a algo que dijo Jesús.
 
-A: Sí. Filemón le debe a Pablo su salvación. ¿Cómo no va a perdonar una deuda material a Onésimo?
+A: En cuanto lo hicisteis a uno de estos mis hermanos más pequeños, a mí lo hicisteis. Pablo está aplicando las palabras del Señor con lujo de detalles.
 
-B: Pero pensemos en Filemón. No era fácil. Onésimo no solo le robó. También lo traicionó. Confió en él y le falló.
+B: Pero seamos honestos. Si yo fuera Filemón, tendría miedo. ¿Y si lo recibo y vuelve a robarme? ¿Y si se escapa otra vez?
 
-A: Exacto. Y ahí está la tensión. Perdonar no es decir que no pasó nada. Es asumir el costo de la restauración.
+A: Claro. El perdón bíblico no es amnesia. No es fingir que no pasó nada. Pablo mismo no lo finge: admite que Onésimo le dañó y le debe.
 
-B: ¿Y qué harías tú? Si alguien te traiciona, te roba, huye, y luego vuelve arrepentido, ¿lo recibes como hermano o le haces pagar?
+B: Entonces el perdón no borra la deuda. La asume alguien.
 
-A: Esa es la pregunta. Porque todos queremos justicia para los demás, pero misericordia para nosotros.
+A: Siempre. El perdón real siempre cuesta algo. Si yo te perdón, alguien paga. Y en el evangelio, ese alguien es Cristo primero, y luego nosotros cuando perdonamos.
 
-B: Tercer giro. Pablo reinterpreta la fuga de Onésimo. Dice: quizá para esto se apartó de ti por algún tiempo, para que le recibieses para siempre.
+B: Déjame procesar eso. Porque cambia todo. Perdonar no es decir: no importa. Es decir: importa, y yo asumo el costo.
 
-A: Ahí está la palabra quizá. En griego tacha. No expresa duda, sino una conclusión reverente. Pablo sugiere que Dios usó la fuga para un propósito mayor.
+A: Eso es. Y hay un detalle que me desarma. Pablo no manda. Podría haber mandado. Tiene autoridad apostólica, lo dice claramente. Pero elige rogar.
 
-B: O sea, Dios no causó el mal, pero lo usó para bien.
+B: Un anciano encadenado rogando por un esclavo. La escena es casi ridícula.
 
-A: Exacto. Como con José, cuando dijo a sus hermanos: vosotros pensasteis mal contra mí, mas Dios lo encaminó a bien. Y como con la crucifixión, el mayor crimen, que se convirtió en salvación.
+A: Es que la autoridad que se impone no convence a nadie. La que se arrodilla, sí. Y Pablo quiere que Filemón haga lo correcto porque lo elige, no porque se lo ordenan.
 
-B: Entonces, la fuga de Onésimo, que fue un mal, Dios la usó para traerlo a la fe y para transformar su relación con Filemón.
+B: Para que su favor sea voluntario y no por necesidad.
 
-A: Sí. Y aquí viene lo más revolucionario: Pablo dice que Onésimo vuelve no ya como esclavo, sino como más que esclavo, como hermano amado.
+A: Y aquí hay algo que me vuela la cabeza. La carta se lee en público. Delante de toda la iglesia que se reúne en la casa de Filemón.
 
-B: Hermano amado. Esa palabra, adelphos, significa miembro de la familia de Dios.
+B: Ah, entonces no es un asunto privado entre dos.
 
-A: Exacto. En Cristo, la relación de amo y esclavo es trascendida por la relación de hermanos. No niega la realidad social, pero declara una realidad espiritual superior.
+A: Para nada. Filemón toma su decisión delante de sus hermanos. Todos van a saber si recibe a Onésimo o no. La presión social se convierte en instrumento pastoral.
 
-B: ¿Y qué harías tú si alguien que te ha fallado se convierte y ahora es tu hermano en la fe? ¿Lo tratas como hermano o como siervo?
+B: Y eso es incómodo. Porque a mí me gusta perdonar en privado, donde nadie me ve, y guardar el rencor en silencio.
 
-A: Cuarto giro. Pablo dice: recíbele como a mí mismo. Es una identificación radical. Lo que se le haga a Onésimo, se le hace a Pablo.
+A: La iglesia hace visible lo que queremos esconder. Y eso es bueno, aunque duela. Porque el rencor escondido se pudre, y el perdón público sana a toda una comunidad.
 
-B: Eso me recuerda a Jesús: en cuanto lo hicisteis a uno de estos mis hermanos más pequeños, a mí lo hicisteis.
+B: Vamos a lo práctico. Porque todo esto suena muy bonito, pero yo tengo un caso concreto.
 
-A: Exacto. Y Pablo no solo pide que lo reciba. Pide que lo reciba como si fuera Pablo mismo. Con el mismo honor, el mismo afecto, la misma dignidad.
+A: Dímelo.
 
-B: Es una locura. Onésimo era un esclavo fugitivo. Y ahora debe ser recibido como el apóstol Pablo.
+B: Alguien me debe dinero. Bastante. Me prometió pagar y no pagó. Y ahora quiere volver a la iglesia, quiere sentarse al lado mío, quiere saludarme. ¿Qué harías tú?
 
-A: Así es el evangelio. Dios nos recibe como recibe a su Hijo. Nos ve en Cristo. Nos ama en Cristo.
+A: Primero, separar dos cosas. La deuda existe. No es sano decir que no. Pablo tampoco lo dice.
 
-B: Entonces, la carta a Filemón es una parábola viviente del evangelio.
+B: Entonces puedo cobrarle.
 
-A: Sí. Onésimo es el pecador. Pablo es el intercesor. Filemón es el Padre que tiene derecho a castigar, pero es llamado a perdonar.
+A: Puedes. Pero pregúntate qué te está pidiendo Dios que hagas con esa deuda. ¿Cobrarla, condonarla, renegociarla? Lo que no puedes es usar la deuda como excusa para negarle el saludo y la mesa.
 
-B: Y Cristo es el Pablo de nuestra historia. Él se puso en nuestro lugar. Él asumió nuestra deuda. Él dijo: yo lo pagaré.
+B: Es que se me hace injusto. Yo trabajé ese dinero.
 
-A: Exacto. Y el Padre, por amor al Hijo, nos recibe no como esclavos, sino como hijos. No como criminales, sino como herederos.
+A: Y es injusto. Nadie dice que no. Pero recuerda lo que Pablo le escribió a Filemón: tú también te me debes. Todos tenemos una cuenta impagable que alguien más pagó.
 
-B: Ahora, bajemos esto a la vida diaria. ¿Qué harías tú si tuvieras que perdonar a alguien que te ha hecho daño?
+B: Ahí me duele. Porque yo también he fallado y he sido perdonado.
 
-A: Pensemos en situaciones concretas. Imagina que un empleado te roba. Lo despiden. Meses después, te pide trabajo de nuevo. ¿Qué haces?
+A: Y no una vez. Muchas. Cada día. La medida con que perdonamos revela si entendimos la medida en que fuimos perdonados.
 
-B: Uf. Depende. Si está arrepentido y ha cambiado, tal vez. Pero cuesta.
+B: Pero hay casos más difíciles que el dinero. ¿Qué tal un padre que abandonó? ¿O un hermano que habló mal de ti y te destruyó la reputación?
 
-A: O imagina que un familiar te debe dinero. No te paga. Y luego se convierte y viene a pedirte perdón. ¿Le condonas la deuda?
+A: Ahí el perdón no es un sentimiento repentino. Es una decisión que se repite. Y la restauración plena puede tomar años. Pablo no le pide a Filemón que sienta algo de inmediato. Le pide que reciba.
 
-B: Es difícil. Porque uno piensa: justicia es que pague. Pero la gracia dice: yo pago.
+B: Recibir. Abrir la puerta. Eso sí puedo hacerlo hoy, aunque el sentimiento venga después.
 
-A: Exacto. Y ahí está el punto. No se trata de ignorar la deuda. Se trata de asumirla tú. Como hizo Pablo. Como hizo Cristo.
+A: Y fíjate en algo más. Pablo no le pide a Onésimo que se defienda. Onésimo no lleva una carta de excusas. Va con las manos vacías, confiando en la intercesión de otro.
 
-B: Pero, ¿y si la otra persona no se arrepiente? ¿También hay que perdonar?
+B: Igual que nosotros delante de Dios. No llevamos argumentos. Llevamos a Cristo.
 
-A: El perdón es una decisión personal. No depende del arrepentimiento del otro. Pero la reconciliación sí requiere arrepentimiento. En el caso de Onésimo, hubo arrepentimiento y restitución.
+A: Exacto. Y eso nos quita el orgullo. Si tú eres Onésimo, no puedes exigir perdón. Lo recibes como regalo. Y si eres Filemón, no puedes cobrar venganza. La deuda ya fue pagada por otro.
 
-B: Entonces, el perdón es liberar al ofensor de la deuda, pero la reconciliación es restaurar la relación.
+B: Hay algo que todavía no entiendo. ¿Por qué Pablo no pide que lo liberen de una vez? Lo sugiere, pero no lo dice.
 
-A: Correcto. Y Filemón estaba llamado a ambas cosas: perdonar y recibir como hermano.
+A: Porque quiere que Filemón vaya más allá de lo mínimo. Confía en que hará aún más de lo que se le pide. La gracia siempre produce más que la ley.
 
-B: ¿Y qué hay de la justicia? ¿No se supone que debemos buscar justicia?
+B: Espera, espera. Entonces la carta no solo pide perdón. Pide generosidad extraordinaria.
 
-A: Sí, pero la justicia sin misericordia es cruel. Y la misericordia sin justicia es complicidad. Pablo no niega la deuda. La asume. Eso es justicia y misericordia juntas.
+A: Siempre. Cuando entiendes cuánto te perdonaron, no das lo mínimo. Das de más. Y eso no se puede ordenar. Se contagia.
 
-B: Me encanta eso. No es borrón y cuenta nueva. Es transferencia de deuda.
+B: Y por eso Pablo no manda. Porque la obediencia forzada no transforma a nadie.
 
-A: Exacto. Y eso es lo que Cristo hizo. No ignoró nuestro pecado. Lo llevó. No ignoró la deuda. La pagó.
+A: Dios mismo prefiere una obediencia voluntaria a una sumisión obligada. Nos persuade con su bondad. No nos arrastra con una cadena.
 
-B: Entonces, la pregunta para el oyente es: ¿A quién necesitas recibir hoy como hermano? ¿A quién necesitas perdonar? ¿A quién necesitas asumirle la deuda?
+B: Aunque Pablo sí estaba encadenado. Qué ironía.
 
-A: Y también: ¿Te has sentido como Onésimo? ¿Un fugitivo que necesita volver a casa? ¿Has experimentado el perdón de Dios?
+A: Y sus cadenas sirvieron para algo. En la prisión, Onésimo nació de nuevo. Lo que el mundo vio como derrota, Dios lo usó como sala de parto.
 
-B: Porque todos somos Onésimo. Todos hemos huido de Dios. Todos hemos pecado. Y Dios, en Cristo, nos recibe como hijos.
+B: Eso me consuela. Porque a veces siento que mis peores años fueron pérdida total.
 
-A: Y todos somos Filemón. Todos tenemos a alguien que nos ha fallado y necesitamos perdonar.
+A: Dios no causa el mal, pero lo encamina. José lo dijo a sus hermanos: vosotros pensasteis mal contra mí, pero Dios lo encaminó a bien. La fuga de Onésimo fue un pecado. Y Dios la usó para salvación.
 
-B: Y todos estamos llamados a ser Pablo. A interceder por otros, a asumir sus deudas, a restaurarlos.
+B: O sea que ni tu peor error escapa de sus manos.
 
-A: Así que la carta a Filemón no es solo una historia antigua. Es un espejo. Nos muestra quiénes somos y quiénes estamos llamados a ser.
+A: Ni el tuyo. Ni el mío. Y eso no nos da permiso para pecar, pero sí esperanza cuando ya pecamos.
 
-B: Y nos confronta con decisiones concretas. Perdonar no es un sentimiento. Es una acción. Es recibir al otro como hermano.
+B: Quiero volver al inicio. Porque dijiste que Pablo no se presenta como prisionero de Roma, sino de Cristo.
 
-A: Sí. Y eso solo es posible cuando recordamos cuánto hemos sido perdonados. Cuando entendemos que nuestra deuda fue pagada por Cristo.
+A: Esa diferencia lo cambia todo. Si eres prisionero de Roma, eres una víctima. Si eres prisionero de Cristo, estás exactamente donde debes estar.
 
-B: Entonces, la idea para llevarse hoy es: perdona como fuiste perdonado. Recibe como fuiste recibido. Ama como fuiste amado.
+B: Y eso es una forma de ver tus problemas que no es natural. Para nada natural.
 
-A: Exacto. Y te invitamos a ver el video completo en el canal Mahanaim, titulado: Ponlo a mi cuenta: el evangelio en Filemón. Allí profundizamos en cada detalle.
+A: No lo es. Pero si Dios está sobre todas las cosas, incluso tus circunstancias difíciles tienen propósito. No son accidentes. Son asignaciones.
 
-B: Y también te invitamos a comentar. ¿Qué harías tú en el lugar de Filemón? ¿Has tenido que perdonar una deuda grande? Comparte tu experiencia.
+B: Me cuesta creerlo cuando estoy en medio del dolor.
 
-A: Nos encantará leerte. Y recuerda: la gracia de nuestro Señor Jesucristo sea con tu espíritu. Amén.
+A: A todos nos cuesta. Por eso Pablo escribe desde la cárcel, no desde un palacio. Su confianza no nació de la comodidad. Nació de la soberanía de Dios.
 
-B: Hasta la próxima.
+B: Y ahora aterriza esto en mi vida. Porque mañana tengo que ver a alguien que me debe.
+
+A: Te propongo algo. Antes de verlo, escribe en un papel lo que te debe. La cifra exacta. Y luego escribe debajo lo que tú le debes a Dios.
+
+B: Eso va a ser una lista larga.
+
+A: Larguísima. Y cuando la veas, decide. No te digo que sientas algo. Te digo que decidas recibir. Abrir la puerta. Sentarte a la mesa.
+
+B: Y si no puedo?
+
+A: Entonces ora como oró Corrie ten Boom, que tuvo que perdonar a un guardia de un campo de concentración. Señor, perdóname y ayúdame a perdonarlo. El amor de Dios fluye cuando dejamos de apretar el puño.
+
+B: Y si la otra persona no quiere volver?
+
+A: Tu parte es tener el corazón abierto. La puerta de tu casa puede estar cerrada, pero la de tu corazón no. Dios se encarga del resto.
+
+B: Me queda una última pregunta. ¿Qué pasa si Filemón no perdonó? No lo sabemos, ¿verdad?
+
+A: La carta se conservó. Eso sugiere que se leyó, que se obedeció, que se guardó como testimonio. Pero la Biblia no nos dice qué hizo Filemón. Y eso es a propósito.
+
+B: ¿Por qué a propósito?
+
+A: Porque la pregunta queda abierta para ti. La carta no te cuenta la decisión de Filemón. Te pregunta por la tuya.
+
+B: Entonces la carta no termina en el versículo veinticinco. Termina en mi vida.
+
+A: Ahí está. La gracia de nuestro Señor Jesucristo sea con tu espíritu. Ese es el final del texto. Pero la decisión sigue pendiente en cada uno de nosotros.
+
+B: Déjame resumir lo que me llevo, porque fue mucho. Un esclavo fugitivo vuelve a casa. Un amo tiene que elegir. Un apóstol paga la deuda. Y yo tengo que decidir a quién voy a recibir.
+
+A: Y no olvides lo más fuerte. Pablo dijo: ponlo a mi cuenta. Cristo dijo algo parecido sobre ti. Tu deuda fue puesta en su cuenta. Su justicia fue puesta en la tuya.
+
+B: Eso es demasiado para un episodio de once minutos.
+
+A: Por eso te invito a ver el video completo del canal Mahanaim. Se llama Onésimo: de esclavo fugitivo a hermano amado. Ahí vas a encontrar todo el recorrido del texto, versículo por versículo.
+
+B: Y mientras tanto, cuéntanos. ¿A quién te está costando recibir? Escríbelo en los comentarios. No tienes que poner nombres. Solo di: hay alguien.
+
+A: Y si hoy decides abrir esa puerta, cuéntanoslo también. Porque tu historia puede animar a otro que está en la misma disyuntiva.
+
+B: Yo voy a empezar hoy. No sé si voy a sentir algo. Pero voy a decidir recibir.
+
+A: Ese es el primer paso. Y el resto lo hace la gracia. Nos escuchamos en el próximo episodio de Mahanaim.

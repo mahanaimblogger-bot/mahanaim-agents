@@ -28,18 +28,18 @@ CONTENIDO HTML:
 
 <div style="margin-bottom: 2.5rem;">
   <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    1. Colosas ✅
+    1. Roma ✅
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.25!3d37.7833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.7833, 29.25!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d12.4964!3d41.9028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z41.9028, 12.4964!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (implícito, destinatario Filemón)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.7833°N, 29.25°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Antigua ciudad de Frigia, en el valle del río Lico, cerca de Laodicea y Hierápolis. Fue un centro comercial y religioso. La iglesia se reunía en la casa de Filemón. Arqueológicamente, se han encontrado inscripciones y restos que confirman su ubicación en la actual Turquía.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Colosas es el hogar de Filemón y la iglesia doméstica. Allí debe resolverse la situación de Onésimo, demostrando que el evangelio transforma las relaciones sociales en el ámbito local.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (contexto de prisión; Hechos 28:30-31)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 41.9028°N, 12.4964°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Capital del Imperio Romano. Pablo estuvo bajo arresto domiciliario en Roma alrededor del 60-62 d.C., predicando el evangelio. La ciudad era el centro político y militar del mundo mediterráneo.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar desde donde Pablo escribe como 'prisionero de Jesucristo', mostrando que su cautiverio es parte del plan soberano de Dios para la expansión del evangelio y la reconciliación entre esclavo y amo.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -49,18 +49,18 @@ CONTENIDO HTML:
 
 <div style="margin-bottom: 2.5rem;">
   <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    2. Roma ✅
+    2. Colosas ✅
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d12.4964!3d41.9028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z41.9028, 12.4964!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.2603!3d37.7864!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.7864, 29.2603!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1, 9, 10, 13, 23 (Pablo prisionero)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 41.9028°N, 12.4964°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Capital del Imperio Romano. Pablo estuvo bajo arresto domiciliario aproximadamente entre 60-62 d.C. (Hechos 28:30-31). Allí escribió las cartas de la cautividad, incluida Filemón. La tradición sitúa su prisión en una casa alquilada.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Roma es el lugar desde donde Pablo escribe, encadenado pero libre en Cristo. Simboliza la soberanía de Dios que usa el cautiverio para extender el evangelio y restaurar relaciones.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (implícita: Filemón era de Colosas; cf. Colosenses 4:9,17)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.7864°N, 29.2603°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Antigua ciudad de Frigia, en el valle del río Lico, cerca de Laodicea y Hierápolis. Fue destruida por un terremoto en el 60 d.C. y reconstruida. La iglesia se reunía en la casa de Filemón.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Hogar de Filemón y de la iglesia doméstica. Allí debía tener lugar la recepción de Onésimo como hermano amado, demostrando la transformación de las relaciones sociales por el evangelio.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -74,14 +74,14 @@ CONTENIDO HTML:
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d27.3417!3d37.9397!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.9397, 27.3417!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d27.3417!3d37.9392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.9392, 27.3417!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (posible lugar de escritura, según algunos estudiosos)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.9397°N, 27.3417°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Importante ciudad de Asia Menor, donde Pablo residió durante tres años (Hechos 19). Algunos eruditos sugieren que Filemón fue escrita desde Éfeso durante un encarcelamiento más breve, aunque la teoría tradicional es Roma.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Si se escribió desde Éfeso, resalta la cercanía geográfica con Colosas y la rapidez de la intercesión. En cualquier caso, muestra la movilidad del ministerio de Pablo.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (posible lugar de escritura alternativo; tradición) </p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.9392°N, 27.3417°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Importante ciudad de Asia Menor, donde Pablo ministró por tres años. Algunos estudiosos sugieren que Filemón fue escrita desde Éfeso durante un encarcelamiento no registrado en Hechos.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Si Pablo escribió desde Éfeso, el regreso de Onésimo a Colosas sería más cercano, pero la carta mantiene la misma enseñanza sobre la reconciliación en Cristo.</p>
   </div>
   
   <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
@@ -99,10 +99,10 @@ CONTENIDO HTML:
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (posible lugar de escritura, según algunos estudiosos)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:1 (posible lugar de escritura alternativo; tradición)</p>
     <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 32.5°N, 34.8917°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad costera de Judea, donde Pablo estuvo encarcelado dos años (Hechos 24-26). Algunos proponen que Filemón fue escrita desde aquí, aunque es menos común.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Si se escribió desde Cesarea, subraya que el evangelio se difunde incluso desde prisiones provinciales. La intercesión por Onésimo trasciende fronteras.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad portuaria donde Pablo estuvo encarcelado dos años (Hechos 24-26). Algunos eruditos proponen que Filemón fue escrita desde allí.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Al igual que Roma o Éfeso, Cesarea sería un contexto de prisión desde el cual Pablo ejerce su ministerio de intercesión y reconciliación.</p>
   </div>
   
   <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
@@ -112,60 +112,18 @@ CONTENIDO HTML:
 
 <div style="margin-bottom: 2.5rem;">
   <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    5. Laodicea ✅
+    5. Valle del Lico ✅
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.1083!3d37.8361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.8361, 29.1083!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
-  
-  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (implícito, iglesia cercana mencionada en Colosenses 4:16)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.8361°N, 29.1083°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad vecina de Colosas, en el valle del Lico. Tenía una iglesia cristiana. La carta a los Colosenses menciona que también se lea a la iglesia de Laodicea (Colosenses 4:16).</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Laodicea representa la expansión del evangelio en la región. La restauración de Onésimo afecta no solo a Colosas sino a las iglesias vecinas, mostrando la dimensión comunitaria de la gracia.</p>
-  </div>
-  
-  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
-    <strong>Nivel de certeza:</strong> Confirmada
-  </div>
-</div>
-
-<div style="margin-bottom: 2.5rem;">
-  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    6. Hierápolis ✅
-  </h3>
-  
-  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.125!3d37.925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.925, 29.125!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
-  
-  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (implícito, iglesia cercana mencionada en Colosenses 4:13)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.925°N, 29.125°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad cercana a Colosas y Laodicea, conocida por sus aguas termales y su iglesia cristiana. Epafras trabajó allí (Colosenses 4:13).</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Hierápolis forma parte del contexto regional donde la iglesia primitiva crecía. La transformación de Onésimo impacta el testimonio cristiano en toda la zona.</p>
-  </div>
-  
-  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
-    <strong>Nivel de certeza:</strong> Confirmada
-  </div>
-</div>
-
-<div style="margin-bottom: 2.5rem;">
-  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    7. Valle del Lico ✅
-  </h3>
-  
-  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.15!3d37.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.85, 29.15!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d29.25!3d37.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.8, 29.25!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
     <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Filemón 1:2 (contexto geográfico de Colosas)</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.85°N, 29.15°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región de Frigia atravesada por el río Lico, afluente del Meandro. En ella se ubicaban Colosas, Laodicea y Hierápolis. Zona de gran actividad comercial y agrícola.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> El valle del Lico es el escenario terrenal donde se desarrolla la historia de Filemón y Onésimo. Dios obra en lugares concretos, transformando comunidades enteras.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.8°N, 29.25°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región de Frigia donde se ubicaban Colosas, Laodicea y Hierápolis. Era un valle fértil y comercial en Asia Menor.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> El entorno geográfico de la iglesia de Colosas, que recibiría la carta y sería testigo de la restauración de Onésimo.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -185,16 +143,14 @@ CONTENIDO HTML:
 ───────────────────────────────────────────
 
 📍 UBICACIONES IDENTIFICADAS:
-1. Colosas (37.7833, 29.25) - confirmada
-2. Roma (41.9028, 12.4964) - confirmada
-3. Éfeso (37.9397, 27.3417) - debatida
+1. Roma (41.9028, 12.4964) - confirmada
+2. Colosas (37.7864, 29.2603) - confirmada
+3. Éfeso (37.9392, 27.3417) - debatida
 4. Cesarea Marítima (32.5, 34.8917) - debatida
-5. Laodicea (37.8361, 29.1083) - confirmada
-6. Hierápolis (37.925, 29.125) - confirmada
-7. Valle del Lico (37.85, 29.15) - confirmada
+5. Valle del Lico (37.8, 29.25) - confirmada
 
  NOTA METODOLÓGICA:
-Las ubicaciones de Colosas, Roma, Laodicea, Hierápolis y el valle del Lico están confirmadas arqueológicamente y son aceptadas unánimemente. Éfeso y Cesarea Marítima son posibles lugares de escritura de la carta, pero la teoría tradicional y más aceptada es Roma (60-62 d.C.). Las coordenadas son aproximadas y se basan en las ubicaciones actuales de los yacimientos arqueológicos. La carta a Filemón no menciona explícitamente muchos lugares, pero el contexto histórico y las referencias en Colosenses permiten identificar el escenario geográfico.
+Las ubicaciones de Roma, Colosas y el valle del Lico están confirmadas por la arqueología y la tradición histórica. Éfeso y Cesarea Marítima son posibles lugares de escritura de Filemón, pero no hay consenso; se incluyen como debatidas. Las coordenadas son aproximadas y se basan en los sitios arqueológicos identificados.
 
 💡 INSTRUCCIONES:
 1. Copia el HTML completo de arriba
