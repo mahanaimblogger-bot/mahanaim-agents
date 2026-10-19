@@ -879,12 +879,78 @@ function elegirCapitulosYoutube(insertados) {
     elegidos = insertados.filter((_, i) => idx.has(i));
   }
 
-  return elegidos.map((m) => ({
-    marca: `imagen_${m.numero}`,
-    titulo: String(m.titulo_capitulo || `Parte ${m.numero}`)
-      .replace(/[<>]/g, "")
-      .trim(),
-  }));
+  const vistos = new Set();
+  return elegidos.map((m) => {
+    let titulo = String(m.titulo_capitulo || "").replace(/[<>]/g, "").trim();
+    if (!titulo || vistos.has(titulo.toLowerCase())) titulo = `Parte ${m.numero}`;
+    vistos.add(titulo.toLowerCase());
+    return { marca: `imagen_${m.numero}`, titulo };
+  });
+}
+
+/**
+ * Capítulos de YouTube con una llamada aparte, DESPUÉS de consolidar los
+ * momentos: así los títulos corresponden a los tramos finales del video.
+ * Devuelve null si la respuesta no es válida (se usa el plan B).
+ */
+async function generarCapitulosYoutube(ssmlConMarcas) {
+  const partes = ssmlConMarcas.split(/<mark name="imagen_(\d+)"\/>/);
+  const bloques = [];
+  for (let i = 1; i < partes.length; i += 2) {
+    const texto = ssmlATextoPlano(partes[i + 1] || "");
+    bloques.push(`[${Number(partes[i])}] ${texto.split(/\s+/).slice(0, 50).join(" ")}`);
+  }
+  const total = bloques.length;
+
+  const prompt = `Eres editor de YouTube. Abajo hay ${total} bloques numerados de un video bíblico; cada uno muestra el comienzo de un tramo.
+
+TAREA: elige entre 9 y 12 bloques donde empiece un CAPÍTULO de YouTube y ponle título.
+
+REGLAS:
+1. El primer capítulo DEBE ser el bloque 1.
+2. Reparte los capítulos por todo el video: no dejes más de 4 bloques seguidos sin capítulo, ni siquiera al final.
+3. Cada título: de 2 a 5 palabras, específico de lo que se trata ese tramo (personaje, idea o palabra clave). Nada genérico y sin repetir el título del video. Sin números ni signos raros.
+4. No repitas ningún título.
+
+BLOQUES:
+${bloques.join("\n")}
+
+FORMATO (JSON estricto):
+{"capitulos":[{"bloque":1,"titulo":"..."}]}`;
+
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Capítulos de YouTube",
+      user: prompt,
+      json: true,
+      temperature: 0.4,
+      maxTokens: 3000,
+    });
+    const lista = parsearJSON(crudo)?.capitulos;
+    if (!Array.isArray(lista)) throw new Error("no hay lista 'capitulos'");
+
+    const vistos = new Set();
+    const salida = [];
+    let previo = 0;
+    for (const c of lista) {
+      const n = Number(c.bloque);
+      const titulo = String(c.titulo || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim();
+      const clave = titulo.toLowerCase();
+      if (!Number.isInteger(n) || n < 1 || n > total || n <= previo) continue;
+      if (!titulo || titulo.length > 60 || vistos.has(clave)) continue;
+      vistos.add(clave);
+      previo = n;
+      salida.push({ marca: `imagen_${n}`, titulo });
+    }
+    if (salida.length < 6 || salida.length > 14 || salida[0].marca !== "imagen_1") {
+      throw new Error(`lista no válida (${salida.length} capítulos)`);
+    }
+    console.log(`   ✅ ${salida.length} capítulos de YouTube con título propio.`);
+    return salida;
+  } catch (e) {
+    console.warn(`   ⚠️ Capítulos de YouTube: ${e.message}. Se usa el plan B.`);
+    return null;
+  }
 }
 
 async function generarPromptsImagenes(insertados, ctx, textoCapitulo) {
@@ -999,7 +1065,9 @@ async function generarArtefactosVideo(dir, ctx, textoCapitulo) {
   return {
     ssml: ssmlConMarcas,
     insertados,
-    capitulosYT: elegirCapitulosYoutube(insertados),
+    capitulosYT:
+      (await generarCapitulosYoutube(ssmlConMarcas)) ||
+      elegirCapitulosYoutube(insertados),
   };
 }
 
@@ -1237,7 +1305,7 @@ LOCUTORES:
 ESTRUCTURA:
 1. GANCHO (primeros 30 a 40 segundos): una escena fuerte o una pregunta que atrape. NADA de "hoy vamos a hablar de" ni saludos largos.
 2. CONTEXTO JUSTO (1 a 2 minutos): lo mínimo para entender la situación.
-3. TRES O CUATRO MOMENTOS CON GIRO: cada uno apoyado en un dato real del material (una palabra del original, un dato histórico, una conexión con otro pasaje) y terminando en una pregunta o sorpresa que lleve al siguiente.
+3. TRES O CUATRO MOMENTOS DE SORPRESA: cada uno apoyado en un dato real del material (una palabra del original, un dato histórico, una conexión con otro pasaje) y terminando en una pregunta o sorpresa que lleve al siguiente.
 4. "¿QUÉ HARÍAS TÚ?": B y A aterrizan el pasaje en una situación concreta de hoy.
 5. CIERRE: una idea para llevarse, una invitación breve a ver el video completo en el canal y a comentar.
 
@@ -1245,6 +1313,10 @@ REGLAS:
 - Extensión total: entre 2.000 y 2.400 palabras (unos 11 a 13 minutos de audio con voz sintética) y mínimo 70 turnos. Desarrolla cada momento con varios intercambios, no con uno solo.
 - Lenguaje oral y natural, español neutro latinoamericano, tuteo. Frases cortas. Algunos turnos muy breves ("¿En serio?", "Espera, espera.") y ninguno de más de 80 palabras.
 - Está pensado para ser leído por voces sintéticas: SIN corchetes, SIN acotaciones, SIN emojis, SIN markdown. Números y referencias bíblicas escritos como se pronuncian ("Filemón, versículo quince"). Palabras griegas o hebreas solo transliteradas, nunca en su alfabeto. Sin abreviaturas ni símbolos.
+- ⛔ NUNCA nombres la estructura en voz alta: nada de "primer giro", "segundo momento", "ahora viene el giro" ni "primer punto". Las sorpresas se sienten, no se anuncian.
+- Sin muletillas: "Exacto" máximo 4 veces en todo el guion y "Uf" máximo 3. Varía las reacciones de ambos.
+- La pregunta "¿qué harías tú?" (o parecida) aparece como máximo 3 veces en todo el guion: en el gancho, al aterrizar en la vida de hoy y en el cierre.
+- Escribe con tilde correcta TODAS las palabras, también las formas con pronombre ("recíbelo", "dímelo", "perdónalo"), porque la voz sintética las pronuncia según la tilde.
 - No inventes datos que no estén en el material ni en conocimiento bíblico ampliamente aceptado.
 - Respeta este perfil doctrinal sin excepción:
 ${PERFIL_DOCTRINAL}
