@@ -6,8 +6,14 @@
 //   1280x720, JPG, menos de 2 MB.
 //
 // Uso:
-//   node scripts/generar-miniatura.js <libro> <capitulo> [--fondo=ruta]
+//   node scripts/generar-miniatura.js <libro> <capitulo> [opciones]
 //   ej: node scripts/generar-miniatura.js filemon 1
+//
+// Opciones (para probar textos sin editar el JSON):
+//   --fondo=ruta            ilustración de fondo
+//   --principal="TEXTO"     gancho grande en blanco
+//   --secundario="TEXTO"    frase de la franja roja
+//   --etiqueta="TEXTO"      línea pequeña de arriba
 //
 // Lee:    prompts_output/<libro>/Capitulo_<n>/youtube_metadata.json
 //         prompts_output/<libro>/Capitulo_<n>/miniatura_fondo.(png|jpg|webp)
@@ -87,9 +93,25 @@ if (!rutaFondo || !fs.existsSync(rutaFondo)) {
 }
 
 // ── Textos ────────────────────────────────────────────────────────
-const etiqueta = String(mini.etiqueta || "").toUpperCase();
-const principal = String(mini.texto_principal || "").toUpperCase();
-const secundario = String(mini.texto_secundario || "").toUpperCase();
+const texto = (opcion, valorJson) =>
+  String(typeof opciones[opcion] === "string" ? opciones[opcion] : valorJson || "")
+    .toUpperCase()
+    .trim();
+const norm = (t) => quitarTildes(t).toUpperCase().replace(/\s+/g, " ").trim();
+
+const etiquetaBase = texto("etiqueta", mini.etiqueta);
+// La línea de arriba siempre dice "ESTUDIO DE <LIBRO> <CAPÍTULO>"
+const etiqueta =
+  etiquetaBase && !etiquetaBase.startsWith("ESTUDIO")
+    ? `ESTUDIO DE ${etiquetaBase}`
+    : etiquetaBase;
+const principal = texto("principal", mini.texto_principal);
+let secundario = texto("secundario", mini.texto_secundario);
+// La franja roja no debe repetir el libro y capítulo de la línea de arriba
+if (secundario && (norm(secundario) === norm(etiquetaBase) || norm(secundario) === norm(etiqueta))) {
+  console.warn("⚠️ El complemento repetía el libro y capítulo; se omite la franja roja.");
+  secundario = "";
+}
 const textoAlaDerecha = mini.lado_texto !== "left";
 
 if (!principal) {
