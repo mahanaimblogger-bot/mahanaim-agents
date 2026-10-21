@@ -408,7 +408,7 @@ REGLAS DE ESTILO Y SSML
 7. Duración objetivo: 2.600-3.000 palabras MÁXIMO (15-18 minutos de narración a velocidad media). NO superes las 3.000 palabras bajo ninguna circunstancia. El guion completo con etiquetas SSML NO debe superar los 22.000 caracteres. Si estás cerca del límite, TERMINÁ el guion aunque falten detalles secundarios. Es preferible un guion conciso y bien estructurado que uno largo y denso.
 
 8. TEXTO PENSADO PARA SER LEÍDO POR UNA VOZ SINTÉTICA (para que suene natural):
-   - Escribí números y referencias bíblicas tal como se pronuncian: "Filemón, versículo quince", "el siglo primero", "sesenta años". Nada de "Flm 1:15", "v. 15" ni cifras sueltas.
+   - Escribí números y referencias bíblicas tal como se pronuncian: "Juan, capítulo tres, versículo dieciséis", "el siglo primero", "sesenta años". Nada de "Flm 1:15", "v. 15" ni cifras sueltas.
    - NO uses abreviaturas, símbolos (&, %, §, /), paréntesis con citas ni guiones largos como adorno.
    - NO escribas en alfabeto griego ni hebreo. Transliterá la palabra original (por ejemplo: "la palabra griega agápe") y explicá su significado.
    - Frases de largo moderado: una idea por frase. Evitá oraciones de más de 35 palabras.
@@ -1156,10 +1156,10 @@ GENERA:
 6. "tags": de 15 a 25 etiquetas para búsqueda (libro, capítulo, personajes, temas, palabras clave). Sin el símbolo #.
 7. "hashtags": 3 a 5 hashtags relevantes.
 8. "miniatura": diseño de la miniatura. El texto lo agrega un programa después, NO la IA de imágenes:
-   - "texto_principal": gancho de 2 a 3 palabras en MAYÚSCULAS, máximo 20 caracteres (ej: "¿PERDONARÍAS?").
-   - "texto_secundario": complemento de 1 a 4 palabras en MAYÚSCULAS, máximo 25 caracteres (puede ir vacío).
+   - "texto_principal": gancho de 2 a 3 palabras en MAYÚSCULAS, máximo 20 caracteres. Debe salir de la idea más fuerte de ESTE guion (una pregunta o frase de impacto); no uses frases genéricas ni copies ejemplos.
+   - "texto_secundario": complemento de 1 a 4 palabras en MAYÚSCULAS, máximo 25 caracteres (puede ir vacío). NO repitas el libro y capítulo: eso ya va aparte en una etiqueta.
    - "lado_texto": "left" o "right" (el lado donde irá el texto).
-   - "prompt_ilustracion": prompt en INGLÉS para una ilustración SIN TEXTO: primer plano emotivo del personaje central del pasaje (rostro con emoción fuerte), contraluz dorado dramático, fondo oscuro. No indiques la posición del personaje en el cuadro. Aplica estas reglas:
+   - "prompt_ilustracion": prompt en INGLÉS para una ilustración SIN TEXTO: primer plano emotivo del personaje central del pasaje (rostro con emoción fuerte), contraluz dorado dramático, fondo oscuro. No indiques la posición del personaje en el cuadro. No pongas marcas, cicatrices, tatuajes, letras ni símbolos sobre el rostro o la frente. Aplica estas reglas:
 ${REGLAS_IMAGEN}
 
 GUION DEL VIDEO:
@@ -1208,6 +1208,10 @@ FORMATO (JSON estricto):
   const tags = limpiarTags(m.tags);
   const hashtags = limpiarHashtags(m.hashtags);
   const ladoTexto = m.miniatura.lado_texto === "left" ? "left" : "right";
+  const etiquetaMini = `${info.bookName.toUpperCase()} ${info.chapterNumber}`;
+  const sinTildes = (t) => quitarTildes(String(t || "")).toUpperCase().trim();
+  let textoSecundario = String(m.miniatura.texto_secundario || "").trim().toUpperCase();
+  if (sinTildes(textoSecundario) === sinTildes(etiquetaMini)) textoSecundario = "";
   const ladoSujeto = ladoTexto === "left" ? "right" : "left";
 
   const promptIlustracion = [
@@ -1231,8 +1235,8 @@ FORMATO (JSON estricto):
     ajustes_youtube: AJUSTES_YOUTUBE,
     miniatura: {
       texto_principal: String(m.miniatura.texto_principal || "").trim().toUpperCase(),
-      texto_secundario: String(m.miniatura.texto_secundario || "").trim().toUpperCase(),
-      etiqueta: `${info.bookName.toUpperCase()} ${info.chapterNumber}`,
+      texto_secundario: textoSecundario,
+      etiqueta: etiquetaMini,
       lado_texto: ladoTexto,
       prompt_ilustracion: promptIlustracion,
       aspect_ratio: "16:9",
@@ -1312,10 +1316,14 @@ ESTRUCTURA:
 REGLAS:
 - Extensión total: entre 2.000 y 2.400 palabras (unos 11 a 13 minutos de audio con voz sintética) y mínimo 70 turnos. Desarrolla cada momento con varios intercambios, no con uno solo.
 - Lenguaje oral y natural, español neutro latinoamericano, tuteo. Frases cortas. Algunos turnos muy breves ("¿En serio?", "Espera, espera.") y ninguno de más de 80 palabras.
-- Está pensado para ser leído por voces sintéticas: SIN corchetes, SIN acotaciones, SIN emojis, SIN markdown. Números y referencias bíblicas escritos como se pronuncian ("Filemón, versículo quince"). Palabras griegas o hebreas solo transliteradas, nunca en su alfabeto. Sin abreviaturas ni símbolos.
+- Está pensado para ser leído por voces sintéticas: SIN corchetes, SIN acotaciones, SIN emojis, SIN markdown. Números y referencias bíblicas escritos como se pronuncian ("Juan, capítulo tres, versículo dieciséis"). Palabras griegas o hebreas solo transliteradas, nunca en su alfabeto. Sin abreviaturas ni símbolos.
 - ⛔ NUNCA nombres la estructura en voz alta: nada de "primer giro", "segundo momento", "ahora viene el giro" ni "primer punto". Las sorpresas se sienten, no se anuncian.
 - Sin muletillas: "Exacto" máximo 4 veces en todo el guion y "Uf" máximo 3. Varía las reacciones de ambos.
 - La pregunta "¿qué harías tú?" (o parecida) aparece como máximo 3 veces en todo el guion: en el gancho, al aterrizar en la vida de hoy y en el cierre.
+- Toda referencia a algo anterior ("como dijiste", "lo que mencionaste") debe corresponder a algo que SÍ se dijo antes en este mismo guion. Si no, no la uses.
+- No menciones la duración del episodio ("este episodio de once minutos", etc.).
+- No atribuyas frases, oraciones ni historias a personas históricas o conocidas, ni uses comillas, salvo que aparezcan en el material de base.
+- Revisa cada turno antes de entregarlo: concordancia verbal y ortografía ("si yo te perdono", no "si yo te perdón"). Las preguntas llevan signo de apertura y de cierre (¿ ?).
 - Escribe con tilde correcta TODAS las palabras, también las formas con pronombre ("recíbelo", "dímelo", "perdónalo"), porque la voz sintética las pronuncia según la tilde.
 - No inventes datos que no estén en el material ni en conocimiento bíblico ampliamente aceptado.
 - Respeta este perfil doctrinal sin excepción:
@@ -1362,7 +1370,9 @@ FORMATO (JSON estricto):
     )
     .map((t) => ({
       locutor: t.locutor,
-      texto: t.texto.replace(/\[[^\]]*\]/g, "").replace(/\s+/g, " ").trim(),
+      texto: corregirInterrogaciones(
+        t.texto.replace(/\[[^\]]*\]/g, "").replace(/\s+/g, " ").trim(),
+      ),
     }))
     .filter((t) => t.texto.length > 0);
 
@@ -1394,6 +1404,17 @@ FORMATO (JSON estricto):
     turnos,
     generado_en: new Date().toISOString(),
   };
+}
+
+/** Agrega el "¿" que falte al inicio de las preguntas (ayuda a la entonación). */
+function corregirInterrogaciones(texto) {
+  return texto
+    .split(/(?<=[.!?…])\s+/)
+    .map((frase) => {
+      const t = frase.trim();
+      return t.endsWith("?") && !t.includes("¿") ? `¿${t}` : t;
+    })
+    .join(" ");
 }
 
 /** Pide el podcast; si queda corto, reintenta una vez avisando el largo. */
