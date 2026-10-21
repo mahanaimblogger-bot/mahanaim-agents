@@ -1,0 +1,142 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Génesis | Capítulo: 23
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El cementerio que se volvió promesa - Ubicaciones Bíblicas de Génesis 23
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El cementerio que se volvió promesa - Ubicaciones Bíblicas de Génesis 23</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Génesis Capítulo 23</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Quiriat-arba (Hebrón) ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d35.0998!3d31.5322!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.5322, 35.0998!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:2</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5322°N, 35.0998°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Antigua ciudad cananea en la región montañosa de Judá, a unos 30 km al sur de Jerusalén. Conocida como Quiriat-arba ('ciudad de los cuatro' o 'ciudad de Arba') por el gigante anaceo Arba (Josué 14:15). Habitada por los hititas (hijos de Het) según el relato bíblico. Importante centro comercial en la ruta entre Jerusalén y Beerseba. Excavaciones arqueológicas han revelado ocupación continua desde el Bronce Medio.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde muere Sara y Abraham hace duelo. Representa el escenario donde la promesa de la tierra comienza a hacerse tangible, aunque Abraham aún no poseía nada. Es el contexto geográfico de la primera propiedad en la tierra prometida.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Cueva de Macpela ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d35.1107!3d31.5247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.5247, 35.1107!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:9,17,19</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5247°N, 35.1107°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Cueva y campo en Macpela, al oriente de Mamre (Hebrón). Abraham la compró a Efrón el heteo por 400 siclos de plata. Según la tradición, es el lugar de sepultura de los patriarcas: Abraham, Sara, Isaac, Rebeca, Jacob y Lea. Hoy se encuentra bajo la estructura de la Tumba de los Patriarcas (Haram al-Khalil), un sitio venerado por judíos, cristianos y musulmanes. La cueva original está debajo del edificio y no ha sido excavada completamente.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Primera propiedad legal de Abraham en Canaán, comprada como sepultura para Sara. Simboliza la garantía de la promesa de la tierra: aunque Abraham era extranjero, poseía una parcela como señal de la herencia futura. Es tipo de la herencia eterna comprada por Cristo.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Mamre 🟡
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d35.1107!3d31.5247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.5247, 35.1107!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:17,19 (implícito)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5247°N, 35.1107°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región cercana a Hebrón, asociada con Abraham. En Génesis 13:18 se dice que Abraham acampó junto a los encinares de Mamre, en Hebrón, y edificó un altar. La cueva de Macpela se ubicaba en el campo de Efrón, frente a Mamre. El sitio tradicional de Mamre se identifica con Ramet el-Khalil, a unos 3 km al norte de Hebrón.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde Abraham tuvo communion con Dios y recibió la promesa de Isaac. La compra de Macpela, en Mamre, conecta la promesa de descendencia con la promesa de tierra.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Probable
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    4. Tierra de Canaán ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d35!3d31.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.5, 35!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:2</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5°N, 35°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región amplia que abarca la tierra prometida a Abraham y sus descendientes. En la Edad del Bronce Medio estaba habitada por diversos pueblos cananeos y ciudades-estado. Hebrón era una de sus principales ciudades en la zona montañosa.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Escenario de la peregrinación de Abraham y de la promesa divina. La compra de la cueva de Macpela es el primer paso en la posesión de esta tierra.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Quiriat-arba (Hebrón) (31.5322, 35.0998) - confirmada
+2. Cueva de Macpela (31.5247, 35.1107) - confirmada
+3. Mamre (31.5247, 35.1107) - probable
+4. Tierra de Canaán (31.5, 35) - confirmada
+
+ NOTA METODOLÓGICA:
+Las ubicaciones de Hebrón (Quiriat-arba) y la Cueva de Macpela están confirmadas por la tradición y la arqueología, aunque la cueva original no ha sido excavada. Mamre se identifica probablemente con Ramet el-Khalil, pero su ubicación exacta es debatida. La Tierra de Canaán es una región amplia, confirmada históricamente. Las coordenadas son aproximadas y basadas en identificaciones académicas comunes.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Génesis, Capítulo: 23
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
