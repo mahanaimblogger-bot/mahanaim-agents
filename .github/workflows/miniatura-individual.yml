@@ -1,0 +1,62 @@
+name: Miniatura (individual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      libro:
+        description: "Libro (ej: genesis, filemon)"
+        required: true
+        type: string
+      rango:
+        description: "Capítulo (ej: 1, 22)"
+        required: true
+        type: string
+      frase_roja:
+        description: "Frase de la franja roja (opcional; si la dejas vacía se usa la del JSON)"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  miniatura:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias de Node
+        run: npm install
+
+      - name: Generar la ilustración de fondo (fal.ai)
+        env:
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          LIBRO: ${{ inputs.libro }}
+          RANGO: ${{ inputs.rango }}
+        run: |
+          node scripts/generar-fondo-miniatura.js "$LIBRO" "$RANGO"
+
+      - name: Poner el texto sobre la ilustración
+        env:
+          LIBRO: ${{ inputs.libro }}
+          RANGO: ${{ inputs.rango }}
+          FRASE_ROJA: ${{ inputs.frase_roja }}
+        run: |
+          if [ -n "$FRASE_ROJA" ]; then
+            node scripts/generar-miniatura.js "$LIBRO" "$RANGO" --secundario="$FRASE_ROJA"
+          else
+            node scripts/generar-miniatura.js "$LIBRO" "$RANGO"
+          fi
+
+      - name: Subir la miniatura como artefacto
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: miniatura-${{ inputs.libro }}-${{ inputs.rango }}
+          path: |
+            prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/miniatura.jpg
+            prompts_output/${{ inputs.libro }}/Capitulo_${{ inputs.rango }}/miniatura_fondo.png
