@@ -5,7 +5,7 @@ Libro: Génesis | Capítulo: 23
 
 📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
 
-TÍTULO: Mapa Interactivo: El cementerio que se volvió promesa - Ubicaciones Bíblicas de Génesis 23
+TÍTULO: Mapa Interactivo: El Funeral de Sara y la Compra de Macpela - Génesis 23
 TIPO: mapa
 URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
 MODO: html
@@ -14,7 +14,7 @@ CONTENIDO HTML:
 ───────────────────────────────────────────
 
 <div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
-  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El cementerio que se volvió promesa - Ubicaciones Bíblicas de Génesis 23</h1>
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El Funeral de Sara y la Compra de Macpela - Génesis 23</h1>
   <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Génesis Capítulo 23</h2>
 </div>
 
@@ -38,8 +38,8 @@ CONTENIDO HTML:
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
     <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:2</p>
     <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5322°N, 35.0998°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Antigua ciudad cananea en la región montañosa de Judá, a unos 30 km al sur de Jerusalén. Conocida como Quiriat-arba ('ciudad de los cuatro' o 'ciudad de Arba') por el gigante anaceo Arba (Josué 14:15). Habitada por los hititas (hijos de Het) según el relato bíblico. Importante centro comercial en la ruta entre Jerusalén y Beerseba. Excavaciones arqueológicas han revelado ocupación continua desde el Bronce Medio.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde muere Sara y Abraham hace duelo. Representa el escenario donde la promesa de la tierra comienza a hacerse tangible, aunque Abraham aún no poseía nada. Es el contexto geográfico de la primera propiedad en la tierra prometida.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad cananea antigua, identificada con Hebrón, en la región montañosa de Judá, a unos 30 km al sur de Jerusalén y a 930 m sobre el nivel del mar. En tiempos de Abraham estaba bajo control hitita (hijos de Het). El nombre Quiriat-arba significa 'ciudad de Arba', asociado a un fundador cananeo o a los anaceos (gigantes). Hebrón es una de las ciudades habitadas más antiguas del mundo, con ocupación continua desde el Calcolítico. Excavaciones arqueológicas han revelado ocupación de la Edad del Bronce Medio.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde muere Sara y Abraham hace duelo. Representa el contexto de peregrinaje y la promesa de la tierra. El nombre Hebrón (de la raíz 'unir, asociar') evoca alianza y comunión, y será el escenario de la primera propiedad de Abraham en la tierra prometida.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -59,8 +59,8 @@ CONTENIDO HTML:
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
     <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:9,17,19</p>
     <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5247°N, 35.1107°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Cueva y campo en Macpela, al oriente de Mamre (Hebrón). Abraham la compró a Efrón el heteo por 400 siclos de plata. Según la tradición, es el lugar de sepultura de los patriarcas: Abraham, Sara, Isaac, Rebeca, Jacob y Lea. Hoy se encuentra bajo la estructura de la Tumba de los Patriarcas (Haram al-Khalil), un sitio venerado por judíos, cristianos y musulmanes. La cueva original está debajo del edificio y no ha sido excavada completamente.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Primera propiedad legal de Abraham en Canaán, comprada como sepultura para Sara. Simboliza la garantía de la promesa de la tierra: aunque Abraham era extranjero, poseía una parcela como señal de la herencia futura. Es tipo de la herencia eterna comprada por Cristo.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Cueva y heredad al oriente de Mamre, en Hebrón, comprada por Abraham a Efrón el hitita por 400 siclos de plata. La tradición judía, cristiana y musulmana la identifica con el edificio conocido como Tumba de los Patriarcas (Cueva de Macpela) en Hebrón. Arqueológicamente, el sitio ha sido venerado desde la antigüedad y presenta estructuras de diversas épocas, aunque la cueva original no ha sido excavada completamente.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Primera propiedad de Abraham en la tierra prometida, adquirida como sepultura para Sara. Simboliza la fe en la promesa de Dios y la esperanza de resurrección. Es el lugar de enterramiento de los patriarcas y matriarcas.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -78,10 +78,10 @@ CONTENIDO HTML:
   </div>
   
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:17,19 (implícito)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:17,19 (implícito como referencia geográfica)</p>
     <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5247°N, 35.1107°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región cercana a Hebrón, asociada con Abraham. En Génesis 13:18 se dice que Abraham acampó junto a los encinares de Mamre, en Hebrón, y edificó un altar. La cueva de Macpela se ubicaba en el campo de Efrón, frente a Mamre. El sitio tradicional de Mamre se identifica con Ramet el-Khalil, a unos 3 km al norte de Hebrón.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde Abraham tuvo communion con Dios y recibió la promesa de Isaac. La compra de Macpela, en Mamre, conecta la promesa de descendencia con la promesa de tierra.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región de Hebrón asociada con el encinar de Mamre, donde Abraham levantó un altar (Génesis 13:18) y recibió la visita de los tres varones (Génesis 18). La cueva de Macpela se ubica 'al oriente de Mamre'. El sitio tradicional de Mamre se encuentra a unos 3 km al norte de Hebrón moderno, con restos de un recinto herodiano y una basílica bizantina.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar de revelación y comunión con Dios. La compra de Macpela en esta zona vincula la promesa divina con un lugar concreto y la fe de Abraham.</p>
   </div>
   
   <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
@@ -91,7 +91,28 @@ CONTENIDO HTML:
 
 <div style="margin-bottom: 2.5rem;">
   <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
-    4. Tierra de Canaán ✅
+    4. Beerseba ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d34.7915!3d31.2447!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.2447, 34.7915!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 22:19 (contexto inmediato; Abraham probablemente venía de allí)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.2447°N, 34.7915°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad en el Néguev, donde Abraham habitó después del sacrificio de Isaac. Importante centro de culto patriarcal, con pozos y un altar. Excavaciones han revelado ocupación desde la Edad del Bronce Medio.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Desde allí Abraham viaja a Hebrón al enterarse de la muerte de Sara. Representa el peregrinaje de fe y la vida nómada del patriarca.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    5. Tierra de Canaán ✅
   </h3>
   
   <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
@@ -101,8 +122,8 @@ CONTENIDO HTML:
   <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
     <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 23:2</p>
     <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5°N, 35°E</p>
-    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región amplia que abarca la tierra prometida a Abraham y sus descendientes. En la Edad del Bronce Medio estaba habitada por diversos pueblos cananeos y ciudades-estado. Hebrón era una de sus principales ciudades en la zona montañosa.</p>
-    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Escenario de la peregrinación de Abraham y de la promesa divina. La compra de la cueva de Macpela es el primer paso en la posesión de esta tierra.</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región amplia que abarca el territorio de Israel/Palestina, habitada por diversos pueblos cananeos en la Edad del Bronce Medio. Incluye la zona montañosa de Judá, donde se encuentra Hebrón.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> La tierra prometida a Abraham y su descendencia. La compra de la cueva de Macpela es la primera posesión legal de Abraham en esta tierra, anticipando la futura heredad.</p>
   </div>
   
   <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
@@ -125,10 +146,11 @@ CONTENIDO HTML:
 1. Quiriat-arba (Hebrón) (31.5322, 35.0998) - confirmada
 2. Cueva de Macpela (31.5247, 35.1107) - confirmada
 3. Mamre (31.5247, 35.1107) - probable
-4. Tierra de Canaán (31.5, 35) - confirmada
+4. Beerseba (31.2447, 34.7915) - confirmada
+5. Tierra de Canaán (31.5, 35) - confirmada
 
  NOTA METODOLÓGICA:
-Las ubicaciones de Hebrón (Quiriat-arba) y la Cueva de Macpela están confirmadas por la tradición y la arqueología, aunque la cueva original no ha sido excavada. Mamre se identifica probablemente con Ramet el-Khalil, pero su ubicación exacta es debatida. La Tierra de Canaán es una región amplia, confirmada históricamente. Las coordenadas son aproximadas y basadas en identificaciones académicas comunes.
+Las ubicaciones de Hebrón (Quiriat-arba), la cueva de Macpela y Beerseba están confirmadas por la arqueología y la tradición unánime. Mamre se considera probable, aunque su identificación exacta con el sitio tradicional es debatida. La Tierra de Canaán es una designación regional amplia. Las coordenadas son aproximadas y basadas en los sitios identificados tradicionalmente.
 
 💡 INSTRUCCIONES:
 1. Copia el HTML completo de arriba
