@@ -1159,7 +1159,7 @@ GENERA:
    - "texto_principal": gancho de 2 a 3 palabras en MAYÚSCULAS, máximo 20 caracteres. Debe salir de la idea más fuerte de ESTE guion (una pregunta o frase de impacto); no uses frases genéricas ni copies ejemplos.
    - "texto_secundario": complemento de 1 a 4 palabras en MAYÚSCULAS, máximo 25 caracteres (puede ir vacío). NO repitas el libro y capítulo: eso ya va aparte en una etiqueta.
    - "lado_texto": "left" o "right" (el lado donde irá el texto).
-   - "prompt_ilustracion": prompt en INGLÉS para una ilustración SIN TEXTO: primer plano emotivo del personaje central del pasaje (rostro con emoción fuerte), contraluz dorado dramático, fondo oscuro. No indiques la posición del personaje en el cuadro. No pongas marcas, cicatrices, tatuajes, letras ni símbolos sobre el rostro o la frente. Aplica estas reglas:
+         - "prompt_ilustracion": prompt en INGLÉS para una ilustración SIN TEXTO. Analiza el capítulo y decide la representación visual MÁS IMPACTANTE y VARIADA. NO uses siempre personas o rostros. Si el texto se centra en un personaje, usa un rostro dramático; si es conceptual, usa objetos, paisajes o metáforas visuales. El objetivo es generar curiosidad y expectativa. Alta calidad, cinematográfico.
 ${REGLAS_IMAGEN}
 
 GUION DEL VIDEO:
@@ -1214,11 +1214,11 @@ FORMATO (JSON estricto):
   if (sinTildes(textoSecundario) === sinTildes(etiquetaMini)) textoSecundario = "";
   const ladoSujeto = ladoTexto === "left" ? "right" : "left";
 
-  const promptIlustracion = [
+      const promptIlustracion = [
     String(m.miniatura.prompt_ilustracion).trim().replace(/--ar\s*\d+:\d+/g, ""),
     `Subject placed on the ${ladoSujeto} third of the frame; the ${ladoTexto} third is dark, empty negative space.`,
-    "Ultra high contrast, dramatic golden rim backlight, deep shadows, saturated warm amber and gold tones, intense emotional close-up, cinematic 35mm look.",
-    `No text, no letters, no watermarks, no modern objects. ${ANATOMIA}`,
+    "Ultra high contrast, dramatic lighting, deep shadows, saturated cinematic tones, 35mm film aesthetic.",
+    "No text, no letters, no watermarks, no modern objects.",
   ].join(" ");
 
   const metadata = {

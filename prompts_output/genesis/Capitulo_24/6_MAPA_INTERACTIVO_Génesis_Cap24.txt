@@ -1,0 +1,186 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Génesis | Capítulo: 24
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El Siervo que Encontró a la Novia - Ubicaciones Bíblicas de Génesis 24
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El Siervo que Encontró a la Novia - Ubicaciones Bíblicas de Génesis 24</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Génesis Capítulo 24</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Hebrón (Valle de Mamre) ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d35.0998!3d31.5326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.5326, 35.0998!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:1-67 (contexto general; Abraham habitaba en Hebrón, cf. Gn 23:19)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.5326°N, 35.0998°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Ciudad cananea identificada con Tell Rumeida (Jebel er-Rumeideh), con ocupación continua desde el Bronce Medio. Asociada a Abraham por la compra de la cueva de Macpela (Gn 23). Centro administrativo y comercial en la ruta montañosa de Judá.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Punto de partida del siervo: representa la tierra de la promesa donde Abraham, ya viejo, asegura la continuidad del linaje mesiánico mediante el matrimonio de Isaac.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Mesopotamia (Aram Naharaim / Padán-aram) ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d39.0333!3d36.8667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z36.8667, 39.0333!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:10</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 36.8667°N, 39.0333°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región del alto Éufrates y sus afluentes, habitada por tribus arameas seminómadas en el Bronce Medio. Los archivos de Mari (s. XVIII a.C.) y Nuzi (ss. XV-XIV a.C.) documentan prácticas sociales y comerciales análogas a las del relato patriarcal.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Simboliza el origen del pueblo del pacto y el lugar donde Dios preservó la simiente aramea de la que nacería Israel. El siervo es enviado allí para no contaminar la línea mesiánica con los cananeos.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Ciudad de Nacor (probablemente Harán o sus alrededores) 🟡
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d39.0333!3d36.8667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z36.8667, 39.0333!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:10</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 36.8667°N, 39.0333°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> La 'ciudad de Nacor' se identifica tradicionalmente con Harán (Tell Hariri) o con un asentamiento cercano en la región de Padán-aram. Harán fue un importante centro comercial y religioso (culto a Sin) en el Bronce Medio. Las tablillas de Mari mencionan tribus arameas en la zona.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar de origen de Rebeca y de la parentela de Abraham; representa la fidelidad de Dios a la promesa de una descendencia numerosa a través de la familia elegida.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Probable
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    4. Pozo de las doncellas (pozo junto a la ciudad de Nacor) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d39.0333!3d36.8667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z36.8667, 39.0333!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:11-27</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 36.8667°N, 39.0333°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Los pozos eran puntos cruciales en las aldeas mesopotámicas, especialmente al atardecer cuando las mujeres salían a sacar agua. La escena refleja con precisión la vida cotidiana del Bronce Medio.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Escenario de la oración del siervo y de la señal divina. Dios responde antes de que termine la oración, mostrando su soberanía en la elección de la novia para Isaac.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    5. Neguev (región del sur de Canáán) ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d34.8!3d31.25!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z31.25, 34.8!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:62</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 31.25°N, 34.8°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Región semiárida al sur de Judá, con asentamientos dispersos y rutas de pastoreo. Isaac habitaba en el Neguev, posiblemente cerca de Beer-lahai-roi.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar donde Isaac espera y se encuentra con Rebeca; simboliza la espera del hijo de la promesa por su esposa, tipificando a Cristo que espera a su Iglesia.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    6. Beer-lahai-roi (Pozo del Viviente que me ve) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d34.4167!3d30.9333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z30.9333, 34.4167!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 24:62 (mencionado como lugar donde Isaac venía)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 30.9333°N, 34.4167°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Pozo situado en el Néguev, entre Cades y Bered (Gn 16:14). Su ubicación exacta es debatida; se han propuesto varios sitios arqueológicos en la zona de Ain Qudeirat o Ain Muweilih.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Lugar teofánico donde Dios se reveló a Agar y luego a Isaac. Representa la providencia divina que ve y provee, enlazando la historia de la salvación.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Debatida
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Hebrón (Valle de Mamre) (31.5326, 35.0998) - confirmada
+2. Mesopotamia (Aram Naharaim / Padán-aram) (36.8667, 39.0333) - confirmada
+3. Ciudad de Nacor (probablemente Harán o sus alrededores) (36.8667, 39.0333) - probable
+4. Pozo de las doncellas (pozo junto a la ciudad de Nacor) (36.8667, 39.0333) - desconocida
+5. Neguev (región del sur de Canáán) (31.25, 34.8) - confirmada
+6. Beer-lahai-roi (Pozo del Viviente que me ve) (30.9333, 34.4167) - debatida
+
+ NOTA METODOLÓGICA:
+Las ubicaciones se han clasificado según su certeza arqueológica e histórica. Hebrón y Mesopotamia son regiones bien documentadas y confirmadas por la arqueología. La ciudad de Nacor se identifica probablemente con Harán, aunque el texto no especifica el nombre exacto; se usa la teoría más aceptada. El pozo de las doncellas es un lugar desconocido en su ubicación precisa, pero se sitúa en la región general de la ciudad de Nacor. El Neguev es una región confirmada, pero Beer-lahai-roi tiene una ubicación debatida entre los eruditos. Las coordenadas proporcionadas son aproximadas y buscan facilitar la visualización educativa en el mapa interactivo.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Génesis, Capítulo: 24
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
