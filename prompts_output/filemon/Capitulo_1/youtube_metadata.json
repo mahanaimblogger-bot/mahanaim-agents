@@ -42,7 +42,11 @@
     "texto_secundario": "DEUDA PAGADA",
     "etiqueta": "FILEMÓN 1",
     "lado_texto": "right",
+<<<<<<< HEAD
     "prompt_ilustracion": "Cinematic hyperrealistic illustration with semi-stylized realism, 35mm film aesthetic, shallow depth of field. First-century Rome. An ancient parchment scroll resting on a warm wooden desk. A golden signet ring presses into bright red wax, sealing the scroll. Beside it, broken iron chains. Dramatic but well-lit atmosphere, soft warm amber ambient light illuminating the scroll and desk, rich textures, intense atmosphere of substitution and freedom. No text, no letters, no watermarks, no modern objects. ABSOLUTELY NO PEOPLE, NO FACES, NO HUMAN FIGURES. Focus on symbolic, conceptual, mysterious elements. Subject placed on the left third of the frame; the right third is empty dark negative space. Ultra high contrast, saturated warm amber and gold tones, cinematic 35mm look.",
+=======
+    "prompt_ilustracion": "Cinematic hyperrealistic illustration with semi-stylized realism, 35mm film aesthetic, shallow depth of field. First-century Rome. An ancient parchment scroll resting on a dark wooden desk. A heavy golden signet ring presses into melted red wax, sealing the scroll. Beside it, broken iron chains lay in the shadows. Dramatic chiaroscuro lighting, golden amber rim light, deep shadows, intense atmosphere of substitution and freedom. No text, no letters, no watermarks, no modern objects. ABSOLUTELY NO PEOPLE, NO FACES, NO HUMAN FIGURES. Focus on symbolic, conceptual, mysterious elements. Subject placed on the left third of the frame; the right third is dark, empty negative space. Ultra high contrast, saturated warm amber and gold tones, cinematic 35mm look.",
+>>>>>>> 5407e677a62d57c5d4f6bd31d5f959cbc43e213f
     "aspect_ratio": "16:9",
     "salida_ancho": 1280,
     "salida_alto": 720
