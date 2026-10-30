@@ -319,7 +319,7 @@ bloques.push({ tipo: "texto", lineas: p.lineas, tam: p.tam, estilo: "blanco" });
 
 if (secundario) {
   // La franja (texto + márgenes) debe caber en la zona
-  let tam = 80;
+  let tam = 65;
   while (tam > 36 && medirFranja(ctx, secundario, tam).w > zonaAncho) tam -= 2;
   bloques.push({ tipo: "franja", texto: secundario, tam });
 }
