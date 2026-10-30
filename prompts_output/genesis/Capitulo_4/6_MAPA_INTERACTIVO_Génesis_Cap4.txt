@@ -1,0 +1,142 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Génesis | Capítulo: 4
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El Altar de Caín: La Religión Sin Sangre que Dios Nunca Aceptó - Ubicaciones Bíblicas
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El Altar de Caín: La Religión Sin Sangre que Dios Nunca Aceptó - Ubicaciones Bíblicas</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Génesis Capítulo 4</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Edén (región general) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d44!3d33!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33, 44!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:16 (expulsión de Caín de la presencia de Jehová, al oriente del Edén)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33°N, 44°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> El Edén es descrito como un jardín en la región de Mesopotamia, asociado con los ríos Tigris y Éufrates (Gn 2:10-14). Su ubicación exacta es desconocida y debatida; se han propuesto teorías que van desde el sur de Mesopotamia hasta Armenia. La arqueología no ha confirmado su existencia como lugar geográfico preciso.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Representa el estado original de comunión con Dios y el paraíso perdido. La expulsión de Caín 'al oriente del Edén' simboliza el alejamiento de la presencia divina y la progresiva degradación del pecado.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Tierra de Nod ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d45.5!3d33.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33.5, 45.5!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:16</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33.5°N, 45.5°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Nod significa 'errante' o 'vagabundo'. Se ubica al oriente del Edén, pero su localización exacta es desconocida. Algunos eruditos la sitúan en la región de Mesopotamia o en el este de Arabia. No hay evidencia arqueológica directa.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Simboliza el exilio y la vida errante lejos de Dios. Caín, condenado a ser vagabundo, habita en una tierra cuyo nombre mismo refleja su condición espiritual.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Ciudad de Enoc (primera ciudad) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d45.5!3d33.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33.5, 45.5!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:17</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33.5°N, 45.5°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Caín construyó una ciudad y la llamó Enoc, en honor a su hijo. No se ha identificado arqueológicamente. Las primeras ciudades conocidas en Mesopotamia (como Eridu, Uruk) datan de períodos posteriores, pero la tradición sitúa esta ciudad en la región de Nod, al oriente del Edén.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Representa el primer intento humano de establecerse y crear civilización lejos de Dios. Es un símbolo del progreso humano sin dependencia divina, y anticipa la ciudad de Babel y Babilonia.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    4. Región de los ríos Tigris y Éufrates (contexto general) ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d44!3d33!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33, 44!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 2:14 (mencionados en el contexto del Edén, aunque no en Génesis 4)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33°N, 44°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Los ríos Tigris y Éufrates son fundamentales en la geografía de Mesopotamia. La arqueología ha confirmado su importancia para las civilizaciones antiguas. Aunque no se mencionan directamente en Génesis 4, son el trasfondo geográfico del relato.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Recuerdan la ubicación del Edén y la bendición original de Dios sobre la creación. En Génesis 4, la tierra maldita por el pecado de Caín contrasta con la fertilidad del Edén.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Edén (región general) (33, 44) - desconocida
+2. Tierra de Nod (33.5, 45.5) - desconocida
+3. Ciudad de Enoc (primera ciudad) (33.5, 45.5) - desconocida
+4. Región de los ríos Tigris y Éufrates (contexto general) (33, 44) - confirmada
+
+ NOTA METODOLÓGICA:
+Las ubicaciones mencionadas en Génesis 4 (Edén, Nod, ciudad de Enoc) no han sido identificadas arqueológicamente con certeza. Se trata de referencias geográficas de la era antediluviana, cuya localización exacta se desconoce. Las coordenadas proporcionadas son aproximaciones basadas en la región general de Mesopotamia, donde la tradición sitúa estos eventos. Los ríos Tigris y Éufrates son los únicos elementos geográficos confirmados, aunque no se mencionan explícitamente en Génesis 4, sino en el contexto del Edén en Génesis 2. Se recomienda presentar estas ubicaciones como parte del mundo bíblico antiguo, señalando su carácter debatido o desconocido.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Génesis, Capítulo: 4
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
