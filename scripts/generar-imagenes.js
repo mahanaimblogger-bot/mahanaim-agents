@@ -84,11 +84,11 @@ for (let i = 0; i < prompts.length; i++) {
   console.log(`   🖼️  [${i + 1}/${prompts.length}] Generando imagen...`);
 
   try {
-    const result = await fal.subscribe("fal-ai/flux/schnell", {
+    const result = await fal.subscribe("fal-ai/flux/dev", {
       input: {
         prompt: promptText,
         image_size: "landscape_16_9",
-        num_inference_steps: 4,
+        num_inference_steps: 28,
         num_images: 1,
       },
       logs: false,

@@ -19,7 +19,6 @@ if (fs.existsSync(ffmpegPortablePath)) {
   console.log("🔧 Usando FFmpeg portable desde tools/");
 }
 
-
 // ============================================================
 // CONFIGURACIÓN
 // ============================================================
@@ -33,7 +32,7 @@ const LIMITE_BYTES_POR_LLAMADA = 4500;
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
 // ============================================================
@@ -51,7 +50,8 @@ async function leerContador() {
     .eq("mes", mes)
     .maybeSingle();
 
-  if (error) throw new Error(`Error leyendo contador de Supabase: ${error.message}`);
+  if (error)
+    throw new Error(`Error leyendo contador de Supabase: ${error.message}`);
   return { mes, caracteres: data?.caracteres || 0 };
 }
 
@@ -60,7 +60,8 @@ async function guardarContador(contador) {
     .from("uso_mensual_tts")
     .upsert({ mes: contador.mes, caracteres: contador.caracteres });
 
-  if (error) throw new Error(`Error guardando contador en Supabase: ${error.message}`);
+  if (error)
+    throw new Error(`Error guardando contador en Supabase: ${error.message}`);
 }
 
 function contarCaracteresFacturables(ssml) {
@@ -72,7 +73,9 @@ function contarCaracteresFacturables(ssml) {
 // ============================================================
 function partirSSML(ssmlCompleto) {
   const matchSpeak = ssmlCompleto.match(/<speak([^>]*)>/);
-  const tagSpeak = matchSpeak ? matchSpeak[0] : `<speak version="1.0" xml:lang="${IDIOMA}">`;
+  const tagSpeak = matchSpeak
+    ? matchSpeak[0]
+    : `<speak version="1.0" xml:lang="${IDIOMA}">`;
 
   const inicioProsody = ssmlCompleto.indexOf("<prosody");
   const finProsodyTag = ssmlCompleto.indexOf(">", inicioProsody);
@@ -81,7 +84,9 @@ function partirSSML(ssmlCompleto) {
   const finContenido = ssmlCompleto.lastIndexOf("</prosody>");
   const contenido = ssmlCompleto.slice(finProsodyTag + 1, finContenido);
 
-  const piezas = contenido.split(/(<break[^>]*\/>)/g).filter((p) => p.length > 0);
+  const piezas = contenido
+    .split(/(<break[^>]*\/>)/g)
+    .filter((p) => p.length > 0);
 
   const trozos = [];
   let actual = "";
@@ -90,7 +95,7 @@ function partirSSML(ssmlCompleto) {
     const candidato = actual + pieza;
     const bytesCandidato = Buffer.byteLength(
       `${tagSpeak}${tagProsody}${candidato}</prosody></speak>`,
-      "utf-8"
+      "utf-8",
     );
 
     if (bytesCandidato > LIMITE_BYTES_POR_LLAMADA && actual.length > 0) {
@@ -103,7 +108,7 @@ function partirSSML(ssmlCompleto) {
   if (actual.length > 0) trozos.push(actual);
 
   return trozos.map(
-    (trozo) => `${tagSpeak}${tagProsody}${trozo}</prosody></speak>`
+    (trozo) => `${tagSpeak}${tagProsody}${trozo}</prosody></speak>`,
   );
 }
 
@@ -186,12 +191,14 @@ async function sintetizarTrozo(ssmlTrozo) {
         audioConfig: { audioEncoding: "LINEAR16" },
         enableTimePointing: ["SSML_MARK"],
       }),
-    }
+    },
   );
 
   if (!respuesta.ok) {
     const errorTexto = await respuesta.text();
-    throw new Error(`Error de la API de Google (${respuesta.status}): ${errorTexto}`);
+    throw new Error(
+      `Error de la API de Google (${respuesta.status}): ${errorTexto}`,
+    );
   }
 
   const datos = await respuesta.json();
@@ -208,28 +215,34 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
   const caracteresDeEsteAudio = contarCaracteresFacturables(ssmlOriginal);
   const contador = await leerContador();
 
-  console.log(`📊 Caracteres facturables de este guion: ${caracteresDeEsteAudio}`);
   console.log(
-    `📊 Llevás gastados este mes (todas las computadoras): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} gratis`
+    `📊 Caracteres facturables de este guion: ${caracteresDeEsteAudio}`,
+  );
+  console.log(
+    `📊 Llevás gastados este mes (todas las computadoras): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} gratis`,
   );
 
   if (contador.caracteres + caracteresDeEsteAudio > MARGEN_SEGURIDAD) {
     console.error(
-      `\n⛔ DETENIDO POR SEGURIDAD: superaría el margen de ${MARGEN_SEGURIDAD} caracteres este mes.`
+      `\n⛔ DETENIDO POR SEGURIDAD: superaría el margen de ${MARGEN_SEGURIDAD} caracteres este mes.`,
     );
     process.exitCode = 1;
     return;
   }
 
   const trozos = partirSSML(ssmlOriginal);
-  console.log(`\n✂️  El guion se partió en ${trozos.length} trozo(s) para respetar el límite de bytes de Google.`);
+  console.log(
+    `\n✂️  El guion se partió en ${trozos.length} trozo(s) para respetar el límite de bytes de Google.`,
+  );
 
   const audiosBuffers = [];
   const timepointsGlobal = [];
   let offsetAcumulado = 0;
 
   for (let i = 0; i < trozos.length; i++) {
-    console.log(`\n🎙️  Generando audio del trozo ${i + 1} de ${trozos.length}...`);
+    console.log(
+      `\n🎙️  Generando audio del trozo ${i + 1} de ${trozos.length}...`,
+    );
     const { audioBuffer, timepoints } = await sintetizarTrozo(trozos[i]);
     audiosBuffers.push(audioBuffer);
 
@@ -242,18 +255,27 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
 
     const { duracionSegundos } = leerDatosWav(audioBuffer);
     offsetAcumulado += duracionSegundos;
-    console.log(`   ✅ Trozo ${i + 1} generado (${duracionSegundos.toFixed(1)}s)`);
+    console.log(
+      `   ✅ Trozo ${i + 1} generado (${duracionSegundos.toFixed(1)}s)`,
+    );
   }
 
   const { wavFinal, duracionTotal } = unirWavs(audiosBuffers);
-  const rutaCruda = `${nombreSalida}_crudo.wav`;
-  fs.writeFileSync(rutaCruda, wavFinal);
-  console.log(`\n✅ Audio crudo guardado en: ${rutaCruda} (duración: ${duracionTotal.toFixed(1)}s)`);
 
-  const rutaFinal = `${nombreSalida}_final.mp3`;
+  // 👇 CAMBIO CLAVE: Forzar que se guarden en la carpeta audio-tts/
+  const rutaCruda = path.join("audio-tts", `${nombreSalida}_crudo.wav`);
+  fs.writeFileSync(rutaCruda, wavFinal);
+  console.log(
+    `\n✅ Audio crudo guardado en: ${rutaCruda} (duración: ${duracionTotal.toFixed(1)}s)`,
+  );
+
+  const rutaFinal = path.join("audio-tts", `${nombreSalida}_final.mp3`);
   await masterizarAudio(rutaCruda, rutaFinal);
 
-  const rutaTimestamps = `${nombreSalida}_timestamps.json`;
+  const rutaTimestamps = path.join(
+    "audio-tts",
+    `${nombreSalida}_timestamps.json`,
+  );
   fs.writeFileSync(rutaTimestamps, JSON.stringify(timepointsGlobal, null, 2));
   console.log(`✅ Timestamps guardados en: ${rutaTimestamps}`);
 
@@ -263,12 +285,16 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
       console.log(`   ${tp.markName}: segundo ${tp.timeSeconds.toFixed(2)}`);
     });
   } else {
-    console.log(`\nℹ️  No se encontraron marcas <mark> en este guion (todavía no las agregamos al prompt).`);
+    console.log(
+      `\nℹ️  No se encontraron marcas <mark> en este guion (todavía no las agregamos al prompt).`,
+    );
   }
 
   contador.caracteres += caracteresDeEsteAudio;
   await guardarContador(contador);
-  console.log(`\n📊 Nuevo total del mes (compartido, en Supabase): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} caracteres gratis`);
+  console.log(
+    `\n📊 Nuevo total del mes (compartido, en Supabase): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} caracteres gratis`,
+  );
   console.log(`\n🎧 Archivo final listo para escuchar: ${rutaFinal}`);
 }
 
