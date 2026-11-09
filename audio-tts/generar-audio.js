@@ -3,22 +3,30 @@ import fs from "fs";
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 import { createClient } from "@supabase/supabase-js";
-// ── Detectar FFmpeg portable ──────────────────────────────────────
-// Si existe FFmpeg en tools/ffmpeg/, usarlo. Si no, usar el del sistema.
-const ffmpegPortablePath = path.join(
-  process.cwd(),
-  "..",
-  "tools",
-  "ffmpeg",
-  "ffmpeg-9.0.2-essentials_build",
-  "bin",
-  "ffmpeg.exe",
-);
-if (fs.existsSync(ffmpegPortablePath)) {
-  ffmpeg.setFfmpegPath(ffmpegPortablePath);
-  console.log("🔧 Usando FFmpeg portable desde tools/");
-}
 
+// ── Detectar FFmpeg según el sistema operativo ─────────────────────
+if (process.platform === "win32") {
+  const ffmpegPortablePath = path.join(
+    process.cwd(),
+    "..",
+    "tools",
+    "ffmpeg",
+    "ffmpeg-9.0.2-essentials_build",
+    "bin",
+    "ffmpeg.exe",
+  );
+  if (fs.existsSync(ffmpegPortablePath)) {
+    ffmpeg.setFfmpegPath(ffmpegPortablePath);
+    console.log("🔧 Usando FFmpeg portable desde tools/ (Windows)");
+  }
+} else {
+  // En Linux (GitHub Actions), usar el del sistema
+  const ffmpegLinuxPath = "/usr/bin/ffmpeg";
+  if (fs.existsSync(ffmpegLinuxPath)) {
+    ffmpeg.setFfmpegPath(ffmpegLinuxPath);
+    console.log("🔧 Usando FFmpeg del sistema (Linux)");
+  }
+}
 
 // ============================================================
 // CONFIGURACIÓN
@@ -33,7 +41,7 @@ const LIMITE_BYTES_POR_LLAMADA = 4500;
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
 // ============================================================
@@ -139,11 +147,7 @@ function unirWavs(buffers) {
 }
 
 // ============================================================
-// MASTERIZACIÓN ("Voz Natural") — tu cadena de FFmpeg
-// ------------------------------------------------------------
-// Toma el WAV crudo de Google TTS y le aplica EQ correctivo,
-// compresión en 2 etapas, un toque de espacio, y normalización
-// de volumen al estándar de Spotify/YouTube (-16 LUFS).
+// MASTERIZACIÓN ("Voz Natural")
 // ============================================================
 function masterizarAudio(rutaEntrada, rutaSalida) {
   return new Promise((resolve, reject) => {
@@ -213,7 +217,8 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
     `📊 Llevás gastados este mes (todas las computadoras): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} gratis`
   );
 
-   const totalEstimado = contador.caracteres + caracteresDeEsteAudio;
+  // 🚨 STOP FORZADO DE SEGURIDAD 🚨
+  const totalEstimado = contador.caracteres + caracteresDeEsteAudio;
   if (totalEstimado > MARGEN_SEGURIDAD) {
     console.error("\n" + "=".repeat(60));
     console.error("🛑 STOP DE SEGURIDAD ACTIVADO 🛑");
@@ -255,14 +260,16 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
   }
 
   const { wavFinal, duracionTotal } = unirWavs(audiosBuffers);
-  const rutaCruda = `${nombreSalida}_crudo.wav`;
+
+  // Forzar que se guarden en la carpeta audio-tts/
+  const rutaCruda = path.join("audio-tts", `${nombreSalida}_crudo.wav`);
   fs.writeFileSync(rutaCruda, wavFinal);
   console.log(`\n✅ Audio crudo guardado en: ${rutaCruda} (duración: ${duracionTotal.toFixed(1)}s)`);
 
-  const rutaFinal = `${nombreSalida}_final.mp3`;
+  const rutaFinal = path.join("audio-tts", `${nombreSalida}_final.mp3`);
   await masterizarAudio(rutaCruda, rutaFinal);
 
-  const rutaTimestamps = `${nombreSalida}_timestamps.json`;
+  const rutaTimestamps = path.join("audio-tts", `${nombreSalida}_timestamps.json`);
   fs.writeFileSync(rutaTimestamps, JSON.stringify(timepointsGlobal, null, 2));
   console.log(`✅ Timestamps guardados en: ${rutaTimestamps}`);
 
@@ -272,7 +279,7 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
       console.log(`   ${tp.markName}: segundo ${tp.timeSeconds.toFixed(2)}`);
     });
   } else {
-    console.log(`\nℹ️  No se encontraron marcas <mark> en este guion (todavía no las agregamos al prompt).`);
+    console.log(`\nℹ️  No se encontraron marcas <mark> en este guion.`);
   }
 
   contador.caracteres += caracteresDeEsteAudio;

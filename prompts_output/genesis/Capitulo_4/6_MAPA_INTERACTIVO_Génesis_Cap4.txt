@@ -1,0 +1,120 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Génesis | Capítulo: 4
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El primer homicidio y la marca de la gracia - Ubicaciones Bíblicas
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El primer homicidio y la marca de la gracia - Ubicaciones Bíblicas</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Génesis Capítulo 4</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Edén (región general) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d44!3d33!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33, 44!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:16 (implícito, al este del Edén)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33°N, 44°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> El Edén es descrito como un jardín en una región no identificada con precisión. Las teorías más comunes lo sitúan en Mesopotamia, entre los ríos Tigris y Éufrates, o en una región más amplia del Creciente Fértil. La arqueología no ha confirmado su ubicación exacta.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> El Edén representa el estado original de comunión con Dios, del cual la humanidad fue expulsada. En Génesis 4, la expulsión es el trasfondo del exilio de Caín, quien sale de la presencia del Señor hacia la tierra de Nod.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Debatida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Tierra de Nod ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d44.5!3d33.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33.5, 44.5!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:16</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33.5°N, 44.5°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Nod significa 'errante' o 'vagabundo'. Su ubicación exacta es desconocida. Se especula que podría estar al este del Edén, en la región de Mesopotamia o en sus alrededores. Algunos eruditos la relacionan con áreas de asentamiento temprano en el Creciente Fértil.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Nod simboliza el exilio y la vida errante lejos de la presencia de Dios. Caín, el primer homicida, es condenado a vagar, y la tierra de Nod representa la condición de alienación espiritual.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Ciudad de Enoc (fundada por Caín) ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d44.5!3d33.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z33.5, 44.5!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Génesis 4:17</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 33.5°N, 44.5°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Caín edificó una ciudad y la llamó Enoc, en honor a su hijo. No se ha identificado arqueológicamente. Las primeras ciudades conocidas en Mesopotamia datan del período de Uruk (c. 4000-3100 a.C.), pero no hay evidencia de una ciudad llamada Enoc. Su ubicación probable sería en la región de Nod, al este del Edén.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Representa el primer intento humano de establecer una civilización estable lejos de Dios, buscando seguridad y permanencia en lugar de dependencia divina. Es el inicio de la cultura urbana sin Dios.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Edén (región general) (33, 44) - debatida
+2. Tierra de Nod (33.5, 44.5) - desconocida
+3. Ciudad de Enoc (fundada por Caín) (33.5, 44.5) - desconocida
+
+ NOTA METODOLÓGICA:
+Las ubicaciones geográficas en Génesis 4 pertenecen al período antediluviano y no han sido confirmadas arqueológicamente. Las coordenadas proporcionadas son aproximaciones basadas en la interpretación tradicional que sitúa estos eventos en la región de Mesopotamia, entre los ríos Tigris y Éufrates. La falta de evidencia directa se debe a la naturaleza prehistórica del relato y a los cambios geográficos ocurridos. Se recomienda utilizar estas ubicaciones como referencia educativa, reconociendo su carácter especulativo.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Génesis, Capítulo: 4
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.
