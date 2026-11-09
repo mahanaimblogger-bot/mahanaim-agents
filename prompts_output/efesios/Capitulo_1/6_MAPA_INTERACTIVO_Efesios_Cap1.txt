@@ -1,0 +1,120 @@
+﻿═══════════════════════════════════════════
+RECURSO DE MAPA INTERACTIVO - MAHANAIM
+Libro: Efesios | Capítulo: 1
+═══════════════════════════════════════════
+
+📋 DATOS PARA CREAR EL RECURSO EN EL ADMIN:
+
+TÍTULO: Mapa Interactivo: El plan secreto que Dios guardó por siglos - Ubicaciones Bíblicas
+TIPO: mapa
+URL DEL RECURSO: (Dejar vacío - el mapa se genera desde el HTML)
+MODO: html
+
+CONTENIDO HTML:
+───────────────────────────────────────────
+
+<div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #d4ac0d;">
+  <h1 style="color: #1a3a5c; font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 0.5rem;">Mapa Interactivo: El plan secreto que Dios guardó por siglos - Ubicaciones Bíblicas</h1>
+  <h2 style="color: #5d4037; font-family: 'Georgia', serif; font-size: 1.2rem; font-weight: normal;">Efesios Capítulo 1</h2>
+</div>
+
+<div style="background: #fdfbf7; padding: 1.5rem; border-radius: 12px; border: 2px solid #d4c4a8; margin-bottom: 2rem;">
+  <h3 style="color: #1a3a5c; margin-top: 0;"> Ubicaciones Bíblicas del Capítulo</h3>
+  <p style="line-height: 1.8; color: #3e2723;">
+    Este mapa interactivo muestra las ubicaciones geográficas mencionadas en el estudio. 
+    Algunas son confirmadas arqueológicamente, otras son probables según la evidencia histórica.
+  </p>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    1. Éfeso ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d27.3417!3d37.9397!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z37.9397, 27.3417!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Efesios 1:1</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 37.9397°N, 27.3417°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Éfeso era una ciudad portuaria en la costa occidental de Asia Menor (actual Turquía), capital de la provincia romana de Asia. Famosa por el templo de Artemisa (Diana), una de las siete maravillas del mundo antiguo. La iglesia fue fundada por Pablo durante su tercer viaje misionero (Hch 19), y allí permaneció unos tres años. La carta a los Efesios fue escrita por Pablo desde Roma (60-62 d.C.).</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Éfeso es la destinataria de la carta y representa el contexto donde los creyentes gentiles recibieron las bendiciones espirituales en Cristo. La ciudad, centro de paganismo y magia, resalta la supremacía de Cristo sobre todo poder y potestad (Ef 1:20-23).</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    2. Roma ✅
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d12.4964!3d41.9028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z41.9028, 12.4964!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Efesios 1:1 (implícito, Pablo escribe desde prisión en Roma)</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> 41.9028°N, 12.4964°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> Roma era la capital del Imperio y centro del mundo mediterráneo. Pablo estuvo bajo arresto domiciliario en Roma alrededor del 60-62 d.C., desde donde escribió las llamadas 'epístolas de la cautividad', incluyendo Efesios (Hch 28:16-31).</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Aunque no se menciona explícitamente en el capítulo, Roma es el lugar desde donde Pablo escribe, lo que subraya que incluso en prisión el evangelio avanza y las verdades eternas trascienden las circunstancias.</p>
+  </div>
+  
+  <div style="background: #d4edda; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #28a745;">
+    <strong>Nivel de certeza:</strong> Confirmada
+  </div>
+</div>
+
+<div style="margin-bottom: 2.5rem;">
+  <h3 style="color: #1a3a5c; border-left: 5px solid #d4ac0d; padding-left: 1rem; margin-bottom: 1rem;">
+    3. Lugares celestiales ️
+  </h3>
+  
+  <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 1rem 0; border: 2px solid #d4c4a8;">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2dnull!3dnull!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2znull, null!5e1!3m2!1ses!2s!4v1" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  
+  <div style="background: #f5f2eb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>📖 Referencia:</strong> Efesios 1:3, 20; 2:6; 3:10; 6:12</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>📍 Coordenadas:</strong> null°N, null°E</p>
+    <p style="margin: 0 0 0.5rem 0;"><strong>🏛️ Contexto Histórico:</strong> No es una ubicación geográfica terrenal, sino una dimensión espiritual donde Cristo reina y donde los creyentes tienen su posición en Él. La expresión griega 'en tois epouraniois' aparece cinco veces en Efesios.</p>
+    <p style="margin: 0;"><strong>✝️ Importancia Teológica:</strong> Representa la esfera de la bendición espiritual y la autoridad de Cristo sobre todo poder. Los creyentes son bendecidos y sentados con Cristo en los lugares celestiales, participando de su victoria.</p>
+  </div>
+  
+  <div style="background: #fff3cd; padding: 0.8rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+    <strong>Nivel de certeza:</strong> Desconocida
+  </div>
+</div>
+
+<div style="background: #1a3a5c; color: #fdfbf7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+  <h3 style="color: #d4ac0d; margin-top: 0;">📚 Nota Metodológica</h3>
+  <p style="line-height: 1.8; margin: 0;">
+    Las ubicaciones marcadas como <strong>"confirmadas"</strong> tienen evidencia arqueológica sólida. 
+    Las <strong>"probables"</strong> se basan en consenso académico y evidencia contextual. 
+    Las <strong>"debatidas"</strong> o <strong>"desconocidas"</strong> reflejan incertidumbre debido a cambios geográficos históricos.
+  </p>
+</div>
+
+───────────────────────────────────────────
+
+📍 UBICACIONES IDENTIFICADAS:
+1. Éfeso (37.9397, 27.3417) - confirmada
+2. Roma (41.9028, 12.4964) - confirmada
+3. Lugares celestiales (null, null) - desconocida
+
+ NOTA METODOLÓGICA:
+Las ubicaciones geográficas mencionadas o implícitas en Efesios 1 son principalmente Éfeso (destinataria) y Roma (lugar de escritura). 'Los lugares celestiales' es una expresión teológica no geográfica. Las coordenadas de Éfeso y Roma son confirmadas arqueológicamente. Para 'los lugares celestiales' no se asignan coordenadas por ser una realidad espiritual.
+
+💡 INSTRUCCIONES:
+1. Copia el HTML completo de arriba
+2. Ve a /admin/recursos/nuevo
+3. Selecciona Libro: Efesios, Capítulo: 1
+4. Tipo: "mapa"
+5. Pega el HTML en "Contenido HTML"
+6. Deja "URL del recurso" vacío
+7. Guarda y publica
+
+✅ El recurso se mostrará con mapas interactivos de Google Maps para cada ubicación.

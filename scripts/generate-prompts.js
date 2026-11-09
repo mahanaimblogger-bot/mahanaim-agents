@@ -357,6 +357,7 @@ ESTRUCTURA OBLIGATORIA DEL GUION (respeta el orden)
      * "¿Qué harías si te dieran a elegir entre dos caminos, y uno de ellos te costara todo?"
      * "Hay una frase en este capítulo que ha perturbado a teólogos por siglos."
      * "El hombre más importante de su generación murió... y ni siquiera lo notaron."
+   - **CTA SUAVE (inmediatamente después del gancho):** Insertá una frase natural para suscribirse, por ejemplo: "Si este tipo de estudios bíblicos profundos te ayudan, suscríbete para no perderte los próximos."
 
 2. CONTEXTO NARRATIVO (60-90 segundos):
    - Ubicá al oyente en el tiempo, lugar y circunstancia histórica con suficiente detalle para que se sienta transportado.
@@ -373,6 +374,8 @@ ESTRUCTURA OBLIGATORIA DEL GUION (respeta el orden)
      * Detalle exegético del estudio o del sermón que profundice el sentido.
    - Mantené tensión narrativa: dejá preguntas abiertas que se resuelven más adelante.
    - Marcá los cambios de escena narrativa con pausas naturales (no forzadas).
+   - **MICRO-GANCHOS (Cada 3-4 minutos):** Insertá una pregunta abierta, un dato impactante o una frase que despierte curiosidad y que se resuelva 2-3 minutos después. NO los nombres "micro-ganchos" ni uses esa palabra en el guion. Simplemente, mantené al oyente enganchado con "mini-tensiones".
+   - **CTA DIRECTO (A la mitad, minuto 8-10):** Insertá una frase como: "Si estás aprendiendo algo nuevo, déjame un like ahora mismo, eso me ayuda a seguir creando este contenido."
 
 4. APLICACIÓN TRANSFORMADORA (90-120 segundos):
    - NO uses frases genéricas tipo "debemos confiar más en Dios" o "aprendamos a ser fieles".
@@ -383,6 +386,7 @@ ESTRUCTURA OBLIGATORIA DEL GUION (respeta el orden)
 5. CONCLUSIÓN IMPACTANTE (45-60 segundos):
    - Volvé al gancho inicial y resolvelo con la verdad central del capítulo.
    - Cerrá con una frase memorable, corta y potente (que el oyente pueda recordar).
+   - **CTA FINAL EXPLÍCITO:** Invitá a comentar y suscribirse, por ejemplo: "Si este estudio te bendijo, suscríbete y déjanos un like. Cuéntanos en los comentarios qué te dejó este pasaje."
    - Terminá con una oración breve (3-4 líneas), no genérica, que fluya de todo el guion.
 
 ═══════════════════════════════════════
@@ -958,10 +962,10 @@ async function generarPromptsImagenes(insertados, ctx, textoCapitulo) {
     .map((m) => `[Momento ${m.numero}] Descripción visual: ${m.descripcion_visual}`)
     .join("\n");
 
-  const prompt = `
+    const prompt = `
 Eres un director de arte cinematográfico e historiador bíblico con expertise en contextos culturales de todas las épocas.
 
-TAREA: Generá EXACTAMENTE ${insertados.length} prompts detallados (en INGLÉS) para IA de generación de imágenes fotorrealistas. Cada prompt corresponde a UNO de los momentos narrativos del video sobre ${ctx}. La cantidad es EXACTA: ${insertados.length}. No generes más ni menos.
+TAREA: Generá EXACTAMENTE ${insertados.length} prompts...
 
 REGLAS UNIVERSALES PARA CADA PROMPT:
 ${REGLAS_IMAGEN}
@@ -970,13 +974,18 @@ ${REGLAS_IMAGEN}
 ═══════════════════════════════════════
 LISTA DE MOMENTOS NARRATIVOS (${insertados.length} momentos)
 ═══════════════════════════════════════
-
 ${listaMomentos}
-
 ═══════════════════════════════════════
 CONTEXTO DEL CAPÍTULO (para coherencia general)
 ═══════════════════════════════════════
 ${textoCapitulo.substring(0, 8000)}
+
+REGLAS PARA MICRO-GANCHOS (IMPORTANTE):
+- Analiza cada momento narrativo. Si el texto de ese momento contiene una pregunta de intriga, una frase de suspenso o un "micro-gancho" (ej. "¿Qué harías si...?", "Lo que te voy a decir ahora cambia todo..."), el prompt de imagen debe ser CONCEPTUAL, no una escena bíblica realista.
+- Para los micro-ganchos, genera un prompt que describa: fondo oscuro y dramático, texto grande y llamativo en tipografía bold (aunque el texto exacto lo pondrá el script de Canvas después), alto contraste, estilo cinematográfico de misterio o motivación.
+- En esos casos, incluye palabras clave como: "conceptual image, bold typography placeholder, dark dramatic background, high contrast, minimalist, cinematic mystery style".
+- Para los momentos que NO son micro-ganchos, sigue las reglas normales de escenas bíblicas realistas.
+
 
 FORMATO DE SALIDA (obligatorio): un objeto JSON con un array "prompts" de EXACTAMENTE ${insertados.length} strings en INGLÉS, en el mismo orden de los momentos:
 { "prompts": ["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9"] }

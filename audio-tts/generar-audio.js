@@ -24,11 +24,11 @@ if (fs.existsSync(ffmpegPortablePath)) {
 // CONFIGURACIÓN
 // ============================================================
 const API_KEY = process.env.GOOGLE_TTS_API_KEY;
-const VOZ = process.env.VOZ_TTS || "es-US-Wavenet-C";
+const VOZ = process.env.VOZ_TTS || "es-US-Chirp3-HD-Algieba";
 const IDIOMA = "es-US";
 
-const LIMITE_MENSUAL_GRATIS = 4_000_000;
-const MARGEN_SEGURIDAD = 3_900_000;
+const LIMITE_MENSUAL_GRATIS = 1_000_000;
+const MARGEN_SEGURIDAD = 940_000;
 const LIMITE_BYTES_POR_LLAMADA = 4500;
 
 const supabase = createClient(
@@ -213,10 +213,19 @@ async function generarAudio(ssmlOriginal, nombreSalida) {
     `📊 Llevás gastados este mes (todas las computadoras): ${contador.caracteres} de ${LIMITE_MENSUAL_GRATIS} gratis`
   );
 
-  if (contador.caracteres + caracteresDeEsteAudio > MARGEN_SEGURIDAD) {
-    console.error(
-      `\n⛔ DETENIDO POR SEGURIDAD: superaría el margen de ${MARGEN_SEGURIDAD} caracteres este mes.`
-    );
+   const totalEstimado = contador.caracteres + caracteresDeEsteAudio;
+  if (totalEstimado > MARGEN_SEGURIDAD) {
+    console.error("\n" + "=".repeat(60));
+    console.error("🛑 STOP DE SEGURIDAD ACTIVADO 🛑");
+    console.error("=".repeat(60));
+    console.error(`El total estimado (${totalEstimado.toLocaleString()} caracteres) supera el margen de seguridad de ${MARGEN_SEGURIDAD.toLocaleString()}.`);
+    console.error(`   - Consumo actual del mes: ${contador.caracteres.toLocaleString()} caracteres.`);
+    console.error(`   - Este guion consume: ${caracteresDeEsteAudio.toLocaleString()} caracteres.`);
+    console.error(`   - Límite mensual gratuito: ${LIMITE_MENSUAL_GRATIS.toLocaleString()} caracteres.`);
+    console.error("=".repeat(60));
+    console.error("El proceso se ha detenido para evitar cargos inesperados.");
+    console.error("Puedes esperar al próximo mes o revisar tu cuota en Google Cloud.");
+    console.error("=".repeat(60) + "\n");
     process.exitCode = 1;
     return;
   }
