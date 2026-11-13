@@ -50,6 +50,44 @@ const audioPath = path.join(audioDir, "guion_video_tts_final.mp3");
 const timestampsPath = path.join(audioDir, "guion_video_tts_timestamps.json");
 const finalVideoPath = path.join(outputDir, "video_final.mp4");
 
+const momentosClavePath = path.join(chapterDir, "momentos_clave.json");
+
+// ── Extraer dinámicamente los textos de los micro-ganchos del SSML ──
+function extraerTextosDeSSML(ssmlPath) {
+  const ssml = fs.readFileSync(ssmlPath, "utf-8");
+  const regex = /<mark name="imagen_(\d+)"\s*\/>([\s\S]*?)(?=<mark|<\/prosody>)/g;
+  let match;
+  const textos = {};
+  
+  while ((match = regex.exec(ssml)) !== null) {
+    const num = parseInt(match[1], 10);
+    let textoLimpio = match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const primeraOracion = textoLimpio.split(/(?<=[.?!])\s+/)[0];
+    
+    if (primeraOracion.length > 10 && primeraOracion.length < 120) {
+      textos[num] = primeraOracion;
+    }
+  }
+  return textos;
+}
+
+// ── Función para cortar el texto en líneas y que quepa en pantalla ──
+function envolverTexto(texto, maxCaracteresPorLinea = 35) {
+  const palabras = texto.split(" ");
+  let lineas = [];
+  let lineaActual = "";
+  for (const palabra of palabras) {
+    if ((lineaActual + palabra).length > maxCaracteresPorLinea) {
+      lineas.push(lineaActual.trim());
+      lineaActual = palabra + " ";
+    } else {
+      lineaActual += palabra + " ";
+    }
+  }
+  if (lineaActual.trim()) lineas.push(lineaActual.trim());
+  return lineas.join("\n");
+}
+
 // ── Validaciones ──────────────────────────────────────────────────
 for (const [name, p] of [
   ["audio", audioPath],
@@ -148,7 +186,8 @@ function getAudioDuration() {
 }
 
 // ── Generar un clip con Ken Burns en 3 fases ──────────────────────
-function generarClipKenBurns(imagePath, duracion, outputPath) {
+// ── Generar un clip con Ken Burns y texto opcional ────────────────
+function generarClipKenBurns(imagePath, duracion, outputPath, textoOverlay = null) {
   return new Promise((resolve, reject) => {
     const fps = 24;
     const frames = Math.round(duracion * fps);
@@ -168,31 +207,44 @@ function generarClipKenBurns(imagePath, duracion, outputPath) {
 
     const exprZ = `if(lt(on/${fps},${t1}), ${zoomInicio} + (${zoomMedio}-${zoomInicio})*((on/${fps})/${t1}), if(lt(on/${fps},${t2}), ${zoomMedio}, if(lt(on/${fps},${t3}), ${zoomMedio} + (${zoomLentoFin}-${zoomMedio})*(((on/${fps})-${t2})/(${t3}-${t2})), ${zoomLentoFin} + (${zoomCierre}-${zoomLentoFin})*(((on/${fps})-${t3})/${durCierre}))))`;
 
-    const vf = [
+    let filtros = [
       `scale=8000:-1`,
       `zoompan=z='${exprZ}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=1920x1080:fps=${fps}`,
       `format=yuv420p`,
-    ].join(",");
+    ];
+
+    let textFilePath = null;
+
+    if (textoOverlay) {
+      const textoFormateado = envolverTexto(textoOverlay);
+      
+      // 1. Guardamos el texto en un archivo temporal para evitar el error de caracteres
+      textFilePath = path.join(outputDir, `temp_text_${Date.now()}.txt`);
+      fs.writeFileSync(textFilePath, textoFormateado, 'utf-8');
+      
+      // 2. Escapamos la ruta del archivo (barras normales y escapando los dos puntos de la C:)
+      const textFilePathEscaped = textFilePath.replace(/\\/g, '/').replace(/:/g, '\\:');
+
+      // 3. Le decimos a FFmpeg que lea el texto desde el archivo (textfile) en lugar de (text)
+      const filtroTexto = `drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':textfile='${textFilePathEscaped}':fontcolor=white:fontsize=52:x=(w-text_w)/2:y=h-250:box=1:boxcolor=black@0.65:boxborderw=25:line_spacing=12:text_align=C:alpha='if(lt(t,1),0,if(lt(t,2),(t-1),1))'`;
+      filtros.push(filtroTexto);
+    }
+
+    const vf = filtros.join(",");
 
     ffmpeg(imagePath)
       .videoFilters(vf)
-      .outputOptions([
-        "-c:v libx264",
-        "-preset medium",
-        "-crf 23",
-        "-pix_fmt yuv420p",
-        "-r 24",
-        `-frames:v ${frames}`,
-        "-movflags",
-        "+faststart",
-      ])
-      .on("start", () =>
-        console.log(
-          `   ▶️  Iniciando render del clip ${path.basename(outputPath)}`,
-        ),
-      )
-      .on("end", () => resolve(outputPath))
-      .on("error", (err) => reject(err))
+      .outputOptions(["-c:v libx264", "-preset medium", "-crf 23", "-pix_fmt yuv420p", "-r 24", `-frames:v ${frames}`, "-movflags", "+faststart"])
+      .on("start", () => console.log(`   ▶️  Iniciando render del clip ${path.basename(outputPath)}`))
+      .on("end", () => {
+        // 4. Borramos el archivo temporal al terminar
+        if (textFilePath && fs.existsSync(textFilePath)) fs.unlinkSync(textFilePath);
+        resolve(outputPath);
+      })
+      .on("error", (err) => {
+        if (textFilePath && fs.existsSync(textFilePath)) fs.unlinkSync(textFilePath);
+        reject(err);
+      })
       .save(outputPath);
   });
 }
@@ -217,12 +269,39 @@ function concatenarClips(clipPaths, outputPath) {
 }
 
 // ── Agregar audio ─────────────────────────────────────────────────
+// ── Agregar audio ─────────────────────────────────────────────────
 function agregarAudio(videoPath, outputPath) {
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input(videoPath)
       .input(audioPath)
-      .outputOptions(["-c:v copy", "-c:a aac", "-b:a 192k", "-shortest"])
+      // Quitamos "-shortest" para que el video no se corte si es más largo que el audio
+      .outputOptions(["-c:v copy", "-c:a aac", "-b:a 192k"])
+      .on("end", () => resolve(outputPath))
+      .on("error", (err) => reject(err))
+      .save(outputPath);
+  });
+}
+
+// ── Generar End Screen (Últimos 20 segundos) ─────────────────────
+function generarEndScreen(ultimaImagen, outputPath) {
+  return new Promise((resolve, reject) => {
+    // Filtro: Desenfoca, oscurece un poco y escribe el texto en el centro
+    // Nota: Usa Arial de Windows. En Linux (GitHub Actions) habría que cambiar la ruta.
+    const filtro = "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=15:5,eq=brightness=-0.2,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='SUSCRÍBETE AL CANAL':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.6:boxborderw=30";
+    
+    ffmpeg(ultimaImagen)
+      .inputOptions(["-loop 1"])
+      .videoFilters(filtro)
+      .outputOptions([
+        "-c:v libx264", 
+        "-preset medium", 
+        "-crf 23", 
+        "-pix_fmt yuv420p", 
+        "-t 10", // 10 segundos exactos
+        "-r 24", 
+        "-movflags", "+faststart"
+      ])
       .on("end", () => resolve(outputPath))
       .on("error", (err) => reject(err))
       .save(outputPath);
@@ -230,22 +309,14 @@ function agregarAudio(videoPath, outputPath) {
 }
 
 // ── Proceso principal ─────────────────────────────────────────────
+// ── Proceso principal ─────────────────────────────────────────────
 async function main() {
   try {
     console.log(`\n🎬 Ensamblando video para ${bookName} ${chapterNum}...\n`);
 
-    // Validar TODAS las imágenes antes de renderizar nada
-    const faltantes = duraciones
-      .filter((d) => !imagenesPorIndice[d.index])
-      .map((d) => d.index);
+    const faltantes = duraciones.filter((d) => !imagenesPorIndice[d.index]).map((d) => d.index);
     if (faltantes.length > 0) {
-      console.error(
-        `❌ Faltan ${faltantes.length} imagen(es) para los índices: ${faltantes.join(", ")}`,
-      );
-      console.error(`   Carpeta revisada: ${imagesDir}`);
-      console.error(
-        `   Archivos presentes: ${archivosImagenes.join(", ") || "(ninguno)"}`,
-      );
+      console.error(`❌ Faltan ${faltantes.length} imagen(es) para los índices: ${faltantes.join(", ")}`);
       process.exit(1);
     }
 
@@ -257,38 +328,68 @@ async function main() {
     console.log("📋 Duraciones por imagen:");
     for (const d of duraciones) {
       const dur = d.end - d.start;
-      console.log(
-        `   imagen_${String(d.index).padStart(2, "0")}: ${dur.toFixed(2)}s`,
-      );
+      console.log(`   imagen_${String(d.index).padStart(2, "0")}: ${dur.toFixed(2)}s`);
     }
     console.log();
+
+        // 1. Extraemos dinámicamente los textos del SSML de ESTE capítulo
+    const ssmlPath = path.join(chapterDir, "guion_video_tts.ssml");
+    const textosGanchos = extraerTextosDeSSML(ssmlPath);
+
+    // 2. Leemos los momentos clave identificados por la IA (si existen)
+    let indicesClave = [];
+    if (fs.existsSync(momentosClavePath)) {
+      const momentosData = JSON.parse(fs.readFileSync(momentosClavePath, "utf-8"));
+      indicesClave = [
+        momentosData.gancho,
+        momentosData.conflicto,
+        momentosData.climax,
+        momentosData.cierre
+      ].filter(Boolean); // Elimina nulos o undefined
+      console.log(`🎯 Momentos clave cargados desde JSON: ${indicesClave.join(", ")}`);
+    } else {
+      // Fallback si el archivo no existe (por si acaso)
+      indicesClave = [1, Math.round(NUM_IMAGENES * 0.25), Math.round(NUM_IMAGENES * 0.75), NUM_IMAGENES];
+      console.log(`⚠️ No se encontró momentos_clave.json. Usando fallback: ${indicesClave.join(", ")}`);
+    }
 
     const clipPaths = [];
     for (const d of duraciones) {
       const imagePath = imagenesPorIndice[d.index];
-      const clipPath = path.join(
-        outputDir,
-        `clip_${String(d.index).padStart(2, "0")}.mp4`,
-      );
+      const clipPath = path.join(outputDir, `clip_${String(d.index).padStart(2, "0")}.mp4`);
       const dur = d.end - d.start;
+      
+      // 3. Aplicamos texto SOLO si la imagen está en los momentos clave
+      const esMicroGancho = indicesClave.includes(d.index);
+      const textoGancho = esMicroGancho ? textosGanchos[d.index] : null;
 
-      console.log(
-        `   🎞️  [${d.index}/${NUM_IMAGENES}] Renderizando clip (${dur.toFixed(2)}s) con ${path.basename(imagePath)}...`,
-      );
-      await generarClipKenBurns(imagePath, dur, clipPath);
+      if (textoGancho) {
+        console.log(`   🎞️  [${d.index}/${NUM_IMAGENES}] Renderizando clip con TEXTO (${dur.toFixed(2)}s)...`);
+      } else {
+        console.log(`   🎞️  [${d.index}/${NUM_IMAGENES}] Renderizando clip (${dur.toFixed(2)}s)...`);
+      }
+      
+      await generarClipKenBurns(imagePath, dur, clipPath, textoGancho);
       clipPaths.push(clipPath);
     }
+
+    // 🆕 Renderizamos el End Screen de 20s y lo añadimos al final
+    console.log(`\n🖥️  Generando Pantalla Final (20s)...`);
+    const endScreenPath = path.join(outputDir, `clip_endscreen.mp4`);
+    const ultimaImagen = imagenesPorIndice[NUM_IMAGENES];
+    await generarEndScreen(ultimaImagen, endScreenPath);
+    clipPaths.push(endScreenPath);
 
     console.log(`\n🔗 Concatenando ${clipPaths.length} clips...`);
     const concatenatedPath = path.join(outputDir, "_video_sin_audio.mp4");
     await concatenarClips(clipPaths, concatenatedPath);
 
-    console.log(`🎵 Agregando audio masterizado...`);
+    console.log(`🎵 Agregando audio...`);
     await agregarAudio(concatenatedPath, finalVideoPath);
 
     console.log(`🧹 Limpiando archivos temporales...`);
-    for (const p of clipPaths) fs.unlinkSync(p);
-    fs.unlinkSync(concatenatedPath);
+    for (const p of clipPaths) if (fs.existsSync(p)) fs.unlinkSync(p);
+    if (fs.existsSync(concatenatedPath)) fs.unlinkSync(concatenatedPath);
     const listPath = path.join(outputDir, "clips_list.txt");
     if (fs.existsSync(listPath)) fs.unlinkSync(listPath);
 

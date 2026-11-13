@@ -1025,6 +1025,46 @@ FORMATO DE SALIDA (obligatorio): un objeto JSON con un array "prompts" de EXACTA
   return lista;
 }
 
+async function identificarMomentosClave(insertados, ctx) {
+  console.log(`\n   🎯 [Momentos Clave] Identificando gancho, conflicto, clímax y cierre...`);
+  
+  const listaMomentos = insertados
+    .map((m) => `[Imagen ${m.numero}] ${m.descripcion_visual}`)
+    .join("\n");
+
+  const prompt = `Eres un editor narrativo experto. Te paso la lista de momentos visuales de un video bíblico sobre ${ctx}.
+  
+TAREA: Identifica los índices (números de imagen) que corresponden a estos 4 momentos clave:
+1. "gancho": Siempre es la imagen 1.
+2. "conflicto": El momento donde se plantea la tensión principal o el problema del capítulo.
+3. "climax": El momento de máxima revelación, tensión o emoción del capítulo.
+4. "cierre": La última imagen del video (la conclusión).
+
+LISTA DE MOMENTOS:
+${listaMomentos}
+
+FORMATO DE SALIDA (JSON estricto):
+{"gancho": 1, "conflicto": 6, "climax": 19, "cierre": 25}`;
+
+  try {
+    const crudo = await llamarIA({
+      etiqueta: "Momentos Clave",
+      user: prompt,
+      json: true,
+      temperature: 0.2,
+      maxTokens: 500,
+    });
+    const parsed = parsearJSON(crudo);
+    if (parsed && parsed.conflicto && parsed.climax && parsed.cierre) {
+      console.log(`   ✅ Momentos clave: Gancho=${parsed.gancho}, Conflicto=${parsed.conflicto}, Clímax=${parsed.climax}, Cierre=${parsed.cierre}`);
+      return parsed;
+    }
+  } catch (e) {
+    console.warn(`   ⚠️ No se pudieron identificar los momentos clave: ${e.message}`);
+  }
+  return null;
+}
+
 async function generarArtefactosVideo(dir, ctx, textoCapitulo) {
   console.log(`\n   🎬 [Video] Generando guion y prompts de imágenes...`);
 
@@ -1070,6 +1110,12 @@ async function generarArtefactosVideo(dir, ctx, textoCapitulo) {
     `   ✅ guion_video_tts.ssml guardado (${ssmlConMarcas.length} caracteres, ${insertados.length} marcas).`,
   );
   guardarJSON(dir, "prompts_imagenes_video.json", prompts);
+
+    // 🆕 Identificar y guardar los momentos clave para el ensamblador
+  const momentosClave = await identificarMomentosClave(insertados, ctx);
+  if (momentosClave) {
+    guardarJSON(dir, "momentos_clave.json", momentosClave);
+  }
 
   return {
     ssml: ssmlConMarcas,
