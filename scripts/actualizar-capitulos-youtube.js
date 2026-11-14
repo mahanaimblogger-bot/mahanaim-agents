@@ -17,6 +17,7 @@ const audioDir = path.join(repoRoot, "audio-tts");
 
 const metadataPath = path.join(chapterDir, "youtube_metadata.json");
 const timestampsPath = path.join(audioDir, "guion_video_tts_timestamps.json");
+const outputTxtPath = path.join(chapterDir, "descripcion_youtube.txt");
 
 if (!fs.existsSync(metadataPath) || !fs.existsSync(timestampsPath)) {
   console.error("❌ Faltan archivos: asegúrate de haber generado los metadatos y el audio.");
@@ -32,32 +33,33 @@ timestamps.forEach(t => {
   tiempos[t.markName] = t.timeSeconds;
 });
 
-// 2. Función para formatear segundos a MM:SS (o HH:MM:SS)
+// 2. Función para formatear segundos a MM:SS
 function formatearTiempo(segundos) {
-  const h = Math.floor(segundos / 3600);
   const m = Math.floor((segundos % 3600) / 60);
   const s = Math.floor(segundos % 60);
-  if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
 // 3. Construir la lista de capítulos
 const listaCapitulos = metadata.capitulos_youtube.map(cap => {
   const segundos = tiempos[cap.marca] || 0;
-  // YouTube exige que el primer capítulo sea 00:00
-  const tiempoFormateado = segundos === 0 ? "00:00" : formatearTiempo(segundos);
+  const tiempoFormateado = segundos < 1 ? "00:00" : formatearTiempo(segundos);
   return `${tiempoFormateado} ${cap.titulo}`;
-}).join("\n");
+}).join("\n"); // Aquí se usa un salto de línea real
 
 // 4. Reemplazar el hueco en la descripción
 if (metadata.descripcion.includes("{{CAPITULOS}}")) {
   metadata.descripcion = metadata.descripcion.replace("{{CAPITULOS}}", listaCapitulos);
 } else {
-  // Si por alguna razón no está el hueco, añadimos los capítulos al final de la descripción
   metadata.descripcion += `\n\n⏱️ CAPÍTULOS\n${listaCapitulos}`;
 }
 
-// 5. Guardar el archivo actualizado
+// 5. Guardar el JSON actualizado
 fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2), "utf-8");
-console.log("✅ Metadatos actualizados con los tiempos exactos de los capítulos.");
+
+// 6. 🆕 CREAR EL ARCHIVO TXT LIMPIO PARA COPIAR Y PEGAR
+fs.writeFileSync(outputTxtPath, metadata.descripcion, "utf-8");
+
+console.log("✅ Metadatos actualizados con los tiempos exactos.");
+console.log(`✅ Archivo creado listo para copiar y pegar: ${outputTxtPath}`);
 console.log("📋 Capítulos generados:\n" + listaCapitulos);

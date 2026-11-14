@@ -63,7 +63,8 @@ const ANATOMIA =
 const PERFIL_DOCTRINAL = `
 - Monoteísmo puro: Un solo Dios, el Padre. Jesucristo es Su Hijo y Mesías, preexistente, de Su esencia pero distinto y subordinado al Padre, con todo poder y autoridad conferido por el Padre.
 - ⛔ REGLA INVIOLABLE SOBRE LA DEIDAD: En NINGÚN punto debes afirmar, sugerir ni dar a entender que existe una "Trinidad" o un "Dios trino" de tres personas divinas coiguales. NUNCA digas que Jesucristo es "Dios" o "Dios el Hijo" (es el HIJO de Dios). NUNCA digas que el Espíritu Santo es "Dios" ni una tercera persona divina (es el Espíritu de Dios y de Cristo). Un solo Dios: el Padre.
-- Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada. Cristo es el hijo de Dios, El mesias, es preexistente, el padre le dio toda autoridad y poder, por medio de Cristo fue hecho todo.`;
+- Soteriología calvinista, escatología premilenial postribulacionista, cesacionismo moderado, teología de pactos reformada. Cristo es el hijo de Dios, El mesias, es preexiste, el padre le dio toda autoridad y poder, por medio de Cristo fue hecho todo.
+- ⛔ REGLA SOBRE LA IGLESIA: NUNCA llames a la Iglesia un "tercer pueblo", una "nueva raza" o una "nueva humanidad". La Iglesia no es una entidad separada de Israel. Es el Israel de Dios, donde los gentiles son injertados (Romanos 11) y los judíos creyentes son el remanente fiel. La salvación crea UN solo pueblo, un solo cuerpo, bajo un solo Señor.`;
 
 const REGLAS_IMAGEN = `
 A) COHERENCIA HISTÓRICA Y CULTURAL:
@@ -97,8 +98,8 @@ F) ESTILO VISUAL:
 G) PROHIBICIONES:
 - NO texto, letras ni marcas de agua.
 - NO rostros reconocibles de personas modernas.
-- NO símbolos cristianos anacrónicos.`;
-
+- NO símbolos cristianos anacrónicos.
+- ⛔ PROHIBIDO TERMINANTEMENTE: pantallas, monitores, televisores, teléfonos, luces eléctricas, cables, micrófonos, o cualquier tecnología posterior al siglo I.`;
 // ============================================================
 // UTILIDADES
 // ============================================================
@@ -967,6 +968,8 @@ Eres un director de arte cinematográfico e historiador bíblico con expertise e
 
 TAREA: Generá EXACTAMENTE ${insertados.length} prompts...
 
+- CADA PROMPT DEBE SER VISUALMENTE ÚNICO. No repitas la misma escena, objeto o paisaje en prompts diferentes (por ejemplo, no uses dos cementerios, o dos escenas idénticas en el mismo capítulo).
+
 REGLAS UNIVERSALES PARA CADA PROMPT:
 ${REGLAS_IMAGEN}
 - Relación de aspecto 16:9 al final de cada prompt (--ar 16:9).
@@ -979,13 +982,6 @@ ${listaMomentos}
 CONTEXTO DEL CAPÍTULO (para coherencia general)
 ═══════════════════════════════════════
 ${textoCapitulo.substring(0, 8000)}
-
-REGLAS PARA MICRO-GANCHOS (IMPORTANTE):
-- Analiza cada momento narrativo. Si el texto de ese momento contiene una pregunta de intriga, una frase de suspenso o un "micro-gancho" (ej. "¿Qué harías si...?", "Lo que te voy a decir ahora cambia todo..."), el prompt de imagen debe ser CONCEPTUAL, no una escena bíblica realista.
-- Para los micro-ganchos, genera un prompt que describa: fondo oscuro y dramático, texto grande y llamativo en tipografía bold (aunque el texto exacto lo pondrá el script de Canvas después), alto contraste, estilo cinematográfico de misterio o motivación.
-- En esos casos, incluye palabras clave como: "conceptual image, bold typography placeholder, dark dramatic background, high contrast, minimalist, cinematic mystery style".
-- Para los momentos que NO son micro-ganchos, sigue las reglas normales de escenas bíblicas realistas.
-
 
 FORMATO DE SALIDA (obligatorio): un objeto JSON con un array "prompts" de EXACTAMENTE ${insertados.length} strings en INGLÉS, en el mismo orden de los momentos:
 { "prompts": ["Cinematic prompt 1... --ar 16:9", "Cinematic prompt 2... --ar 16:9"] }
@@ -1034,24 +1030,29 @@ async function identificarMomentosClave(insertados, ctx) {
 
   const prompt = `Eres un editor narrativo experto. Te paso la lista de momentos visuales de un video bíblico sobre ${ctx}.
   
-TAREA: Identifica los índices (números de imagen) que corresponden a estos 4 momentos clave:
+TAREA: Identifica los índices (números de imagen) que corresponden a estos 4 momentos clave. Además, crea una frase GANCHO súper impactante (máximo 4 palabras, todo en MAYÚSCULAS) para cada uno:
 1. "gancho": Siempre es la imagen 1.
-2. "conflicto": El momento donde se plantea la tensión principal o el problema del capítulo.
-3. "climax": El momento de máxima revelación, tensión o emoción del capítulo.
-4. "cierre": La última imagen del video (la conclusión).
+2. "conflicto": El momento donde se plantea la tensión principal.
+3. "climax": El momento de máxima revelación.
+4. "cierre": La última imagen del video.
 
 LISTA DE MOMENTOS:
 ${listaMomentos}
 
 FORMATO DE SALIDA (JSON estricto):
-{"gancho": 1, "conflicto": 6, "climax": 19, "cierre": 25}`;
+{
+  "gancho": 1, "texto_gancho": "FRASE IMPACTANTE",
+  "conflicto": 12, "texto_conflicto": "FRASE IMPACTANTE",
+  "climax": 15, "texto_climax": "FRASE IMPACTANTE",
+  "cierre": 23, "texto_cierre": "FRASE IMPACTANTE"
+}`;
 
   try {
     const crudo = await llamarIA({
       etiqueta: "Momentos Clave",
       user: prompt,
       json: true,
-      temperature: 0.2,
+      temperature: 0.3,
       maxTokens: 500,
     });
     const parsed = parsearJSON(crudo);

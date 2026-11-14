@@ -216,17 +216,18 @@ function generarClipKenBurns(imagePath, duracion, outputPath, textoOverlay = nul
     let textFilePath = null;
 
     if (textoOverlay) {
-      const textoFormateado = envolverTexto(textoOverlay);
+      const textoFormateado = envolverTexto(textoOverlay, 25); // Menos caracteres por línea
       
-      // 1. Guardamos el texto en un archivo temporal para evitar el error de caracteres
       textFilePath = path.join(outputDir, `temp_text_${Date.now()}.txt`);
       fs.writeFileSync(textFilePath, textoFormateado, 'utf-8');
       
-      // 2. Escapamos la ruta del archivo (barras normales y escapando los dos puntos de la C:)
       const textFilePathEscaped = textFilePath.replace(/\\/g, '/').replace(/:/g, '\\:');
+      
+      // Usamos la fuente Anton desde assets/fonts, borde negro y letras más grandes
+      const rutaFuente = path.join(repoRoot, "assets", "fonts", "Anton-Regular.ttf").replace(/\\/g, "/").replace(/:/g, "\\:");
 
-      // 3. Le decimos a FFmpeg que lea el texto desde el archivo (textfile) en lugar de (text)
-      const filtroTexto = `drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':textfile='${textFilePathEscaped}':fontcolor=white:fontsize=52:x=(w-text_w)/2:y=h-250:box=1:boxcolor=black@0.65:boxborderw=25:line_spacing=12:text_align=C:alpha='if(lt(t,1),0,if(lt(t,2),(t-1),1))'`;
+      const filtroTexto = `drawtext=fontfile='${rutaFuente}':textfile='${textFilePathEscaped}':fontcolor=white:fontsize=85:borderw=8:bordercolor=black:x=(w-text_w)/2:y=h-300:line_spacing=15:text_align=C:alpha='if(lt(t,1),0,if(lt(t,2),(t-1),1))'`;
+      
       filtros.push(filtroTexto);
     }
 
@@ -237,7 +238,6 @@ function generarClipKenBurns(imagePath, duracion, outputPath, textoOverlay = nul
       .outputOptions(["-c:v libx264", "-preset medium", "-crf 23", "-pix_fmt yuv420p", "-r 24", `-frames:v ${frames}`, "-movflags", "+faststart"])
       .on("start", () => console.log(`   ▶️  Iniciando render del clip ${path.basename(outputPath)}`))
       .on("end", () => {
-        // 4. Borramos el archivo temporal al terminar
         if (textFilePath && fs.existsSync(textFilePath)) fs.unlinkSync(textFilePath);
         resolve(outputPath);
       })
@@ -334,21 +334,31 @@ async function main() {
 
         // 1. Extraemos dinámicamente los textos del SSML de ESTE capítulo
     const ssmlPath = path.join(chapterDir, "guion_video_tts.ssml");
-    const textosGanchos = extraerTextosDeSSML(ssmlPath);
-
-    // 2. Leemos los momentos clave identificados por la IA (si existen)
+   
+        // 2. Leemos los momentos clave identificados por la IA
     let indicesClave = [];
+    let textosGanchos = {}; // 🆕 Aquí guardaremos los textos impactantes
+
     if (fs.existsSync(momentosClavePath)) {
       const momentosData = JSON.parse(fs.readFileSync(momentosClavePath, "utf-8"));
+      
+      // Extraemos los índices (números de imagen)
       indicesClave = [
         momentosData.gancho,
         momentosData.conflicto,
         momentosData.climax,
         momentosData.cierre
       ].filter(Boolean); // Elimina nulos o undefined
+      
+      // Mapeamos cada imagen a su frase gancho
+      textosGanchos[momentosData.gancho] = momentosData.texto_gancho;
+      textosGanchos[momentosData.conflicto] = momentosData.texto_conflicto;
+      textosGanchos[momentosData.climax] = momentosData.texto_climax;
+      textosGanchos[momentosData.cierre] = momentosData.texto_cierre;
+
       console.log(`🎯 Momentos clave cargados desde JSON: ${indicesClave.join(", ")}`);
     } else {
-      // Fallback si el archivo no existe (por si acaso)
+      // Fallback por si el orquestador falló
       indicesClave = [1, Math.round(NUM_IMAGENES * 0.25), Math.round(NUM_IMAGENES * 0.75), NUM_IMAGENES];
       console.log(`⚠️ No se encontró momentos_clave.json. Usando fallback: ${indicesClave.join(", ")}`);
     }
