@@ -12,7 +12,7 @@ dotenv.config({ path: path.join(repoRoot, ".env") });
 dotenv.config({ path: path.join(repoRoot, "audio-tts", ".env") });
 
 const API_KEY = process.env.GOOGLE_TTS_API_KEY;
-const VOZ = "es-US-Chirp3-HD-Algieba"; // La nueva voz
+const VOZ = "es-US-Chirp3-HD-Kore"; // La nueva voz
 const IDIOMA = "es-US";
 
 // Un texto corto y representativo de tu canal
@@ -50,7 +50,7 @@ async function probarVoz() {
     const datos = await respuesta.json();
     const buffer = Buffer.from(datos.audioContent, "base64");
     
-    const nombreArchivo = "prueba-voz-algieba.mp3";
+    const nombreArchivo = "prueba-voz-Kore.mp3";
     fs.writeFileSync(nombreArchivo, buffer);
     
     console.log(`\n✅ ¡Listo! Audio guardado como: ${nombreArchivo}`);
